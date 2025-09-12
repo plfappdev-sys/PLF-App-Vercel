@@ -1,0 +1,12 @@
+Always use tunnel when starting or restarting app and server
+
+This is the folder we are building our app in "C:\Projects\Test\September\V5\PLF-App-Clean"
+
+This is the folder where we get what it is we want to build, so always come here to check how the app is supposed to work. "C:\Projects\Test\September\V5\Resources\PLF_App_Fixed_Final"
+
+We are doing the clean build because the one in resources is giving issues so I want to rebuild it and avoid making errors. So we will rebuild it step by step in the folder. component by component. Screen by screen. But we get the inspiration in this folder and fix whatever code or configurations that will not work.
+
+Whenever we make changes and notes, we update the following file. "C:\Projects\Test\September\V5\PLF-App-Clean\ErrorTroubleshootingSteps.txt"
+Make notes of all the changes and steps we take so we can keep track of what works and what does not work.
+
+When we have successfully implemented a step, suggest which step to tackle next and keep it updated in the notes.
