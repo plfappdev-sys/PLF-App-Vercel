@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Modal, TouchableOpacity, Platform } from 'react-native';
 import { 
   Title, 
   Card, 
@@ -7,10 +7,19 @@ import {
   Button,
   List,
   Chip,
-  ActivityIndicator
+  ActivityIndicator,
+  Portal,
+  Dialog,
+  Paragraph,
+  TextInput,
+  Menu,
+  Divider
 } from 'react-native-paper';
-import { useAuth } from '../../AppSimple';
-import MockMemberService from '../services/MockMemberService';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useMockAuth } from '../contexts/MockAuthContext';
+import { ReportService } from '../services/ReportService';
+import { PDFReportGenerator } from '../services/PDFReportGenerator';
+import { downloadHTMLReport, downloadCSVReport, generateReportFilename } from '../utils/fileDownload';
 
 interface Report {
   id: string;
@@ -22,9 +31,20 @@ interface Report {
 }
 
 const ReportsScreen: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useMockAuth();
   const [generating, setGenerating] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'all' | 'financial' | 'member' | 'transaction' | 'analytics'>('all');
+  
+  // Report generation state
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [startDate, setStartDate] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+  const [endDate, setEndDate] = useState(new Date());
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [selectedMember, setSelectedMember] = useState('');
+  const [transactionType, setTransactionType] = useState<string>('all');
+  const [availableMembers, setAvailableMembers] = useState<Array<{memberNumber: string, name: string}>>([]);
 
   // Available reports
   const reports: Report[] = [
@@ -129,6 +149,184 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
+  // Handle report selection
+  const handleReportSelection = (report: Report) => {
+    setSelectedReport(report);
+    setShowReportModal(true);
+    
+    // Reset parameters
+    setStartDate(new Date(new Date().setMonth(new Date().getMonth() - 1)));
+    setEndDate(new Date());
+    setSelectedMember('');
+    setTransactionType('all');
+    
+    // Load available members for member reports
+    if (report.type === 'member') {
+      loadAvailableMembers();
+    }
+  };
+
+  // Load available members for selection
+  const loadAvailableMembers = async () => {
+    try {
+      // Mock member data - in real app, this would come from MemberService
+      const members = [
+        { memberNumber: 'MEMBER001', name: 'John Doe' },
+        { memberNumber: 'MEMBER002', name: 'Jane Smith' },
+        { memberNumber: 'MEMBER003', name: 'Mike Johnson' },
+        { memberNumber: 'MEMBER004', name: 'Sarah Wilson' },
+        { memberNumber: 'MEMBER005', name: 'David Brown' },
+      ];
+      setAvailableMembers(members);
+    } catch (error) {
+      console.error('Error loading members:', error);
+    }
+  };
+
+  // Generate report with parameters
+  const generateReportWithParams = async () => {
+    if (!selectedReport) return;
+    
+    setGenerating(selectedReport.id);
+    try {
+      let reportData;
+      const generatedBy = currentUser?.email || 'Unknown User';
+      
+      switch (selectedReport.id) {
+        case '1': // Fund Status Report
+          reportData = await ReportService.generateFundStatusReport(generatedBy);
+          break;
+        
+        case '2': // Member Statement Report
+          if (!selectedMember) {
+            alert('Please select a member for this report.');
+            return;
+          }
+          reportData = await ReportService.generateMemberStatementReport(selectedMember, generatedBy);
+          break;
+        
+        case '3': // Transaction Report
+          reportData = await ReportService.generateTransactionReport(
+            startDate,
+            endDate,
+            transactionType === 'all' ? undefined : transactionType as any,
+            generatedBy
+          );
+          break;
+        
+        case '6': // Standing Analysis Report
+          reportData = await ReportService.generateStandingAnalysisReport(generatedBy);
+          break;
+        
+        default:
+          alert('This report type is not yet implemented.');
+          return;
+      }
+
+      // Generate and download PDF based on report type
+      let htmlContent: string;
+      switch (reportData.reportType) {
+        case 'fund_status':
+          htmlContent = PDFReportGenerator.generateFundStatusHTML(reportData);
+          break;
+        case 'member_statement':
+          htmlContent = PDFReportGenerator.generateMemberStatementHTML(reportData);
+          break;
+        case 'transaction_report':
+          htmlContent = PDFReportGenerator.generateTransactionReportHTML(reportData);
+          break;
+        case 'standing_analysis':
+          // For standing analysis, use fund status template as fallback
+          htmlContent = PDFReportGenerator.generateFundStatusHTML(reportData);
+          break;
+        default:
+          throw new Error(`Unsupported report type: ${reportData.reportType}`);
+      }
+      const filename = generateReportFilename(reportData.reportType, '.html');
+      await downloadHTMLReport(htmlContent, filename);
+      
+      // Update last generated date
+      const updatedReports = reports.map(r => 
+        r.id === selectedReport.id ? { ...r, lastGenerated: new Date() } : r
+      );
+      // In a real app, you would update state with updatedReports
+      
+      setShowReportModal(false);
+      alert(`${selectedReport.title} has been generated and downloaded successfully!`);
+      
+    } catch (error) {
+      console.error('Error generating report:', error);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  // Export to CSV
+  const exportToCSV = async () => {
+    if (!selectedReport) return;
+    
+    setGenerating(`${selectedReport.id}-csv`);
+    try {
+      let reportData;
+      const generatedBy = currentUser?.email || 'Unknown User';
+      
+      switch (selectedReport.id) {
+        case '1': // Fund Status Report
+          reportData = await ReportService.generateFundStatusReport(generatedBy);
+          break;
+        
+        case '2': // Member Statement Report
+          if (!selectedMember) {
+            alert('Please select a member for this report.');
+            return;
+          }
+          reportData = await ReportService.generateMemberStatementReport(selectedMember, generatedBy);
+          break;
+        
+        case '3': // Transaction Report
+          reportData = await ReportService.generateTransactionReport(
+            startDate,
+            endDate,
+            transactionType === 'all' ? undefined : transactionType as any,
+            generatedBy
+          );
+          break;
+        
+        default:
+          alert('CSV export not available for this report type.');
+          return;
+      }
+
+      const csvContent = ReportService.exportToCSV(reportData);
+      const filename = generateReportFilename(reportData.reportType, '.csv');
+      await downloadCSVReport(csvContent, filename);
+      
+      alert(`${selectedReport.title} has been exported to CSV successfully!`);
+      
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      alert('Failed to export to CSV. Please try again.');
+    } finally {
+      setGenerating(null);
+    }
+  };
+
+  // Date picker handlers
+  const handleStartDateChange = (event: any, selectedDate?: Date) => {
+    setShowStartDatePicker(false);
+    if (selectedDate) {
+      setStartDate(selectedDate);
+    }
+  };
+
+  const handleEndDateChange = (event: any, selectedDate?: Date) => {
+    setShowEndDatePicker(false);
+    if (selectedDate) {
+      setEndDate(selectedDate);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -190,18 +388,24 @@ const ReportsScreen: React.FC = () => {
           </Title>
           
           {filteredReports.map((report, index) => (
-            <List.Item
+            <TouchableOpacity 
               key={report.id}
-              title={report.title}
-              description={report.description}
-              left={props => (
+              onPress={() => handleReportSelection(report)}
+              style={[
+                styles.reportItem,
+                index < filteredReports.length - 1 && styles.reportItemBorder
+              ]}
+            >
+              <View style={styles.reportItemContent}>
                 <List.Icon 
-                  {...props} 
                   icon={report.icon as any} 
                   color={getTypeColor(report.type)}
+                  style={styles.reportIcon}
                 />
-              )}
-              right={props => (
+                <View style={styles.reportTextContainer}>
+                  <Text style={styles.reportTitle}>{report.title}</Text>
+                  <Text style={styles.reportDescription}>{report.description}</Text>
+                </View>
                 <View style={styles.reportRight}>
                   <Chip 
                     style={[styles.typeChip, { backgroundColor: getTypeColor(report.type) }]}
@@ -215,12 +419,8 @@ const ReportsScreen: React.FC = () => {
                     </Text>
                   )}
                 </View>
-              )}
-              style={[
-                styles.reportItem,
-                index < filteredReports.length - 1 && styles.reportItemBorder
-              ]}
-            />
+              </View>
+            </TouchableOpacity>
           ))}
         </Card.Content>
       </Card>
@@ -291,6 +491,157 @@ const ReportsScreen: React.FC = () => {
           />
         </Card.Content>
       </Card>
+
+      {/* Report Generation Modal */}
+      <Portal>
+        <Dialog 
+          visible={showReportModal} 
+          onDismiss={() => setShowReportModal(false)}
+          style={styles.modal}
+        >
+          <Dialog.Title style={styles.modalTitle}>
+            {selectedReport?.title}
+          </Dialog.Title>
+          
+          <Dialog.Content>
+            <Paragraph style={styles.modalDescription}>
+              {selectedReport?.description}
+            </Paragraph>
+
+            {/* Date Range Selector */}
+            {(selectedReport?.type === 'transaction' || selectedReport?.type === 'financial') && (
+              <>
+                <Text style={styles.modalLabel}>Date Range</Text>
+                <View style={styles.dateContainer}>
+                  <TouchableOpacity 
+                    style={styles.dateInput}
+                    onPress={() => setShowStartDatePicker(true)}
+                  >
+                    <Text style={styles.dateText}>
+                      From: {formatDate(startDate)}
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity 
+                    style={styles.dateInput}
+                    onPress={() => setShowEndDatePicker(true)}
+                  >
+                    <Text style={styles.dateText}>
+                      To: {formatDate(endDate)}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {showStartDatePicker && (
+                  <DateTimePicker
+                    value={startDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleStartDateChange}
+                  />
+                )}
+
+                {showEndDatePicker && (
+                  <DateTimePicker
+                    value={endDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleEndDateChange}
+                  />
+                )}
+              </>
+            )}
+
+            {/* Member Selection */}
+            {selectedReport?.type === 'member' && (
+              <>
+                <Text style={styles.modalLabel}>Select Member</Text>
+                <Menu
+                  visible={false} // Controlled by separate state
+                  onDismiss={() => {}}
+                  anchor={
+                    <TouchableOpacity style={styles.memberSelector}>
+                      <Text style={styles.memberSelectorText}>
+                        {selectedMember 
+                          ? availableMembers.find(m => m.memberNumber === selectedMember)?.name || selectedMember
+                          : 'Select a member...'
+                        }
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                >
+                  {availableMembers.map(member => (
+                    <Menu.Item
+                      key={member.memberNumber}
+                      onPress={() => setSelectedMember(member.memberNumber)}
+                      title={member.name}
+                      titleStyle={styles.memberItem}
+                    />
+                  ))}
+                </Menu>
+              </>
+            )}
+
+            {/* Transaction Type Filter */}
+            {selectedReport?.type === 'transaction' && (
+              <>
+                <Text style={styles.modalLabel}>Transaction Type</Text>
+                <View style={styles.filterContainer}>
+                  <Chip
+                    selected={transactionType === 'all'}
+                    onPress={() => setTransactionType('all')}
+                    style={styles.filterChip}
+                  >
+                    All Types
+                  </Chip>
+                  <Chip
+                    selected={transactionType === 'deposit'}
+                    onPress={() => setTransactionType('deposit')}
+                    style={styles.filterChip}
+                  >
+                    Deposits
+                  </Chip>
+                  <Chip
+                    selected={transactionType === 'withdrawal'}
+                    onPress={() => setTransactionType('withdrawal')}
+                    style={styles.filterChip}
+                  >
+                    Withdrawals
+                  </Chip>
+                </View>
+              </>
+            )}
+          </Dialog.Content>
+
+          <Dialog.Actions>
+            <Button 
+              onPress={() => setShowReportModal(false)}
+              style={styles.modalButton}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onPress={exportToCSV}
+              loading={generating?.includes('-csv')}
+              disabled={!!generating}
+              style={styles.modalButton}
+              icon="file-excel"
+            >
+              Export CSV
+            </Button>
+            <Button 
+              onPress={generateReportWithParams}
+              loading={generating === selectedReport?.id}
+              disabled={!!generating}
+              style={styles.modalButton}
+              mode="contained"
+              icon="file-pdf-box"
+            >
+              Generate PDF
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 };
@@ -338,6 +689,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
+  reportItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  reportIcon: {
+    margin: 0,
+  },
+  reportTextContainer: {
+    flex: 1,
+  },
+  reportTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  reportDescription: {
+    fontSize: 12,
+    color: '#666',
+  },
   reportRight: {
     alignItems: 'flex-end',
     gap: 4,
@@ -357,6 +729,62 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: 10,
+  },
+  // Modal styles
+  modal: {
+    maxWidth: 500,
+    alignSelf: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  modalDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+  },
+  dateInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  memberSelector: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    marginBottom: 20,
+  },
+  memberSelectorText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  memberItem: {
+    fontSize: 14,
+  },
+  modalButton: {
+    marginHorizontal: 4,
   },
 });
 

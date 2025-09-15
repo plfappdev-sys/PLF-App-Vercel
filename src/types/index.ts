@@ -11,7 +11,7 @@ export interface User {
   createdBy: string;
 }
 
-export type UserRole = 'superuser' | 'admin' | 'member';
+export type UserRole = 'superuser' | 'admin' | 'executive' | 'member';
 
 export interface PersonalInfo {
   firstName: string;
@@ -67,8 +67,11 @@ export interface SignUpForm {
 }
 
 export interface RootStackParamList {
-  Login: undefined;
-  SignUp: undefined;
+  [key: string]: undefined;
+  Auth: undefined;
+  AuthLogin: undefined;
+  AuthSignUp: undefined;
+  MainTabs: undefined;
   Dashboard: undefined;
   Profile: undefined;
   Transactions: undefined;
@@ -76,9 +79,11 @@ export interface RootStackParamList {
   Reports: undefined;
   Announcements: undefined;
   DepositApproval: undefined;
-  LoanApproval: undefined;
   MemberManagement: undefined;
   Main: undefined;
+  LoanApplication: undefined;
+  LoanApproval: undefined;
+  MemberApproval: undefined;
 }
 
 // Member financial information (from reference project)
@@ -126,11 +131,140 @@ export interface LoanRecord {
   repaymentSchedule: RepaymentInstallment[];
 }
 
+// Transaction interface
+export interface Transaction {
+  transactionId: string;
+  memberNumber: string;
+  type: 'deposit' | 'loan_disbursement' | 'loan_repayment' | 'penalty' | 'interest';
+  amount: number;
+  description: string;
+  date: Date;
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
+  approvalWorkflow: {
+    submittedBy: string;
+    submissionDate: Date;
+    reviewedBy?: string;
+    reviewDate?: Date;
+    approvalNotes?: string;
+  };
+  supportingDocuments: SupportingDocument[];
+  relatedTransactions: string[];
+  auditTrail: AuditEntry[];
+}
+
+// Supporting document
+export interface SupportingDocument {
+  documentType: 'proof_of_payment' | 'loan_application' | 'other';
+  documentUrl: string;
+  uploadDate: Date;
+}
+
+// Audit entry
+export interface AuditEntry {
+  action: string;
+  performedBy: string;
+  timestamp: Date;
+  details: Record<string, any>;
+}
+
+// Deposit form
+export interface DepositForm {
+  amount: number;
+  description: string;
+  proofOfPayment: string;
+}
+
 // Repayment installment
 export interface RepaymentInstallment {
   dueDate: Date;
   amount: number;
   status: 'pending' | 'paid' | 'overdue';
+}
+
+// Loan interface
+export interface Loan {
+  loanId: string;
+  memberNumber: string;
+  applicationDetails: {
+    requestedAmount: number;
+    loanTerm: number; // in months
+    purpose: string;
+    applicationDate: Date;
+    supportingDocuments: string[];
+    guarantors: Guarantor[];
+    employmentInfo: EmploymentInfo;
+    bankingDetails: BankingDetails;
+    nextOfKin: NextOfKin;
+  };
+  approvalProcess: {
+    status: 'pending' | 'under_review' | 'approved' | 'rejected' | 'disbursed';
+    reviewedBy?: string;
+    reviewDate?: Date;
+    approvalNotes?: string;
+    conditions: string[];
+  };
+  disbursementDetails?: {
+    approvedAmount: number;
+    disbursementDate: Date;
+    disbursementMethod: string;
+    disbursedBy: string;
+  };
+  repaymentSchedule?: {
+    totalAmount: number;
+    interestRate: number;
+    repaymentPeriod: number;
+    monthlyPayment: number;
+    schedule: RepaymentScheduleItem[];
+  };
+  currentStatus: {
+    outstandingBalance: number;
+    totalPaid: number;
+    lastPaymentDate?: Date;
+    nextDueDate?: Date;
+    isInDefault: boolean;
+  };
+}
+
+// Guarantor
+export interface Guarantor {
+  memberNumber: string;
+  guaranteeAmount: number;
+  status: 'pending' | 'confirmed' | 'declined';
+}
+
+// Repayment schedule item
+export interface RepaymentScheduleItem {
+  installmentNumber: number;
+  dueDate: Date;
+  principalAmount: number;
+  interestAmount: number;
+  totalAmount: number;
+  status: 'pending' | 'paid' | 'overdue' | 'partial';
+}
+
+// Employment information
+export interface EmploymentInfo {
+  employerName: string;
+  position: string;
+  salaryDate: string;
+  employmentDate: string;
+  employerAddress: string;
+  employerContact: string;
+}
+
+// Banking details
+export interface BankingDetails {
+  bankName: string;
+  accountNumber: string;
+  branchCode: string;
+  accountHolder: string;
+}
+
+// Next of kin information
+export interface NextOfKin {
+  name: string;
+  contactNumber: string;
+  relationship: string;
 }
 
 // Fund statistics

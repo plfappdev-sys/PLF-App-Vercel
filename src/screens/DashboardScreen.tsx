@@ -9,12 +9,15 @@ import {
   Chip,
   Divider
 } from 'react-native-paper';
-import { useAuth } from '../../AppSimple';
+import { useNavigation } from '@react-navigation/native';
+import { useMockAuth } from '../contexts/MockAuthContext';
 import MockMemberService from '../services/MockMemberService';
 import { Member } from '../types/index';
+import { PLFTheme } from '../theme/colors';
 
 const DashboardScreen: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout } = useMockAuth();
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [memberData, setMemberData] = useState<Member | null>(null);
@@ -27,8 +30,8 @@ const DashboardScreen: React.FC = () => {
       setFundStats(stats);
 
       // Load member-specific data if user is a member
-      if (currentUser?.role === 'member' && currentUser.uid) {
-        const member = await MockMemberService.getMemberByUserId(currentUser.uid);
+      if (currentUser?.role === 'member' && currentUser.memberNumber) {
+        const member = await MockMemberService.getMemberByNumber(currentUser.memberNumber);
         setMemberData(member);
       }
     } catch (error) {
@@ -37,6 +40,14 @@ const DashboardScreen: React.FC = () => {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const handleApplyForLoan = () => {
+    navigation.navigate('LoanApplication' as never);
+  };
+
+  const handleReviewLoans = () => {
+    navigation.navigate('LoanApproval' as never);
   };
 
   useEffect(() => {
@@ -54,10 +65,10 @@ const DashboardScreen: React.FC = () => {
 
   const getStandingColor = (standing: string) => {
     switch (standing) {
-      case 'good': return '#4CAF50';
-      case 'owing_10': return '#FF9800';
-      case 'owing_20': return '#FF5722';
-      default: return '#F44336';
+      case 'good': return PLFTheme.colors.success;
+      case 'owing_10': return PLFTheme.colors.warning;
+      case 'owing_20': return '#FF5722'; // Keeping orange-red for owing_20
+      default: return PLFTheme.colors.error;
     }
   };
 
@@ -77,7 +88,7 @@ const DashboardScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#228B22" />
+        <ActivityIndicator size="large" color={PLFTheme.colors.primaryGreen} />
         <Text style={styles.loadingText}>Loading dashboard...</Text>
       </View>
     );
@@ -173,7 +184,7 @@ const DashboardScreen: React.FC = () => {
               </View>
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Outstanding Amount:</Text>
-                <Text style={[styles.statValue, { color: '#F44336' }]}>
+                <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
                   {formatCurrency(memberData.financialInfo.outstandingAmount)}
                 </Text>
               </View>
@@ -235,7 +246,7 @@ const DashboardScreen: React.FC = () => {
                 <Button mode="contained" style={styles.actionButton}>
                   Make Deposit
                 </Button>
-                <Button mode="outlined" style={styles.actionButton}>
+                <Button mode="outlined" style={styles.actionButton} onPress={handleApplyForLoan}>
                   Request Loan
                 </Button>
                 <Button mode="outlined" style={styles.actionButton}>
@@ -246,10 +257,10 @@ const DashboardScreen: React.FC = () => {
             
             {(currentUser?.role === 'superuser' || currentUser?.role === 'admin') && (
               <>
-                <Button mode="contained" style={styles.actionButton}>
+                <Button mode="contained" style={styles.actionButton} onPress={() => navigation.navigate('DepositApproval' as never)}>
                   Approve Deposits
                 </Button>
-                <Button mode="outlined" style={styles.actionButton}>
+                <Button mode="outlined" style={styles.actionButton} onPress={handleReviewLoans}>
                   Review Loans
                 </Button>
                 <Button mode="outlined" style={styles.actionButton}>
@@ -278,75 +289,76 @@ const DashboardScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: PLFTheme.colors.lightGray,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: PLFTheme.colors.lightGray,
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: PLFTheme.spacing.sm,
     fontSize: 16,
+    color: PLFTheme.colors.darkGray,
   },
   welcomeCard: {
-    margin: 20,
-    marginBottom: 10,
-    backgroundColor: '#6200EE',
+    margin: PLFTheme.spacing.lg,
+    marginBottom: PLFTheme.spacing.sm,
+    backgroundColor: PLFTheme.colors.primaryGreen,
   },
   welcomeTitle: {
-    color: 'white',
+    color: PLFTheme.colors.white,
     fontSize: 24,
   },
   roleText: {
-    color: 'white',
+    color: PLFTheme.colors.white,
     fontSize: 14,
     opacity: 0.9,
   },
   logoutButton: {
-    marginTop: 15,
-    borderColor: 'white',
+    marginTop: PLFTheme.spacing.md,
+    borderColor: PLFTheme.colors.white,
   },
   logoutButtonText: {
-    color: 'white',
+    color: PLFTheme.colors.white,
   },
   card: {
-    margin: 20,
-    marginTop: 10,
+    margin: PLFTheme.spacing.lg,
+    marginTop: PLFTheme.spacing.sm,
   },
   cardTitle: {
     fontSize: 18,
-    marginBottom: 15,
-    color: '#333',
+    marginBottom: PLFTheme.spacing.md,
+    color: PLFTheme.colors.primaryGold,
   },
   statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: PLFTheme.spacing.sm,
   },
   statLabel: {
     fontSize: 14,
-    color: '#666',
+    color: PLFTheme.colors.darkGray,
   },
   statValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: PLFTheme.colors.black,
   },
   membershipInfo: {
-    marginTop: 10,
+    marginTop: PLFTheme.spacing.sm,
   },
   standingChip: {
     alignSelf: 'flex-start',
   },
   standingChipText: {
-    color: 'white',
+    color: PLFTheme.colors.white,
     fontSize: 12,
   },
   standingSummary: {
-    marginTop: 10,
+    marginTop: PLFTheme.spacing.sm,
   },
   standingRow: {
     flexDirection: 'row',
@@ -356,18 +368,18 @@ const styles = StyleSheet.create({
   },
   standingLabel: {
     fontSize: 14,
-    color: '#666',
+    color: PLFTheme.colors.darkGray,
   },
   standingCount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: PLFTheme.colors.black,
   },
   actionButtons: {
-    marginTop: 15,
+    marginTop: PLFTheme.spacing.md,
   },
   actionButton: {
-    marginBottom: 10,
+    marginBottom: PLFTheme.spacing.sm,
   },
 });
 

@@ -3,8 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useAuth } from '../../AppSimple';
+import { useMockAuth } from '../contexts/MockAuthContext';
 import { RootStackParamList, UserRole } from '../types/index';
+import { PLFTheme } from '../theme/colors';
 
 // Import screens
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -14,6 +15,10 @@ import ProfileScreen from '../screens/ProfileScreen';
 import TransactionsScreen from '../screens/TransactionsScreen';
 import MembersScreen from '../screens/MembersScreen';
 import ReportsScreen from '../screens/ReportsScreen';
+import LoanApplicationScreen from '../screens/LoanApplicationScreen';
+import LoanApprovalScreen from '../screens/LoanApprovalScreen';
+import DepositApprovalScreen from '../screens/transactions/DepositApprovalScreen';
+import MemberApprovalScreen from '../screens/MemberApprovalScreen'; // Will create this screen
 
 // Placeholder screens for other tabs
 import { View, Text, StyleSheet } from 'react-native';
@@ -73,12 +78,22 @@ const getTabsForRole = (role: UserRole) => {
     });
   }
 
+  // Add executive-specific tabs
+  if (role === 'executive') {
+    baseTabs.splice(2, 0, {
+      name: 'Approvals',
+      component: MemberApprovalScreen,
+      icon: 'check-circle',
+      label: 'Approvals'
+    });
+  }
+
   return baseTabs;
 };
 
 // Main tab navigator
 const MainTabNavigator: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useMockAuth();
   
   if (!currentUser) return null;
 
@@ -86,6 +101,7 @@ const MainTabNavigator: React.FC = () => {
 
   return (
     <Tab.Navigator
+      id={undefined}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           const tab = tabs.find(t => t.name === route.name);
@@ -99,12 +115,12 @@ const MainTabNavigator: React.FC = () => {
             />
           );
         },
-        tabBarActiveTintColor: '#228B22',
-        tabBarInactiveTintColor: '#999999',
+        tabBarActiveTintColor: PLFTheme.colors.primaryGreen,
+        tabBarInactiveTintColor: PLFTheme.colors.darkGray,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E0E0E0',
+          backgroundColor: PLFTheme.colors.white,
+          borderTopColor: PLFTheme.colors.mediumGray,
           paddingBottom: 8,
           height: 60,
         },
@@ -128,6 +144,7 @@ const MainTabNavigator: React.FC = () => {
 const AuthStackNavigator: React.FC = () => {
   return (
     <Stack.Navigator
+      id={undefined}
       screenOptions={{
         headerShown: false,
       }}
@@ -140,7 +157,7 @@ const AuthStackNavigator: React.FC = () => {
 
 // Main app navigator
 const AppNavigator: React.FC = () => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, loading } = useMockAuth();
 
   if (loading) {
     return null;
@@ -148,9 +165,47 @@ const AppNavigator: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
         {currentUser ? (
-          <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+          <>
+            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+            <Stack.Screen 
+              name="LoanApplication" 
+              component={LoanApplicationScreen}
+              options={{
+                presentation: 'modal',
+                headerShown: true,
+                title: 'Apply for Loan'
+              }}
+            />
+            <Stack.Screen 
+              name="LoanApproval" 
+              component={LoanApprovalScreen}
+              options={{
+                presentation: 'modal',
+                headerShown: true,
+                title: 'Loan Approval'
+              }}
+            />
+            <Stack.Screen 
+              name="DepositApproval" 
+              component={DepositApprovalScreen}
+              options={{
+                presentation: 'modal',
+                headerShown: true,
+                title: 'Deposit Approvals'
+              }}
+            />
+            <Stack.Screen 
+              name="MemberApproval" 
+              component={MemberApprovalScreen}
+              options={{
+                presentation: 'modal',
+                headerShown: true,
+                title: 'Member Approvals'
+              }}
+            />
+          </>
         ) : (
           <Stack.Screen name="Auth" component={AuthStackNavigator} />
         )}
@@ -164,18 +219,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    padding: PLFTheme.spacing.lg,
+    backgroundColor: PLFTheme.colors.lightGray,
   },
   placeholderTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    marginBottom: PLFTheme.spacing.sm,
+    color: PLFTheme.colors.primaryGold,
   },
   placeholderText: {
     fontSize: 16,
-    color: '#666',
+    color: PLFTheme.colors.darkGray,
     textAlign: 'center',
   },
 });

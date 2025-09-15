@@ -8,10 +8,10 @@ import {
   List,
   Avatar
 } from 'react-native-paper';
-import { useAuth } from '../../AppSimple';
+import { useMockAuth } from '../contexts/MockAuthContext';
 
 const ProfileScreen: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout } = useMockAuth();
 
   if (!currentUser) {
     return (

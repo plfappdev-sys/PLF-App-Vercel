@@ -1,28 +1,37 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../../AppSimple';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useMockAuth } from '../../contexts/MockAuthContext';
+import { PLFTheme } from '../../theme/colors';
+import { RootStackParamList } from '../../types/index';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigation = useNavigation();
+  const [loginStatus, setLoginStatus] = useState('');
+  const { login } = useMockAuth();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      setLoginStatus('Please fill in all fields');
       return;
     }
 
     setLoading(true);
+    setLoginStatus('');
     try {
+      console.log('Attempting login with:', email);
       await login(email, password);
+      console.log('Login successful, current user should be set');
+      setLoginStatus('Login successful! Redirecting...');
       // Navigation will be handled by the auth state change in AuthContext
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message || 'An error occurred during login');
+      console.error('Login error:', error);
+      setLoginStatus(error.message || 'An error occurred during login');
     } finally {
       setLoading(false);
     }
@@ -30,19 +39,19 @@ const LoginScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* PLF Logo */}
+      {/* PLF Logo and Branding */}
       <View style={styles.logoContainer}>
         <Image 
           source={require('../../../assets/plf-logo.png')} 
           style={styles.logoImage}
           resizeMode="contain"
         />
+        <Text style={styles.title}>People's Liberator Fund</Text>
         <Text style={styles.tagline}>TOGETHER WE RISE</Text>
       </View>
 
       {/* Login Form */}
       <View style={styles.formContainer}>
-        <Text style={styles.title}>People's Liberator Fund</Text>
         <Text style={styles.subtitle}>Member Login</Text>
         
         <TextInput
@@ -76,11 +85,20 @@ const LoginScreen: React.FC = () => {
           {loading ? 'Logging in...' : 'Login'}
         </Button>
         
+        {loginStatus ? (
+          <Text style={[
+            styles.statusText,
+            { color: loginStatus.includes('successful') ? PLFTheme.colors.primaryGreen : PLFTheme.colors.error }
+          ]}>
+            {loginStatus}
+          </Text>
+        ) : null}
+        
         <Text style={styles.helpText}>
           SuperUser Login: superuser@plf.com / Wawa@PLF2025
         </Text>
         
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp' as never)}>
+        <TouchableOpacity onPress={() => navigation.navigate('AuthSignUp')}>
           <Text style={styles.linkText}>
             Don't have an account? Sign up
           </Text>
@@ -93,24 +111,24 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5DC', // Beige background
+    backgroundColor: PLFTheme.colors.primaryBeige,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: PLFTheme.spacing.lg,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: PLFTheme.spacing.xl,
   },
   logoImage: {
     width: 200,
     height: 200,
-    marginBottom: 10,
+    marginBottom: PLFTheme.spacing.sm,
   },
   tagline: {
     fontSize: 16,
-    color: '#228B22', // Forest green
-    marginTop: 10,
+    color: PLFTheme.colors.primaryGreen,
+    marginTop: PLFTheme.spacing.sm,
     fontWeight: '600',
   },
   formContainer: {
@@ -121,38 +139,44 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#B8860B', // Dark goldenrod
-    marginBottom: 10,
+    color: PLFTheme.colors.primaryGold,
+    marginBottom: PLFTheme.spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
+    color: PLFTheme.colors.darkGray,
+    marginBottom: PLFTheme.spacing.xl,
     textAlign: 'center',
   },
   input: {
     width: '100%',
-    marginBottom: 15,
-    backgroundColor: 'white',
+    marginBottom: PLFTheme.spacing.md,
+    backgroundColor: PLFTheme.colors.white,
   },
   button: {
     width: '100%',
-    marginTop: 10,
+    marginTop: PLFTheme.spacing.sm,
     paddingVertical: 5,
-    backgroundColor: '#228B22', // Forest green
+    backgroundColor: PLFTheme.colors.primaryGreen,
   },
   helpText: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: PLFTheme.spacing.lg,
     fontSize: 12,
-    color: '#666',
+    color: PLFTheme.colors.darkGray,
   },
   linkText: {
     textAlign: 'center',
-    marginTop: 10,
-    color: '#228B22', // Forest green
+    marginTop: PLFTheme.spacing.sm,
+    color: PLFTheme.colors.primaryGreen,
     textDecorationLine: 'underline',
+  },
+  statusText: {
+    textAlign: 'center',
+    marginTop: PLFTheme.spacing.md,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

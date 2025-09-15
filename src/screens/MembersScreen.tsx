@@ -10,12 +10,12 @@ import {
   Chip,
   Searchbar
 } from 'react-native-paper';
-import { useAuth } from '../../AppSimple';
+import { useMockAuth } from '../contexts/MockAuthContext';
 import MockMemberService from '../services/MockMemberService';
 import { Member } from '../types/index';
 
 const MembersScreen: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { currentUser } = useMockAuth();
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);

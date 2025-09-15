@@ -1,17 +1,14 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { AuthProvider } from './src/contexts/MockAuthContext';
-import AppNavigatorSimple from './src/navigation/AppNavigatorSimple';
+import TestComponent from './TestComponent';
 
 // Main App component
 const App = () => {
   return (
     <PaperProvider>
-      <AuthProvider>
-        <StatusBar style="auto" />
-        <AppNavigatorSimple />
-      </AuthProvider>
+      <StatusBar style="auto" />
+      <TestComponent />
     </PaperProvider>
   );
 };

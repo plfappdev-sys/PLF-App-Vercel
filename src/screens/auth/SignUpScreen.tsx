@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { SignUpForm } from '../../types';
 import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../../AppSimple';
+import { useMockAuth } from '../../contexts/MockAuthContext';
+import { PLFTheme } from '../../theme/colors';
 
 const SignUpScreen: React.FC = () => {
   const [formData, setFormData] = useState<SignUpForm>({
@@ -29,18 +30,22 @@ const SignUpScreen: React.FC = () => {
     }
   });
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuth();
+  const [signupStatus, setSignupStatus] = useState('');
+  const { signup } = useMockAuth();
   const navigation = useNavigation();
 
   const handleSignUp = async () => {
+    // Clear previous status
+    setSignupStatus('');
+    
     // Basic validation
     if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      setSignupStatus('Please fill in all required fields');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      setSignupStatus('Passwords do not match');
       return;
     }
 
@@ -62,9 +67,10 @@ const SignUpScreen: React.FC = () => {
         memberNumber: formData.membershipType === 'existing' ? formData.memberNumber : undefined
       });
       
-      Alert.alert('Success', 'Account created successfully! Please wait for verification.');
+      setSignupStatus('Account created successfully! Please wait for verification.');
+      // Navigation will be handled by the auth state change in AppNavigator
     } catch (error: any) {
-      Alert.alert('Signup Failed', error.message || 'An error occurred during signup');
+      setSignupStatus(error.message || 'An error occurred during signup');
     } finally {
       setLoading(false);
     }
@@ -217,6 +223,15 @@ const SignUpScreen: React.FC = () => {
           {loading ? 'Creating Account...' : 'Create Account'}
         </Button>
 
+        {signupStatus ? (
+          <Text style={[
+            styles.statusText,
+            { color: signupStatus.includes('successful') ? PLFTheme.colors.primaryGreen : PLFTheme.colors.error }
+          ]}>
+            {signupStatus}
+          </Text>
+        ) : null}
+
         <Text style={styles.helpText}>
           * Required fields
         </Text>
@@ -303,6 +318,12 @@ const styles = StyleSheet.create({
   radioLabel: {
     fontSize: 14,
     color: '#333',
+  },
+  statusText: {
+    textAlign: 'center',
+    marginTop: PLFTheme.spacing.md,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

@@ -1,2 +1,2 @@
-import AppSimple from './AppSimple';
-export default AppSimple;
+import AppSimpleDirect from './AppSimpleDirect';
+export default AppSimpleDirect;

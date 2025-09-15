@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { auth, db, app, isFirebaseInitialized } from '../../firebase.rn.config';
 import { User, UserRole } from '../types/index';
 import MemberService from '../services/memberService';
+import { UserService } from '../services/UserService';
 import { User as FirebaseUser, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { isFirebaseAuthAvailable, withFirebaseAuthCheck, safeFirebaseOperation } from '../utils/firebaseUtils';
 import { Alert } from 'react-native';
@@ -15,6 +16,24 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
   verifyMemberNumber: (memberNumber: string) => Promise<boolean>;
+  
+  // Role-based permission checks
+  hasRole: (role: UserRole) => boolean;
+  hasAnyRole: (roles: UserRole[]) => boolean;
+  isSuperUser: () => boolean;
+  isAdmin: () => boolean;
+  isExecutive: () => boolean;
+  isMember: () => boolean;
+  
+  // Executive functions
+  getPendingApprovals: () => Promise<User[]>;
+  approveUser: (userId: string, notes?: string) => Promise<void>;
+  rejectUser: (userId: string, notes?: string) => Promise<void>;
+  updateUserRole: (userId: string, newRole: UserRole) => Promise<void>;
+  
+  // User management
+  getAllUsers: () => Promise<User[]>;
+  getUserStatistics: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -274,6 +293,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // Role-based permission checks
+  const hasRole = (role: UserRole): boolean => {
+    return currentUser?.role === role;
+  };
+
+  const hasAnyRole = (roles: UserRole[]): boolean => {
+    return roles.includes(currentUser?.role as UserRole);
+  };
+
+  const isSuperUser = (): boolean => hasRole('superuser');
+  const isAdmin = (): boolean => hasRole('admin');
+  const isExecutive = (): boolean => hasRole('executive');
+  const isMember = (): boolean => hasRole('member');
+
+  // Executive functions
+  const getPendingApprovals = async (): Promise<User[]> => {
+    if (!isSuperUser() && !isAdmin() && !isExecutive()) {
+      throw new Error('Insufficient permissions');
+    }
+    return UserService.getPendingApprovals();
+  };
+
+  const approveUser = async (userId: string, notes?: string): Promise<void> => {
+    if (!isSuperUser() && !isAdmin() && !isExecutive()) {
+      throw new Error('Insufficient permissions');
+    }
+    await UserService.updateApprovalStatus(userId, true, currentUser?.email || 'system', notes);
+  };
+
+  const rejectUser = async (userId: string, notes?: string): Promise<void> => {
+    if (!isSuperUser() && !isAdmin() && !isExecutive()) {
+      throw new Error('Insufficient permissions');
+    }
+    await UserService.updateApprovalStatus(userId, false, currentUser?.email || 'system', notes);
+  };
+
+  const updateUserRole = async (userId: string, newRole: UserRole): Promise<void> => {
+    if (!isSuperUser()) {
+      throw new Error('Only SuperUser can update user roles');
+    }
+    await UserService.updateUserRole(userId, newRole, currentUser?.email || 'system');
+  };
+
+  // User management
+  const getAllUsers = async (): Promise<User[]> => {
+    if (!isSuperUser() && !isAdmin()) {
+      throw new Error('Insufficient permissions');
+    }
+    return UserService.getAllUsers();
+  };
+
+  const getUserStatistics = async (): Promise<any> => {
+    if (!isSuperUser() && !isAdmin()) {
+      throw new Error('Insufficient permissions');
+    }
+    return UserService.getUserStatistics();
+  };
+
   const value: AuthContextType = {
     currentUser,
     firebaseUser,
@@ -282,7 +359,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     logout,
     updateUserProfile,
-    verifyMemberNumber
+    verifyMemberNumber,
+    hasRole,
+    hasAnyRole,
+    isSuperUser,
+    isAdmin,
+    isExecutive,
+    isMember,
+    getPendingApprovals,
+    approveUser,
+    rejectUser,
+    updateUserRole,
+    getAllUsers,
+    getUserStatistics
   };
 
   return (

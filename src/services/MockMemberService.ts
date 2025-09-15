@@ -64,6 +64,7 @@ class MockMemberService {
   static async getFundStatistics(): Promise<FundStatistics> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('MockMemberService.getFundStatistics() returning:', mockFundStatistics);
     return mockFundStatistics;
   }
 
