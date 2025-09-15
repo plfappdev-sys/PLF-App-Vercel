@@ -1,5 +1,6 @@
 import { Member, Transaction, FundStatistics } from '../types/index';
 import MockMemberService from './MockMemberService';
+import { InterestReportService } from './InterestReportService';
 
 export interface ReportData {
   title: string;
@@ -396,6 +397,216 @@ export class ReportService {
       };
     } catch (error) {
       console.error('Error generating standing analysis report:', error);
+      throw error;
+    }
+  }
+
+  // Generate Interest Earned Report
+  static async generateInterestEarnedReport(
+    startDate: Date,
+    endDate: Date,
+    generatedBy: string
+  ): Promise<ReportData> {
+    try {
+      const members = await MockMemberService.getAllMembers();
+      
+      // Generate interest report using the InterestReportService
+      const interestReport = InterestReportService.generateFundInterestSummary(
+        members,
+        startDate,
+        endDate
+      );
+
+      return {
+        title: 'Interest Earned Report',
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'interest_earned',
+        data: {
+          period: interestReport.period,
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          netInterest: interestReport.netActualInterest,
+          memberReports: interestReport.memberReports,
+          summary: {
+            totalMembers: interestReport.totalMembers,
+            membersWithSavings: interestReport.membersWithSavings,
+            membersWithLoans: interestReport.membersWithLoans,
+            averageInterestRate: interestReport.averageInterestRate
+          }
+        },
+        summary: {
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          netInterest: interestReport.netActualInterest,
+          totalMembers: interestReport.totalMembers
+        },
+      };
+    } catch (error) {
+      console.error('Error generating interest earned report:', error);
+      throw error;
+    }
+  }
+
+  // Generate Interest Charged Report
+  static async generateInterestChargedReport(
+    startDate: Date,
+    endDate: Date,
+    generatedBy: string
+  ): Promise<ReportData> {
+    try {
+      const members = await MockMemberService.getAllMembers();
+      
+      // Generate interest report using the InterestReportService
+      const interestReport = InterestReportService.generateFundInterestSummary(
+        members,
+        startDate,
+        endDate
+      );
+
+      return {
+        title: 'Interest Charged Report',
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'interest_charged',
+        data: {
+          period: interestReport.period,
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          netInterest: interestReport.netActualInterest,
+          memberReports: interestReport.memberReports.filter(report => report.actualInterestCharged > 0),
+          summary: {
+            totalMembers: interestReport.totalMembers,
+            membersWithLoans: interestReport.membersWithLoans,
+            averageLoanInterestRate: interestReport.averageInterestRate
+          }
+        },
+        summary: {
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          netInterest: interestReport.netActualInterest,
+          totalMembers: interestReport.totalMembers
+        },
+      };
+    } catch (error) {
+      console.error('Error generating interest charged report:', error);
+      throw error;
+    }
+  }
+
+  // Generate Member Interest Statement
+  static async generateMemberInterestStatement(
+    memberNumber: string,
+    startDate: Date,
+    endDate: Date,
+    generatedBy: string
+  ): Promise<ReportData> {
+    try {
+      const member = await MockMemberService.getMemberByNumber(memberNumber);
+      if (!member) {
+        throw new Error(`Member ${memberNumber} not found`);
+      }
+
+      const members = await MockMemberService.getAllMembers();
+      const interestReport = InterestReportService.generateFundInterestSummary(
+        members,
+        startDate,
+        endDate
+      );
+
+      const memberInterest = interestReport.memberReports.find(
+        report => report.memberNumber === memberNumber
+      );
+
+      if (!memberInterest) {
+        throw new Error(`No interest data found for member ${memberNumber}`);
+      }
+
+      return {
+        title: `Interest Statement - Member ${memberNumber}`,
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'member_interest_statement',
+        data: {
+          member: {
+            memberNumber: member.memberNumber || memberNumber,
+            name: `Member ${memberNumber}`,
+            currentBalance: member.financialInfo?.currentBalance || 0,
+            totalContributions: member.financialInfo?.totalContributions || 0
+          },
+          period: interestReport.period,
+          interestDetails: memberInterest,
+          summary: {
+            totalInterestEarned: memberInterest.actualInterestEarned,
+            totalInterestCharged: memberInterest.actualInterestCharged,
+            netInterest: memberInterest.actualInterestEarned - memberInterest.actualInterestCharged
+          }
+        },
+        summary: {
+          memberNumber,
+          totalInterestEarned: memberInterest.actualInterestEarned,
+          totalInterestCharged: memberInterest.actualInterestCharged,
+          netInterest: memberInterest.actualInterestEarned - memberInterest.actualInterestCharged
+        },
+      };
+    } catch (error) {
+      console.error('Error generating member interest statement:', error);
+      throw error;
+    }
+  }
+
+  // Generate Fund Interest Summary Report
+  static async generateFundInterestSummaryReport(
+    startDate: Date,
+    endDate: Date,
+    generatedBy: string
+  ): Promise<ReportData> {
+    try {
+      const members = await MockMemberService.getAllMembers();
+      
+      // Generate interest report using the InterestReportService
+      const interestReport = InterestReportService.generateFundInterestSummary(
+        members,
+        startDate,
+        endDate
+      );
+
+      return {
+        title: 'Fund Interest Summary Report',
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'fund_interest_summary',
+        data: {
+          period: interestReport.period,
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          netInterest: interestReport.netActualInterest,
+          memberBreakdown: {
+            totalMembers: interestReport.totalMembers,
+            membersWithSavings: interestReport.membersWithSavings,
+            membersWithLoans: interestReport.membersWithLoans
+          },
+          interestRates: {
+            averageInterestRate: interestReport.averageInterestRate
+          },
+          topEarners: interestReport.memberReports
+            .filter(report => report.actualInterestEarned > 0)
+            .sort((a, b) => b.actualInterestEarned - a.actualInterestEarned)
+            .slice(0, 10),
+          topBorrowers: interestReport.memberReports
+            .filter(report => report.actualInterestCharged > 0)
+            .sort((a, b) => b.actualInterestCharged - a.actualInterestCharged)
+            .slice(0, 10)
+        },
+        summary: {
+          totalInterestEarned: interestReport.totalActualInterestEarned,
+          totalInterestCharged: interestReport.totalActualInterestCharged,
+          netInterest: interestReport.netActualInterest,
+          totalMembers: interestReport.totalMembers
+        },
+      };
+    } catch (error) {
+      console.error('Error generating fund interest summary report:', error);
       throw error;
     }
   }

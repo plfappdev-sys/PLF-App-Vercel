@@ -29,7 +29,14 @@ export const mockMemberData: Member = {
     percentageOutstanding: 0,
     balanceBroughtForward: 0,
     plannedContributions: 2000,
-    actualContributions: 2000
+    actualContributions: 2000,
+    // Interest tracking fields
+    currentInterestEarned: 450,
+    totalInterestEarned: 2250,
+    currentInterestCharged: 0,
+    totalInterestCharged: 0,
+    lastInterestCalculation: new Date('2025-09-15'),
+    interestRate: 0.05 // 5% annual interest rate
   },
   contributionHistory: [
     {
@@ -52,9 +59,15 @@ export const mockMemberData: Member = {
     }
   ],
   loanHistory: [],
+  interestHistory: [],
   membershipStatus: {
     isActive: true,
     standingCategory: 'good'
+  },
+  interestSettings: {
+    calculationMethod: 'monthly',
+    compounding: true,
+    taxDeduction: 0
   },
   lastUpdated: new Date()
 };
@@ -78,13 +91,76 @@ class MockMemberService {
   static async getAllMembers(): Promise<Member[]> {
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Generate some mock members with different standings
+    // Generate some mock members with different standings and interest data
     const members: Member[] = [
-      { ...mockMemberData, memberNumber: 'MEMBER001', financialInfo: { ...mockMemberData.financialInfo, outstandingAmount: 0 } },
-      { ...mockMemberData, memberNumber: 'MEMBER002', financialInfo: { ...mockMemberData.financialInfo, outstandingAmount: 2500, percentageOutstanding: 12.5 }, membershipStatus: { isActive: true, standingCategory: 'owing_10' } },
-      { ...mockMemberData, memberNumber: 'MEMBER003', financialInfo: { ...mockMemberData.financialInfo, outstandingAmount: 4000, percentageOutstanding: 20 }, membershipStatus: { isActive: true, standingCategory: 'owing_20' } },
-      { ...mockMemberData, memberNumber: 'MEMBER004', financialInfo: { ...mockMemberData.financialInfo, outstandingAmount: 6000, percentageOutstanding: 30 }, membershipStatus: { isActive: true, standingCategory: 'owing_30' } },
-      { ...mockMemberData, memberNumber: 'MEMBER005', financialInfo: { ...mockMemberData.financialInfo, outstandingAmount: 10000, percentageOutstanding: 50 }, membershipStatus: { isActive: true, standingCategory: 'owing_50' } }
+      { 
+        ...mockMemberData, 
+        memberNumber: 'MEMBER001', 
+        financialInfo: { 
+          ...mockMemberData.financialInfo, 
+          outstandingAmount: 0 
+        } 
+      },
+      { 
+        ...mockMemberData, 
+        memberNumber: 'MEMBER002', 
+        financialInfo: { 
+          ...mockMemberData.financialInfo, 
+          outstandingAmount: 2500, 
+          percentageOutstanding: 12.5,
+          currentInterestCharged: 125,
+          totalInterestCharged: 625
+        }, 
+        membershipStatus: { 
+          isActive: true, 
+          standingCategory: 'owing_10' 
+        } 
+      },
+      { 
+        ...mockMemberData, 
+        memberNumber: 'MEMBER003', 
+        financialInfo: { 
+          ...mockMemberData.financialInfo, 
+          outstandingAmount: 4000, 
+          percentageOutstanding: 20,
+          currentInterestCharged: 200,
+          totalInterestCharged: 1000
+        }, 
+        membershipStatus: { 
+          isActive: true, 
+          standingCategory: 'owing_20' 
+        } 
+      },
+      { 
+        ...mockMemberData, 
+        memberNumber: 'MEMBER004', 
+        financialInfo: { 
+          ...mockMemberData.financialInfo, 
+          outstandingAmount: 6000, 
+          percentageOutstanding: 30,
+          currentInterestCharged: 300,
+          totalInterestCharged: 1500
+        }, 
+        membershipStatus: { 
+          isActive: true, 
+          standingCategory: 'owing_30' 
+        } 
+      },
+      { 
+        ...mockMemberData, 
+        memberNumber: 'MEMBER005', 
+        financialInfo: { 
+          ...mockMemberData.financialInfo, 
+          outstandingAmount: 10000, 
+          percentageOutstanding: 50,
+          currentInterestCharged: 500,
+          totalInterestCharged: 2500
+        }, 
+        membershipStatus: { 
+          isActive: true, 
+          standingCategory: 'owing_50' 
+        } 
+      }
     ];
     
     return members;

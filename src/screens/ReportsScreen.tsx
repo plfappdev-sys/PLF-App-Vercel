@@ -95,6 +95,38 @@ const ReportsScreen: React.FC = () => {
       description: 'Member growth and engagement analytics',
       icon: 'chart-line',
       lastGenerated: new Date('2025-09-09')
+    },
+    {
+      id: '7',
+      title: 'Interest Earned Report',
+      type: 'financial',
+      description: 'Detailed report on interest earned by members',
+      icon: 'trending-up',
+      lastGenerated: new Date('2025-09-14')
+    },
+    {
+      id: '8',
+      title: 'Interest Charged Report',
+      type: 'financial',
+      description: 'Detailed report on interest charged on loans',
+      icon: 'trending-down',
+      lastGenerated: new Date('2025-09-14')
+    },
+    {
+      id: '9',
+      title: 'Interest Statement',
+      type: 'member',
+      description: 'Individual member interest statement',
+      icon: 'file-document',
+      lastGenerated: new Date('2025-09-14')
+    },
+    {
+      id: '10',
+      title: 'Fund Interest Summary',
+      type: 'financial',
+      description: 'Comprehensive fund-wide interest analysis',
+      icon: 'chart-pie',
+      lastGenerated: new Date('2025-09-14')
     }
   ];
 
@@ -218,6 +250,43 @@ const ReportsScreen: React.FC = () => {
           reportData = await ReportService.generateStandingAnalysisReport(generatedBy);
           break;
         
+        case '7': // Interest Earned Report
+          reportData = await ReportService.generateInterestEarnedReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '8': // Interest Charged Report
+          reportData = await ReportService.generateInterestChargedReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '9': // Member Interest Statement
+          if (!selectedMember) {
+            alert('Please select a member for this report.');
+            return;
+          }
+          reportData = await ReportService.generateMemberInterestStatement(
+            selectedMember,
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '10': // Fund Interest Summary Report
+          reportData = await ReportService.generateFundInterestSummaryReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
         default:
           alert('This report type is not yet implemented.');
           return;
@@ -238,6 +307,19 @@ const ReportsScreen: React.FC = () => {
         case 'standing_analysis':
           // For standing analysis, use fund status template as fallback
           htmlContent = PDFReportGenerator.generateFundStatusHTML(reportData);
+          break;
+        case 'interest_earned':
+          htmlContent = PDFReportGenerator.generateInterestEarnedHTML(reportData);
+          break;
+        case 'interest_charged':
+          htmlContent = PDFReportGenerator.generateInterestChargedHTML(reportData);
+          break;
+        case 'member_interest_statement':
+          htmlContent = PDFReportGenerator.generateMemberInterestStatementHTML(reportData);
+          break;
+        case 'fund_interest_summary':
+          // Use interest earned template as fallback for fund interest summary
+          htmlContent = PDFReportGenerator.generateInterestEarnedHTML(reportData);
           break;
         default:
           throw new Error(`Unsupported report type: ${reportData.reportType}`);

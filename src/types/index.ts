@@ -98,12 +98,25 @@ export interface Member {
     balanceBroughtForward: number;
     plannedContributions: number;
     actualContributions: number;
+    // Interest tracking fields
+    currentInterestEarned: number;
+    totalInterestEarned: number;
+    currentInterestCharged: number;
+    totalInterestCharged: number;
+    lastInterestCalculation: Date;
+    interestRate: number; // Member-specific interest rate
   };
   contributionHistory: ContributionRecord[];
   loanHistory: LoanRecord[];
+  interestHistory: InterestAccrual[];
   membershipStatus: {
     isActive: boolean;
     standingCategory: 'good' | 'owing_10' | 'owing_20' | 'owing_30' | 'owing_50' | 'owing_65' | 'owing_65_plus';
+  };
+  interestSettings: {
+    calculationMethod: 'daily' | 'monthly' | 'annual';
+    compounding: boolean;
+    taxDeduction: number;
   };
   lastUpdated: Date;
 }
@@ -135,7 +148,7 @@ export interface LoanRecord {
 export interface Transaction {
   transactionId: string;
   memberNumber: string;
-  type: 'deposit' | 'loan_disbursement' | 'loan_repayment' | 'penalty' | 'interest';
+  type: 'deposit' | 'loan_disbursement' | 'loan_repayment' | 'penalty' | 'interest_earned' | 'interest_charged';
   amount: number;
   description: string;
   date: Date;
@@ -150,6 +163,14 @@ export interface Transaction {
   supportingDocuments: SupportingDocument[];
   relatedTransactions: string[];
   auditTrail: AuditEntry[];
+  interestDetails?: {
+    principalAmount: number;
+    interestRate: number;
+    period: number; // days
+    calculationDate: Date;
+    accrualId?: string; // Reference to interestAccruals
+    compounding: boolean;
+  };
 }
 
 // Supporting document
@@ -179,6 +200,24 @@ export interface RepaymentInstallment {
   dueDate: Date;
   amount: number;
   status: 'pending' | 'paid' | 'overdue';
+}
+
+// Interest accrual record
+export interface InterestAccrual {
+  accrualId: string;
+  memberNumber: string;
+  calculationDate: Date;
+  periodStart: Date;
+  periodEnd: Date;
+  principalAmount: number;
+  interestRate: number;
+  interestAmount: number;
+  interestType: 'earned' | 'charged';
+  compounding: boolean;
+  daysInPeriod: number;
+  status: 'calculated' | 'applied' | 'reversed';
+  appliedDate?: Date;
+  transactionId?: string; // Reference to interest transaction
 }
 
 // Loan interface
