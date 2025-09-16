@@ -11,7 +11,7 @@ import {
   Searchbar
 } from 'react-native-paper';
 import { useMockAuth } from '../contexts/MockAuthContext';
-import MockMemberService from '../services/MockMemberService';
+import RealMemberService from '../services/RealMemberService';
 import { Member } from '../types/index';
 
 const MembersScreen: React.FC = () => {
@@ -24,7 +24,7 @@ const MembersScreen: React.FC = () => {
 
   const loadMembers = async () => {
     try {
-      const allMembers = await MockMemberService.getAllMembers();
+      const allMembers = await RealMemberService.getAllMembers();
       setMembers(allMembers);
       setFilteredMembers(allMembers);
     } catch (error) {
@@ -45,6 +45,7 @@ const MembersScreen: React.FC = () => {
     if (searchQuery) {
       filtered = filtered.filter(member => 
         member.memberNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (member.personalInfo?.fullName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         member.financialInfo.outstandingAmount.toString().includes(searchQuery)
       );
     }
@@ -112,7 +113,7 @@ const MembersScreen: React.FC = () => {
           <Title style={styles.cardTitle}>Search & Filter</Title>
           
           <Searchbar
-            placeholder="Search by member number or amount..."
+            placeholder="Search by name, member number, or amount..."
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={styles.searchBar}
@@ -189,7 +190,7 @@ const MembersScreen: React.FC = () => {
             filteredMembers.map((member, index) => (
               <List.Item
                 key={member.memberNumber}
-                title={`Member ${member.memberNumber}`}
+                title={`${member.personalInfo?.fullName || `Member ${member.memberNumber}`} (${member.memberNumber})`}
                 description={`Balance: ${formatCurrency(member.financialInfo.currentBalance)} • Outstanding: ${formatCurrency(member.financialInfo.outstandingAmount)}`}
                 left={props => (
                   <List.Icon 

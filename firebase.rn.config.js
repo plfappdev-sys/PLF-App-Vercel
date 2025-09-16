@@ -1,10 +1,11 @@
 // Firebase configuration for React Native/Expo
-// Enhanced with better error handling and React Native compatibility
+// Using Firebase v9 with modular imports for better React Native compatibility
 
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Your Firebase project configuration
 const firebaseConfig = {
@@ -38,11 +39,15 @@ const initializeFirebase = async () => {
     
     while (retries > 0) {
       try {
-        auth = getAuth(app);
+        // Initialize auth with React Native persistence
+        auth = initializeAuth(app, {
+          persistence: getReactNativePersistence(AsyncStorage)
+        });
+        
         db = getFirestore(app);
         storage = getStorage(app);
         isFirebaseInitialized = true;
-        console.log('Firebase initialized successfully for React Native');
+        console.log('Firebase v9 initialized successfully for React Native');
         break;
       } catch (serviceError) {
         retries--;
@@ -102,8 +107,10 @@ const createFallbackAuth = () => {
   return fallbackAuth;
 };
 
-// Initialize Firebase immediately
-initializeFirebase();
+// Initialize Firebase with a small delay to allow React Native to register components
+setTimeout(() => {
+  initializeFirebase();
+}, 1000);
 
 export { auth, db, storage, app, isFirebaseInitialized };
 export default app;

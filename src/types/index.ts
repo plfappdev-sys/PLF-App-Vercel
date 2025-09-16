@@ -90,6 +90,11 @@ export interface RootStackParamList {
 export interface Member {
   memberNumber: string;
   userId: string;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    fullName: string;
+  };
   financialInfo: {
     totalContributions: number;
     currentBalance: number;

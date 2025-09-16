@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useMockAuth } from '../contexts/MockAuthContext';
-import MockMemberService from '../services/MockMemberService';
+import RealMemberService from '../services/RealMemberService';
 import { Member } from '../types/index';
 import { PLFTheme } from '../theme/colors';
 
@@ -26,12 +26,12 @@ const DashboardScreen: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       // Load fund statistics for all roles
-      const stats = await MockMemberService.getFundStatistics();
+      const stats = await RealMemberService.getFundStatistics();
       setFundStats(stats);
 
       // Load member-specific data if user is a member
       if (currentUser?.role === 'member' && currentUser.memberNumber) {
-        const member = await MockMemberService.getMemberByNumber(currentUser.memberNumber);
+        const member = await RealMemberService.getMemberByNumber(currentUser.memberNumber);
         setMemberData(member);
       }
     } catch (error) {

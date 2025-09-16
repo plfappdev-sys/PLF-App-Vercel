@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import RealMemberService from '../services/RealMemberService';
 
 interface User {
   uid: string;
@@ -52,6 +53,7 @@ interface AuthContextType {
   isSuperUser: () => boolean;
   isAdmin: () => boolean;
   isExecutive: () => boolean;
+  verifyMemberNumber: (memberNumber: string) => Promise<boolean>;
 }
 
 const MockAuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -298,6 +300,11 @@ export const MockAuthProvider: React.FC<MockAuthProviderProps> = ({ children }) 
     return currentUser?.role === 'executive' || currentUser?.role === 'admin' || currentUser?.role === 'superuser';
   };
 
+  // Verify member number using real data
+  const verifyMemberNumber = async (memberNumber: string): Promise<boolean> => {
+    return RealMemberService.verifyMemberNumber(memberNumber);
+  };
+
   const value: AuthContextType = {
     currentUser,
     loading,
@@ -309,7 +316,8 @@ export const MockAuthProvider: React.FC<MockAuthProviderProps> = ({ children }) 
     rejectUser,
     isSuperUser,
     isAdmin,
-    isExecutive
+    isExecutive,
+    verifyMemberNumber
   };
 
   return (

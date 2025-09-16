@@ -3,9 +3,16 @@ import { auth, db, app, isFirebaseInitialized } from '../../firebase.rn.config';
 import { User, UserRole } from '../types/index';
 import MemberService from '../services/memberService';
 import { UserService } from '../services/UserService';
-import { User as FirebaseUser, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { isFirebaseAuthAvailable, withFirebaseAuthCheck, safeFirebaseOperation } from '../utils/firebaseUtils';
 import { Alert } from 'react-native';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, collection, updateDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -63,8 +70,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Check if SuperUser exists - handle permission errors gracefully
       try {
-        const superUserDoc = await db.collection('users').doc('superuser@plf.com').get();
-        if (!superUserDoc.exists) {
+        const superUserDoc = await getDoc(doc(db, 'users', 'superuser@plf.com'));
+        if (!superUserDoc.exists()) {
           // Create SuperUser account data in Firestore
           const superUserData: User = {
             uid: 'superuser-uid',
@@ -95,7 +102,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             createdBy: 'system'
           };
 
-          await db.collection('users').doc('superuser@plf.com').set(superUserData);
+          await setDoc(doc(db, 'users', 'superuser@plf.com'), superUserData);
           console.log('SuperUser account initialized');
         }
       } catch (firestoreError) {
@@ -110,8 +117,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Fetch user profile from Firestore
   const fetchUserProfile = async (firebaseUser: FirebaseUser): Promise<User | null> => {
     try {
-      const userDoc = await db.collection('users').doc(firebaseUser.email || firebaseUser.uid).get();
-      if (userDoc.exists) {
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.email || firebaseUser.uid));
+      if (userDoc.exists()) {
         const userData = userDoc.data() as User;
         // Convert Firestore timestamps to Date objects
         return {
@@ -162,11 +169,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Special handling for SuperUser (since we can't create Firebase auth for demo)
       if (email === 'superuser@plf.com' && password === 'Wawa@PLF2025') {
-        const superUserDoc = await db.collection('users').doc('superuser@plf.com').get();
-        if (superUserDoc.exists) {
+        const superUserDoc = await getDoc(doc(db, 'users', 'superuser@plf.com'));
+        if (superUserDoc.exists()) {
           setCurrentUser(superUserDoc.data() as User);
           return;
         }
+      }
+      
+      // Check if Firebase is properly initialized
+      if (!isFirebaseInitialized) {
+        throw new Error('Firebase is not initialized yet. Please wait a moment and try again.');
       }
       
       // Check if Firebase auth is available
@@ -186,6 +198,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Signup function
   const signup = async (email: string, password: string, userData: Partial<User>): Promise<void> => {
     try {
+      // Check if Firebase is properly initialized
+      if (!isFirebaseInitialized) {
+        throw new Error('Firebase is not initialized yet. Please wait a moment and try again.');
+      }
+      
       // Verify member number if it's an existing member
       if (userData.membershipInfo?.membershipType === 'existing' && userData.memberNumber) {
         const isValid = await verifyMemberNumber(userData.memberNumber);
@@ -216,7 +233,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
 
       // Save user profile to Firestore
-      await db.collection('users').doc(email).set(newUser);
+      await setDoc(doc(db, 'users', email), newUser);
       
       // Link to existing member if applicable
       if (userData.memberNumber && userData.membershipInfo?.membershipType === 'existing') {
@@ -240,6 +257,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
       
+      // Check if Firebase is properly initialized
+      if (!isFirebaseInitialized) {
+        throw new Error('Firebase is not initialized yet. Please wait a moment and try again.');
+      }
+      
       await signOut(auth);
       setCurrentUser(null);
       setFirebaseUser(null);
@@ -254,13 +276,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!currentUser) throw new Error('No user logged in');
     
     try {
+      // Check if Firebase is properly initialized
+      if (!isFirebaseInitialized) {
+        throw new Error('Firebase is not initialized yet. Please wait a moment and try again.');
+      }
+      
       const updatedUser = {
         ...currentUser,
         ...userData,
         updatedAt: new Date()
       };
       
-      await db.collection('users').doc(currentUser.email).set(updatedUser, { merge: true });
+      await setDoc(doc(db, 'users', currentUser.email), updatedUser, { merge: true });
       setCurrentUser(updatedUser);
     } catch (error) {
       console.error('Error updating user profile:', error);
@@ -270,27 +297,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Monitor authentication state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setLoading(true);
-      setFirebaseUser(firebaseUser);
-      
-      if (firebaseUser) {
-        const userProfile = await fetchUserProfile(firebaseUser);
-        setCurrentUser(userProfile);
-      } else {
-        // Check if we have a SuperUser session
-        if (!currentUser || currentUser.email !== 'superuser@plf.com') {
-          setCurrentUser(null);
-        }
+    let unsubscribe: (() => void) | null = null;
+    
+    const setupAuthListener = async () => {
+      // Wait for Firebase to initialize
+      if (!isFirebaseInitialized) {
+        console.log('Waiting for Firebase initialization...');
+        // Retry after a short delay
+        setTimeout(setupAuthListener, 1000);
+        return;
       }
       
-      setLoading(false);
-    });
+      try {
+        unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          setLoading(true);
+          setFirebaseUser(firebaseUser);
+          
+          if (firebaseUser) {
+            const userProfile = await fetchUserProfile(firebaseUser);
+            setCurrentUser(userProfile);
+          } else {
+            // Check if we have a SuperUser session
+            if (!currentUser || currentUser.email !== 'superuser@plf.com') {
+              setCurrentUser(null);
+            }
+          }
+          
+          setLoading(false);
+        });
+        
+        console.log('Auth state listener set up successfully');
+      } catch (error) {
+        console.error('Failed to set up auth state listener:', error);
+        // Retry after a short delay
+        setTimeout(setupAuthListener, 1000);
+      }
+    };
 
     // Initialize system data
     initializeSystemData();
+    
+    // Set up auth listener
+    setupAuthListener();
 
-    return unsubscribe;
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   // Role-based permission checks

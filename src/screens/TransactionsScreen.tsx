@@ -10,7 +10,7 @@ import {
   Chip
 } from 'react-native-paper';
 import { useMockAuth } from '../contexts/MockAuthContext';
-import MockMemberService from '../services/MockMemberService';
+import RealMemberService from '../services/RealMemberService';
 
 interface Transaction {
   transactionId: string;
@@ -30,7 +30,7 @@ const TransactionsScreen: React.FC = () => {
 
   const loadTransactions = async () => {
     try {
-      const recentTransactions = await MockMemberService.getRecentTransactions();
+      const recentTransactions = await RealMemberService.getRecentTransactions();
       setTransactions(recentTransactions);
     } catch (error) {
       console.error('Error loading transactions:', error);

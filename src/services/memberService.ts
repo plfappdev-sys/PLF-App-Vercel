@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase.config';
+import { db } from '../../firebase.rn.config';
 
 class MemberService {
   // Initialize member data (placeholder for now)

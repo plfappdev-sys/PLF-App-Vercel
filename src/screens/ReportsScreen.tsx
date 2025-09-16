@@ -20,6 +20,7 @@ import { useMockAuth } from '../contexts/MockAuthContext';
 import { ReportService } from '../services/ReportService';
 import { PDFReportGenerator } from '../services/PDFReportGenerator';
 import { downloadHTMLReport, downloadCSVReport, generateReportFilename } from '../utils/fileDownload';
+import RealMemberService from '../services/RealMemberService';
 
 interface Report {
   id: string;
@@ -198,20 +199,31 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
+  // State for member menu visibility
+  const [showMemberMenu, setShowMemberMenu] = useState(false);
+
   // Load available members for selection
   const loadAvailableMembers = async () => {
     try {
-      // Mock member data - in real app, this would come from MemberService
-      const members = [
-        { memberNumber: 'MEMBER001', name: 'John Doe' },
-        { memberNumber: 'MEMBER002', name: 'Jane Smith' },
-        { memberNumber: 'MEMBER003', name: 'Mike Johnson' },
-        { memberNumber: 'MEMBER004', name: 'Sarah Wilson' },
-        { memberNumber: 'MEMBER005', name: 'David Brown' },
-      ];
-      setAvailableMembers(members);
+      // Get real member data from RealMemberService
+      const members = await RealMemberService.getAllMembers();
+      const availableMembersList = members.map(member => ({
+        memberNumber: member.memberNumber,
+        name: member.personalInfo?.fullName || `Member ${member.memberNumber}`
+      }));
+      setAvailableMembers(availableMembersList);
     } catch (error) {
       console.error('Error loading members:', error);
+      // Fallback to mock data if real data fails - use actual member numbers from real data
+      const members = [
+        { memberNumber: 'Member 6', name: 'Christopher Naude (Mock)' },
+        { memberNumber: 'Member 24', name: 'Jeffrey Matlou (Mock)' },
+        { memberNumber: 'Member 25', name: 'Jonas Letlhaku (Mock)' },
+        { memberNumber: 'Member 54', name: 'Naomi Mokhine (Mock)' },
+        { memberNumber: 'Member 55', name: 'Nicholas Molale (Mock)' },
+        { memberNumber: 'Member 66', name: 'Refilwe Lentswe (Mock)' },
+      ];
+      setAvailableMembers(members);
     }
   };
 
@@ -371,6 +383,47 @@ const ReportsScreen: React.FC = () => {
             startDate,
             endDate,
             transactionType === 'all' ? undefined : transactionType as any,
+            generatedBy
+          );
+          break;
+        
+        case '6': // Standing Analysis Report
+          reportData = await ReportService.generateStandingAnalysisReport(generatedBy);
+          break;
+        
+        case '7': // Interest Earned Report
+          reportData = await ReportService.generateInterestEarnedReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '8': // Interest Charged Report
+          reportData = await ReportService.generateInterestChargedReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '9': // Member Interest Statement
+          if (!selectedMember) {
+            alert('Please select a member for this report.');
+            return;
+          }
+          reportData = await ReportService.generateMemberInterestStatement(
+            selectedMember,
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '10': // Fund Interest Summary Report
+          reportData = await ReportService.generateFundInterestSummaryReport(
+            startDate,
+            endDate,
             generatedBy
           );
           break;
@@ -638,24 +691,30 @@ const ReportsScreen: React.FC = () => {
             {selectedReport?.type === 'member' && (
               <>
                 <Text style={styles.modalLabel}>Select Member</Text>
+                <TouchableOpacity 
+                  style={styles.memberSelector}
+                  onPress={() => setShowMemberMenu(true)}
+                >
+                  <Text style={styles.memberSelectorText}>
+                    {selectedMember 
+                      ? availableMembers.find(m => m.memberNumber === selectedMember)?.name || selectedMember
+                      : 'Select a member...'
+                    }
+                  </Text>
+                </TouchableOpacity>
+                
                 <Menu
-                  visible={false} // Controlled by separate state
-                  onDismiss={() => {}}
-                  anchor={
-                    <TouchableOpacity style={styles.memberSelector}>
-                      <Text style={styles.memberSelectorText}>
-                        {selectedMember 
-                          ? availableMembers.find(m => m.memberNumber === selectedMember)?.name || selectedMember
-                          : 'Select a member...'
-                        }
-                      </Text>
-                    </TouchableOpacity>
-                  }
+                  visible={showMemberMenu}
+                  onDismiss={() => setShowMemberMenu(false)}
+                  anchor={{ x: 0, y: 0 }} // Position will be handled by the TouchableOpacity
                 >
                   {availableMembers.map(member => (
                     <Menu.Item
                       key={member.memberNumber}
-                      onPress={() => setSelectedMember(member.memberNumber)}
+                      onPress={() => {
+                        setSelectedMember(member.memberNumber);
+                        setShowMemberMenu(false);
+                      }}
                       title={member.name}
                       titleStyle={styles.memberItem}
                     />

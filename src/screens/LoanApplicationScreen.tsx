@@ -13,7 +13,7 @@ import {
 } from 'react-native-paper';
 import { useMockAuth } from '../contexts/MockAuthContext';
 import MockLoanService from '../services/MockLoanService';
-import MockMemberService from '../services/MockMemberService';
+import RealMemberService from '../services/RealMemberService';
 import { Member } from '../types/index';
 
 const LoanApplicationScreen: React.FC = () => {
@@ -60,7 +60,7 @@ const LoanApplicationScreen: React.FC = () => {
     const loadData = async () => {
       try {
         // Load all members for guarantor selection
-        const allMembers = await MockMemberService.getAllMembers();
+        const allMembers = await RealMemberService.getAllMembers();
         // Filter out current user and members who are already added as guarantors
         const availableMembers = allMembers.filter(member => 
           member.memberNumber !== currentUser?.memberNumber &&
@@ -70,7 +70,7 @@ const LoanApplicationScreen: React.FC = () => {
 
         // Load current member's financial information if they have a member number
         if (currentUser?.memberNumber) {
-          const memberData = await MockMemberService.getMemberByNumber(currentUser.memberNumber);
+          const memberData = await RealMemberService.getMemberByNumber(currentUser.memberNumber);
           if (memberData) {
             setMemberFinancialInfo({
               currentBalance: memberData.financialInfo.currentBalance,
