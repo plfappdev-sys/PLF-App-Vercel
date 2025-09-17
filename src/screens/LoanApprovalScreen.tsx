@@ -12,12 +12,12 @@ import {
   List,
   IconButton
 } from 'react-native-paper';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import MockLoanService from '../services/MockLoanService';
 import { Loan } from '../types/index';
 
 const LoanApprovalScreen: React.FC = () => {
-  const { currentUser } = useMockAuth();
+  const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingLoans, setPendingLoans] = useState<Loan[]>([]);

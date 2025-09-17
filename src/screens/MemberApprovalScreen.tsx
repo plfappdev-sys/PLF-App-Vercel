@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Card, Button, ActivityIndicator, Divider } from 'react-native-paper';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import { User } from '../types/index';
 import { PLFTheme } from '../theme/colors';
 
 const MemberApprovalScreen: React.FC = () => {
-  const { getPendingApprovals, approveUser, rejectUser, isSuperUser, isAdmin, isExecutive } = useMockAuth();
+  const { getPendingApprovals, approveUser, rejectUser, isSuperUser, isAdmin, isExecutive } = useAuth();
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);

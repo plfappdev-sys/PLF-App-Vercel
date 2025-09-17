@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Chip
 } from 'react-native-paper';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import RealMemberService from '../services/RealMemberService';
 
 interface Transaction {
@@ -23,7 +23,7 @@ interface Transaction {
 }
 
 const TransactionsScreen: React.FC = () => {
-  const { currentUser } = useMockAuth();
+  const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');

@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import { RootStackParamList, UserRole } from '../types/index';
 import { PLFTheme } from '../theme/colors';
 
@@ -93,11 +93,11 @@ const getTabsForRole = (role: UserRole) => {
 
 // Main tab navigator
 const MainTabNavigator: React.FC = () => {
-  const { currentUser } = useMockAuth();
+  const { user } = useAuth();
   
-  if (!currentUser) return null;
+  if (!user) return null;
 
-  const tabs = getTabsForRole(currentUser.role);
+  const tabs = getTabsForRole(user.role as UserRole);
 
   return (
     <Tab.Navigator
@@ -157,7 +157,7 @@ const AuthStackNavigator: React.FC = () => {
 
 // Main app navigator
 const AppNavigator: React.FC = () => {
-  const { currentUser, loading } = useMockAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return null;
@@ -166,7 +166,7 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator id={undefined} screenOptions={{ headerShown: false }}>
-        {currentUser ? (
+        {user ? (
           <>
             <Stack.Screen name="MainTabs" component={MainTabNavigator} />
             <Stack.Screen 

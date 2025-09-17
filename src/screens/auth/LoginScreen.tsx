@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useMockAuth } from '../../contexts/MockAuthContext';
+import { useAuth } from '../../contexts/SupabaseAuthContext';
 import { PLFTheme } from '../../theme/colors';
 import { RootStackParamList } from '../../types/index';
 
@@ -12,7 +12,7 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [loginStatus, setLoginStatus] = useState('');
-  const { login } = useMockAuth();
+  const { signIn } = useAuth();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const handleLogin = async () => {
@@ -25,7 +25,7 @@ const LoginScreen: React.FC = () => {
     setLoginStatus('');
     try {
       console.log('Attempting login with:', email);
-      await login(email, password);
+      await signIn(email, password);
       console.log('Login successful, current user should be set');
       setLoginStatus('Login successful! Redirecting...');
       // Navigation will be handled by the auth state change in AuthContext

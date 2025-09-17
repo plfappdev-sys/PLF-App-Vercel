@@ -10,13 +10,14 @@ import {
   Divider
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import RealMemberService from '../services/RealMemberService';
+import { SupabaseMemberService } from '../services/supabaseMemberService';
 import { Member } from '../types/index';
 import { PLFTheme } from '../theme/colors';
 
 const DashboardScreen: React.FC = () => {
-  const { currentUser, logout } = useMockAuth();
+  const { user: currentUser, signOut } = useAuth();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -25,17 +26,22 @@ const DashboardScreen: React.FC = () => {
 
   const loadDashboardData = async () => {
     try {
-      // Load fund statistics for all roles
-      const stats = await RealMemberService.getFundStatistics();
+      // Load fund statistics for all roles - use Supabase for real data
+      const stats = await SupabaseMemberService.getFundStatistics();
       setFundStats(stats);
 
       // Load member-specific data if user is a member
-      if (currentUser?.role === 'member' && currentUser.memberNumber) {
-        const member = await RealMemberService.getMemberByNumber(currentUser.memberNumber);
-        setMemberData(member);
+      // For now, we'll use mock data since the real member data isn't integrated yet
+      if (currentUser?.role === 'member') {
+        // TODO: Replace with actual member data integration
+        const mockMember = await RealMemberService.getMemberByNumber('6'); // Using a test member number
+        setMemberData(mockMember);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      // Fallback to mock data if Supabase fails
+      const stats = await RealMemberService.getFundStatistics();
+      setFundStats(stats);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -105,7 +111,7 @@ const DashboardScreen: React.FC = () => {
       <Card style={styles.welcomeCard}>
         <Card.Content>
           <Title style={styles.welcomeTitle}>
-            Welcome, {currentUser?.personalInfo.firstName}!
+            Welcome, {currentUser?.email.split('@')[0]}!
           </Title>
           <Text style={styles.roleText}>
             Role: {currentUser?.role?.toUpperCase()}
@@ -115,7 +121,7 @@ const DashboardScreen: React.FC = () => {
           </Text>
           <Button 
             mode="outlined" 
-            onPress={logout}
+            onPress={() => signOut()}
             style={styles.logoutButton}
             labelStyle={styles.logoutButtonText}
           >

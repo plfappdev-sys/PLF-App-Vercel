@@ -11,13 +11,13 @@ import {
   List,
   Chip
 } from 'react-native-paper';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import MockLoanService from '../services/MockLoanService';
 import RealMemberService from '../services/RealMemberService';
 import { Member } from '../types/index';
 
 const LoanApplicationScreen: React.FC = () => {
-  const { currentUser } = useMockAuth();
+  const { user: currentUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [memberFinancialInfo, setMemberFinancialInfo] = useState<{

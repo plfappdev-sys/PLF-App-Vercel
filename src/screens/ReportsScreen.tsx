@@ -16,8 +16,9 @@ import {
   Divider
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useMockAuth } from '../contexts/MockAuthContext';
+import { useAuth } from '../contexts/SupabaseAuthContext';
 import { ReportService } from '../services/ReportService';
+import { SupabaseReportService } from '../services/supabaseReportService';
 import { PDFReportGenerator } from '../services/PDFReportGenerator';
 import { downloadHTMLReport, downloadCSVReport, generateReportFilename } from '../utils/fileDownload';
 import RealMemberService from '../services/RealMemberService';
@@ -32,7 +33,7 @@ interface Report {
 }
 
 const ReportsScreen: React.FC = () => {
-  const { currentUser } = useMockAuth();
+  const { user: currentUser } = useAuth();
   const [generating, setGenerating] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<'all' | 'financial' | 'member' | 'transaction' | 'analytics'>('all');
   
@@ -238,7 +239,7 @@ const ReportsScreen: React.FC = () => {
       
       switch (selectedReport.id) {
         case '1': // Fund Status Report
-          reportData = await ReportService.generateFundStatusReport(generatedBy);
+          reportData = await SupabaseReportService.generateFundStatusReport(generatedBy);
           break;
         
         case '2': // Member Statement Report
@@ -246,11 +247,11 @@ const ReportsScreen: React.FC = () => {
             alert('Please select a member for this report.');
             return;
           }
-          reportData = await ReportService.generateMemberStatementReport(selectedMember, generatedBy);
+          reportData = await SupabaseReportService.generateMemberStatementReport(selectedMember, generatedBy);
           break;
         
         case '3': // Transaction Report
-          reportData = await ReportService.generateTransactionReport(
+          reportData = await SupabaseReportService.generateTransactionReport(
             startDate,
             endDate,
             transactionType === 'all' ? undefined : transactionType as any,
@@ -367,7 +368,7 @@ const ReportsScreen: React.FC = () => {
       
       switch (selectedReport.id) {
         case '1': // Fund Status Report
-          reportData = await ReportService.generateFundStatusReport(generatedBy);
+          reportData = await SupabaseReportService.generateFundStatusReport(generatedBy);
           break;
         
         case '2': // Member Statement Report
@@ -375,11 +376,11 @@ const ReportsScreen: React.FC = () => {
             alert('Please select a member for this report.');
             return;
           }
-          reportData = await ReportService.generateMemberStatementReport(selectedMember, generatedBy);
+          reportData = await SupabaseReportService.generateMemberStatementReport(selectedMember, generatedBy);
           break;
         
         case '3': // Transaction Report
-          reportData = await ReportService.generateTransactionReport(
+          reportData = await SupabaseReportService.generateTransactionReport(
             startDate,
             endDate,
             transactionType === 'all' ? undefined : transactionType as any,
@@ -433,7 +434,7 @@ const ReportsScreen: React.FC = () => {
           return;
       }
 
-      const csvContent = ReportService.exportToCSV(reportData);
+      const csvContent = SupabaseReportService.exportToCSV(reportData);
       const filename = generateReportFilename(reportData.reportType, '.csv');
       await downloadCSVReport(csvContent, filename);
       

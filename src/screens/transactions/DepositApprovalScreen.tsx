@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { useMockAuth } from '../../contexts/MockAuthContext';
+import { useAuth } from '../../contexts/SupabaseAuthContext';
 import { Transaction } from '../../types/index';
 
 // Mock transaction service for deposit approvals
@@ -107,7 +107,7 @@ const MockTransactionService = {
 };
 
 export default function DepositApprovalScreen() {
-  const { currentUser } = useMockAuth();
+  const { user: currentUser } = useAuth();
   const [pendingDeposits, setPendingDeposits] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

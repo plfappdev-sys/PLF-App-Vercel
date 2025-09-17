@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-nat
 import { TextInput, Button, Text } from 'react-native-paper';
 import { SignUpForm } from '../../types';
 import { useNavigation } from '@react-navigation/native';
-import { useMockAuth } from '../../contexts/MockAuthContext';
+import { useAuth } from '../../contexts/SupabaseAuthContext';
 import { PLFTheme } from '../../theme/colors';
 
 const SignUpScreen: React.FC = () => {
@@ -31,7 +31,7 @@ const SignUpScreen: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [signupStatus, setSignupStatus] = useState('');
-  const { signup } = useMockAuth();
+  const { signUp } = useAuth();
   const navigation = useNavigation();
 
   const handleSignUp = async () => {
@@ -51,21 +51,13 @@ const SignUpScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      await signup(formData.email, formData.password, {
-        personalInfo: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          idNumber: formData.idNumber,
-          dateOfBirth: new Date(), // Should be from date picker
-          phoneNumber: formData.phoneNumber,
-          address: formData.address
-        },
-        membershipInfo: {
-          membershipType: formData.membershipType,
-          joinDate: new Date(),
-        },
-        memberNumber: formData.membershipType === 'existing' ? formData.memberNumber : undefined
-      });
+      const result = await signUp(formData.email, formData.password, 
+        formData.membershipType === 'existing' ? formData.memberNumber : undefined
+      );
+      
+      if (result.error) {
+        throw new Error(result.error);
+      }
       
       setSignupStatus('Account created successfully! Please wait for verification.');
       // Navigation will be handled by the auth state change in AppNavigator
