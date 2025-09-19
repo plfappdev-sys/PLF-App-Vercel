@@ -6,6 +6,11 @@ describe('InterestCalculationService', () => {
   const testMemberWithSavings: Member = {
     memberNumber: 'MEM001',
     userId: 'user123',
+    personalInfo: {
+      firstName: 'Test',
+      lastName: 'Member',
+      fullName: 'Test Member'
+    },
     financialInfo: {
       totalContributions: 12000,
       currentBalance: 50000, // R50,000 savings
@@ -44,7 +49,7 @@ describe('InterestCalculationService', () => {
       ...testMemberWithSavings.financialInfo,
       currentBalance: -25000, // R25,000 loan outstanding
       outstandingAmount: 25000,
-      interestRate: 0.10 // 10% annual interest on loans
+      interestRate: 0.20 // 20% annual interest on loans as per Resolution PLF-AGM/2023/007
     }
   };
 
@@ -56,8 +61,8 @@ describe('InterestCalculationService', () => {
       
       const interest = InterestCalculationService.calculateDailyInterest(principal, annualRate, days, true);
       
-      // Compound interest: 10000 * (1 + 0.05/365)^365 - 10000 ≈ 512.68
-      expect(interest).toBeCloseTo(512.68, 2);
+      // Compound interest: 10000 * (1 + 0.05/365)^365 - 10000 ≈ 512.67
+      expect(interest).toBeCloseTo(512.67, 2);
     });
 
     it('should calculate simple interest correctly', () => {
@@ -100,8 +105,8 @@ describe('InterestCalculationService', () => {
         1 // 1 day
       );
 
-      // Daily interest on R25,000 at 10%: 25000 * (1 + 0.10/365)^1 - 25000 ≈ 6.85
-      expect(interestCharged).toBeCloseTo(6.85, 2);
+      // Daily interest on R25,000 at 20%: 25000 * (1 + 0.20/365)^1 - 25000 ≈ 13.70
+      expect(interestCharged).toBeCloseTo(13.70, 2);
       expect(interestEarned).toBe(0);
     });
 
@@ -121,9 +126,9 @@ describe('InterestCalculationService', () => {
       );
 
       // Interest earned on R25,000 at 5%: ~3.42
-      // Interest charged on R10,000 at 10%: ~2.74
+      // Interest charged on R10,000 at 20%: ~5.48
       expect(interestEarned).toBeCloseTo(3.42, 2);
-      expect(interestCharged).toBeCloseTo(2.74, 2);
+      expect(interestCharged).toBeCloseTo(5.48, 2);
     });
   });
 
@@ -194,12 +199,12 @@ describe('InterestCalculationService', () => {
       const updatedMember = InterestCalculationService.updateMemberBalances(
         testMemberWithLoan,
         0,
-        6.85
+        13.70
       );
 
-      expect(updatedMember.financialInfo.currentInterestCharged).toBe(6.85);
-      expect(updatedMember.financialInfo.totalInterestCharged).toBe(6.85);
-      expect(updatedMember.financialInfo.currentBalance).toBe(-25006.85);
+      expect(updatedMember.financialInfo.currentInterestCharged).toBe(13.70);
+      expect(updatedMember.financialInfo.totalInterestCharged).toBe(13.70);
+      expect(updatedMember.financialInfo.currentBalance).toBe(-25013.70);
     });
   });
 
@@ -216,8 +221,8 @@ describe('InterestCalculationService', () => {
         true
       );
 
-      // 30 days compound interest: ~41.10
-      expect(interest).toBeCloseTo(41.10, 2);
+      // 30 days compound interest: ~41.18
+      expect(interest).toBeCloseTo(41.18, 2);
     });
   });
 
@@ -235,7 +240,7 @@ describe('InterestCalculationService', () => {
       expect(report.memberNumber).toBe('MEM001');
       expect(report.period.days).toBe(30);
       expect(report.currentBalance).toBe(50000);
-      expect(report.projectedInterestEarned).toBeCloseTo(205.50, 2); // 30 days interest on R50,000
+      expect(report.projectedInterestEarned).toBeCloseTo(205.89, 2); // 30 days interest on R50,000
       expect(report.calculationMethod).toBe('daily');
     });
   });

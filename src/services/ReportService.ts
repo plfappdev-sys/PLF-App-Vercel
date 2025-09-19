@@ -1,5 +1,6 @@
 import { Member, Transaction, FundStatistics } from '../types/index';
-import MockMemberService from './MockMemberService';
+import { SupabaseMemberService } from './supabaseMemberService';
+import { SupabaseTransactionService } from './supabaseTransactionService';
 import { InterestReportService } from './InterestReportService';
 
 export interface ReportData {
@@ -22,20 +23,20 @@ export class ReportService {
       try {
         console.log('Starting Promise.all for fund status report');
         [members, fundStats, recentTransactions] = await Promise.all([
-          MockMemberService.getAllMembers(),
-          MockMemberService.getFundStatistics(),
-          MockMemberService.getRecentTransactions()
+          SupabaseMemberService.getAllMembers(),
+          SupabaseMemberService.getFundStatistics(),
+          SupabaseTransactionService.getRecentTransactions()
         ]);
         console.log('Promise.all completed successfully');
       } catch (promiseError) {
         console.error('Promise.all failed:', promiseError);
         // Fallback: try to get data individually
         console.log('Starting fallback data retrieval');
-        members = await MockMemberService.getAllMembers();
+        members = await SupabaseMemberService.getAllMembers();
         console.log('Members retrieved:', members.length);
-        fundStats = await MockMemberService.getFundStatistics();
+        fundStats = await SupabaseMemberService.getFundStatistics();
         console.log('Fund stats retrieved in fallback:', fundStats);
-        recentTransactions = await MockMemberService.getRecentTransactions();
+        recentTransactions = await SupabaseTransactionService.getRecentTransactions();
         console.log('Transactions retrieved:', recentTransactions.length);
       }
       
@@ -555,6 +556,122 @@ export class ReportService {
     }
   }
 
+  // Generate Monthly Contributions Report
+  static async generateMonthlyContributionsReport(
+    startDate: Date,
+    endDate: Date,
+    generatedBy: string
+  ): Promise<ReportData> {
+    try {
+      const members = await MockMemberService.getAllMembers();
+      const transactions = await MockMemberService.getRecentTransactions();
+      
+      // Filter contributions within date range
+      const contributions = transactions.filter(t => 
+        t.type === 'deposit' && 
+        t.status === 'approved' &&
+        new Date(t.date) >= startDate && 
+        new Date(t.date) <= endDate
+      );
+
+      // Group by month
+      const monthlyData: Record<string, number> = {};
+      contributions.forEach(contribution => {
+        const monthKey = new Date(contribution.date).toISOString().substring(0, 7); // YYYY-MM
+        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + contribution.amount;
+      });
+
+      // Calculate totals
+      const totalContributions = contributions.reduce((sum, t) => sum + t.amount, 0);
+      const averageContribution = contributions.length > 0 ? totalContributions / contributions.length : 0;
+
+      return {
+        title: 'Monthly Contributions Report',
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'monthly_contributions',
+        data: {
+          period: { startDate, endDate },
+          totalContributions,
+          averageContribution,
+          contributionCount: contributions.length,
+          monthlyBreakdown: Object.entries(monthlyData).map(([month, amount]) => ({
+            month: new Date(month + '-01').toLocaleDateString('en-ZA', { year: 'numeric', month: 'short' }),
+            amount,
+            contributionCount: contributions.filter(t => 
+              new Date(t.date).toISOString().substring(0, 7) === month
+            ).length
+          })),
+          memberContributions: members.map(member => ({
+            memberNumber: member.memberNumber,
+            name: member.personalInfo?.fullName || `Member ${member.memberNumber}`,
+            totalContributed: contributions
+              .filter(t => t.memberNumber === member.memberNumber)
+              .reduce((sum, t) => sum + t.amount, 0),
+            contributionCount: contributions.filter(t => t.memberNumber === member.memberNumber).length
+          })).filter(m => m.totalContributed > 0)
+        },
+        summary: {
+          totalContributions,
+          averageContribution,
+          contributionCount: contributions.length,
+          activeContributors: new Set(contributions.map(t => t.memberNumber)).size
+        },
+      };
+    } catch (error) {
+      console.error('Error generating monthly contributions report:', error);
+      throw error;
+    }
+  }
+
+  // Generate Loan Portfolio Report
+  static async generateLoanPortfolioReport(generatedBy: string): Promise<ReportData> {
+    try {
+      const members = await MockMemberService.getAllMembers();
+      
+      // Filter members with outstanding loans
+      const borrowers = members.filter(member => (member.financialInfo?.outstandingAmount || 0) > 0);
+      
+      const totalOutstanding = borrowers.reduce((sum, m) => sum + (m.financialInfo?.outstandingAmount || 0), 0);
+      const averageLoanAmount = borrowers.length > 0 ? totalOutstanding / borrowers.length : 0;
+
+      return {
+        title: 'Loan Portfolio Report',
+        generatedDate: new Date(),
+        generatedBy,
+        reportType: 'loan_portfolio',
+        data: {
+          totalOutstanding,
+          averageLoanAmount,
+          borrowerCount: borrowers.length,
+          loanPortfolio: borrowers.map(borrower => ({
+            memberNumber: borrower.memberNumber,
+            name: borrower.personalInfo?.fullName || `Member ${borrower.memberNumber}`,
+            outstandingAmount: borrower.financialInfo?.outstandingAmount || 0,
+            totalContributions: borrower.financialInfo?.totalContributions || 0,
+            percentageOutstanding: borrower.financialInfo?.percentageOutstanding || 0,
+            standingCategory: borrower.membershipStatus?.standingCategory || 'good'
+          })),
+          riskAnalysis: {
+            highRisk: borrowers.filter(b => (b.financialInfo?.percentageOutstanding || 0) > 50).length,
+            mediumRisk: borrowers.filter(b => (b.financialInfo?.percentageOutstanding || 0) > 20 && (b.financialInfo?.percentageOutstanding || 0) <= 50).length,
+            lowRisk: borrowers.filter(b => (b.financialInfo?.percentageOutstanding || 0) <= 20).length
+          }
+        },
+        summary: {
+          totalOutstanding,
+          averageLoanAmount,
+          borrowerCount: borrowers.length,
+          riskPercentage: borrowers.length > 0 ? 
+            (borrowers.filter(b => (b.financialInfo?.percentageOutstanding || 0) > 50).length / borrowers.length) * 100 : 0
+        },
+      };
+    } catch (error) {
+      console.error('Error generating loan portfolio report:', error);
+      throw error;
+    }
+  }
+
   // Generate Fund Interest Summary Report
   static async generateFundInterestSummaryReport(
     startDate: Date,
@@ -709,6 +826,27 @@ export class ReportService {
       case 'transaction_report':
         csvContent += this.transactionReportToCSV(reportData.data);
         break;
+      case 'monthly_contributions':
+        csvContent += this.monthlyContributionsToCSV(reportData.data);
+        break;
+      case 'loan_portfolio':
+        csvContent += this.loanPortfolioToCSV(reportData.data);
+        break;
+      case 'standing_analysis':
+        csvContent += this.standingAnalysisToCSV(reportData.data);
+        break;
+      case 'interest_earned':
+        csvContent += this.interestEarnedToCSV(reportData.data);
+        break;
+      case 'interest_charged':
+        csvContent += this.interestChargedToCSV(reportData.data);
+        break;
+      case 'member_interest_statement':
+        csvContent += this.memberInterestStatementToCSV(reportData.data);
+        break;
+      case 'fund_interest_summary':
+        csvContent += this.fundInterestSummaryToCSV(reportData.data);
+        break;
       default:
         csvContent += 'CSV export not available for this report type\n';
     }
@@ -770,6 +908,191 @@ export class ReportService {
     
     (data.transactions || []).forEach((t: any) => {
       csv += `${new Date(t.date).toLocaleDateString()},${t.memberNumber},${t.type},R ${t.amount.toLocaleString()},${t.status},"${t.description}"\n`;
+    });
+
+    return csv;
+  }
+
+  private static monthlyContributionsToCSV(data: any): string {
+    let csv = 'Monthly Contributions Report\n';
+    csv += `Period: ${new Date(data.period.startDate).toLocaleDateString()} to ${new Date(data.period.endDate).toLocaleDateString()}\n\n`;
+    
+    csv += 'Summary\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Contributions,R ${(data.totalContributions || 0).toLocaleString()}\n`;
+    csv += `Average Contribution,R ${(data.averageContribution || 0).toLocaleString()}\n`;
+    csv += `Contribution Count,${data.contributionCount || 0}\n`;
+    csv += `Active Contributors,${data.activeContributors || 0}\n\n`;
+    
+    csv += 'Monthly Breakdown\n';
+    csv += 'Month,Amount,Contributions\n';
+    (data.monthlyBreakdown || []).forEach((month: any) => {
+      csv += `${month.month},R ${(month.amount || 0).toLocaleString()},${month.contributionCount || 0}\n`;
+    });
+    
+    csv += '\nMember Contributions\n';
+    csv += 'Member,Name,Total Contributed,Contribution Count\n';
+    (data.memberContributions || []).forEach((member: any) => {
+      csv += `${member.memberNumber},"${member.name}",R ${(member.totalContributed || 0).toLocaleString()},${member.contributionCount || 0}\n`;
+    });
+
+    return csv;
+  }
+
+  private static loanPortfolioToCSV(data: any): string {
+    let csv = 'Loan Portfolio Report\n\n';
+    
+    csv += 'Summary\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Outstanding,R ${(data.totalOutstanding || 0).toLocaleString()}\n`;
+    csv += `Average Loan Amount,R ${(data.averageLoanAmount || 0).toLocaleString()}\n`;
+    csv += `Borrower Count,${data.borrowerCount || 0}\n`;
+    csv += `Risk Percentage,${(data.riskPercentage || 0).toFixed(1)}%\n\n`;
+    
+    csv += 'Risk Analysis\n';
+    csv += 'Risk Level,Count\n';
+    csv += `High Risk,${data.riskAnalysis?.highRisk || 0}\n`;
+    csv += `Medium Risk,${data.riskAnalysis?.mediumRisk || 0}\n`;
+    csv += `Low Risk,${data.riskAnalysis?.lowRisk || 0}\n\n`;
+    
+    csv += 'Loan Portfolio Details\n';
+    csv += 'Member,Name,Outstanding Amount,Total Contributions,Percentage Outstanding,Standing\n';
+    (data.loanPortfolio || []).forEach((loan: any) => {
+      csv += `${loan.memberNumber},"${loan.name}",R ${(loan.outstandingAmount || 0).toLocaleString()},R ${(loan.totalContributions || 0).toLocaleString()},${(loan.percentageOutstanding || 0).toFixed(1)}%,${loan.standingCategory}\n`;
+    });
+
+    return csv;
+  }
+
+  private static standingAnalysisToCSV(data: any): string {
+    let csv = 'Member Standing Analysis Report\n\n';
+    
+    csv += 'Standing Analysis\n';
+    csv += 'Standing,Count,Total Balance,Total Contributions\n';
+    const standings = ['good', 'owing_10', 'owing_20', 'owing_30', 'owing_50', 'owing_65', 'owing_65_plus'];
+    standings.forEach(standing => {
+      const category = data.standingAnalysis[standing];
+      if (category) {
+        csv += `${standing.replace('_', ' ').toUpperCase()},${category.count},R ${(category.totalBalance || 0).toLocaleString()},R ${(category.totalContributions || 0).toLocaleString()}\n`;
+      }
+    });
+    
+    csv += '\nRisk Analysis\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Members,${data.riskAnalysis?.totalMembers || 0}\n`;
+    csv += `Total Fund Value,R ${(data.riskAnalysis?.totalFundValue || 0).toLocaleString()}\n`;
+    csv += `Total Outstanding,R ${(data.riskAnalysis?.totalOutstanding || 0).toLocaleString()}\n`;
+    csv += `Risk Percentage,${(data.riskAnalysis?.riskPercentage || 0).toFixed(1)}%\n`;
+    csv += `Members At Risk,${data.riskAnalysis?.membersAtRisk || 0}\n\n`;
+    
+    csv += 'Recommendations\n';
+    (data.recommendations || []).forEach((rec: string, index: number) => {
+      csv += `${index + 1}. ${rec}\n`;
+    });
+
+    return csv;
+  }
+
+  private static interestEarnedToCSV(data: any): string {
+    let csv = 'Interest Earned Report\n';
+    csv += `Period: ${new Date(data.period.start).toLocaleDateString()} to ${new Date(data.period.end).toLocaleDateString()}\n\n`;
+    
+    csv += 'Summary\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Interest Earned,R ${(data.totalInterestEarned || 0).toLocaleString()}\n`;
+    csv += `Total Interest Charged,R ${(data.totalInterestCharged || 0).toLocaleString()}\n`;
+    csv += `Net Interest,R ${(data.netInterest || 0).toLocaleString()}\n`;
+    csv += `Total Members,${data.summary?.totalMembers || 0}\n`;
+    csv += `Members With Savings,${data.summary?.membersWithSavings || 0}\n`;
+    csv += `Members With Loans,${data.summary?.membersWithLoans || 0}\n`;
+    csv += `Average Interest Rate,${(data.summary?.averageInterestRate || 0).toFixed(2)}%\n\n`;
+    
+    csv += 'Member Interest Details\n';
+    csv += 'Member,Interest Earned,Interest Charged,Net Interest\n';
+    (data.memberReports || []).forEach((member: any) => {
+      if (member.actualInterestEarned > 0) {
+        csv += `${member.memberNumber},R ${(member.actualInterestEarned || 0).toLocaleString()},R ${(member.actualInterestCharged || 0).toLocaleString()},R ${((member.actualInterestEarned || 0) - (member.actualInterestCharged || 0)).toLocaleString()}\n`;
+      }
+    });
+
+    return csv;
+  }
+
+  private static interestChargedToCSV(data: any): string {
+    let csv = 'Interest Charged Report\n';
+    csv += `Period: ${new Date(data.period.start).toLocaleDateString()} to ${new Date(data.period.end).toLocaleDateString()}\n\n`;
+    
+    csv += 'Summary\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Interest Charged,R ${(data.totalInterestCharged || 0).toLocaleString()}\n`;
+    csv += `Total Interest Earned,R ${(data.totalInterestEarned || 0).toLocaleString()}\n`;
+    csv += `Net Interest,R ${(data.netInterest || 0).toLocaleString()}\n`;
+    csv += `Total Members,${data.summary?.totalMembers || 0}\n`;
+    csv += `Members With Loans,${data.summary?.membersWithLoans || 0}\n`;
+    csv += `Average Loan Interest Rate,${(data.summary?.averageLoanInterestRate || 0).toFixed(2)}%\n\n`;
+    
+    csv += 'Member Interest Charges\n';
+    csv += 'Member,Interest Charged,Interest Earned,Net Interest\n';
+    (data.memberReports || []).forEach((member: any) => {
+      if (member.actualInterestCharged > 0) {
+        csv += `${member.memberNumber},R ${(member.actualInterestCharged || 0).toLocaleString()},R ${(member.actualInterestEarned || 0).toLocaleString()},R ${((member.actualInterestEarned || 0) - (member.actualInterestCharged || 0)).toLocaleString()}\n`;
+      }
+    });
+
+    return csv;
+  }
+
+  private static memberInterestStatementToCSV(data: any): string {
+    let csv = `Member Interest Statement - ${data.member.name}\n`;
+    csv += `Member Number: ${data.member.memberNumber}\n`;
+    csv += `Period: ${new Date(data.period.start).toLocaleDateString()} to ${new Date(data.period.end).toLocaleDateString()}\n\n`;
+    
+    csv += 'Member Information\n';
+    csv += 'Field,Value\n';
+    csv += `Name,${data.member.name}\n`;
+    csv += `Member Number,${data.member.memberNumber}\n`;
+    csv += `Current Balance,R ${(data.member.currentBalance || 0).toLocaleString()}\n`;
+    csv += `Total Contributions,R ${(data.member.totalContributions || 0).toLocaleString()}\n\n`;
+    
+    csv += 'Interest Summary\n';
+    csv += 'Metric,Amount\n';
+    csv += `Interest Earned,R ${(data.summary?.totalInterestEarned || 0).toLocaleString()}\n`;
+    csv += `Interest Charged,R ${(data.summary?.totalInterestCharged || 0).toLocaleString()}\n`;
+    csv += `Net Interest,R ${(data.summary?.netInterest || 0).toLocaleString()}\n\n`;
+    
+    csv += 'Interest Details\n';
+    csv += 'Type,Amount,Rate\n';
+    csv += `Savings Interest,R ${(data.interestDetails?.actualInterestEarned || 0).toLocaleString()},${(data.interestDetails?.savingsInterestRate || 0).toFixed(2)}%\n`;
+    csv += `Loan Interest,R ${(data.interestDetails?.actualInterestCharged || 0).toLocaleString()},${(data.interestDetails?.loanInterestRate || 0).toFixed(2)}%\n`;
+    csv += `Net Interest,R ${((data.interestDetails?.actualInterestEarned || 0) - (data.interestDetails?.actualInterestCharged || 0)).toLocaleString()}\n`;
+
+    return csv;
+  }
+
+  private static fundInterestSummaryToCSV(data: any): string {
+    let csv = 'Fund Interest Summary Report\n';
+    csv += `Period: ${new Date(data.period.start).toLocaleDateString()} to ${new Date(data.period.end).toLocaleDateString()}\n\n`;
+    
+    csv += 'Summary\n';
+    csv += 'Metric,Value\n';
+    csv += `Total Interest Earned,R ${(data.totalInterestEarned || 0).toLocaleString()}\n`;
+    csv += `Total Interest Charged,R ${(data.totalInterestCharged || 0).toLocaleString()}\n`;
+    csv += `Net Interest,R ${(data.netInterest || 0).toLocaleString()}\n`;
+    csv += `Total Members,${data.memberBreakdown?.totalMembers || 0}\n`;
+    csv += `Members With Savings,${data.memberBreakdown?.membersWithSavings || 0}\n`;
+    csv += `Members With Loans,${data.memberBreakdown?.membersWithLoans || 0}\n`;
+    csv += `Average Interest Rate,${(data.interestRates?.averageInterestRate || 0).toFixed(2)}%\n\n`;
+    
+    csv += 'Top Interest Earners\n';
+    csv += 'Rank,Member,Interest Earned\n';
+    (data.topEarners || []).forEach((member: any, index: number) => {
+      csv += `${index + 1},${member.memberNumber},R ${(member.actualInterestEarned || 0).toLocaleString()}\n`;
+    });
+    
+    csv += '\nTop Interest Payers\n';
+    csv += 'Rank,Member,Interest Charged\n';
+    (data.topBorrowers || []).forEach((member: any, index: number) => {
+      csv += `${index + 1},${member.memberNumber},R ${(member.actualInterestCharged || 0).toLocaleString()}\n`;
     });
 
     return csv;

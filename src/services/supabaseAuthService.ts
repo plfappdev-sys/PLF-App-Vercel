@@ -35,9 +35,9 @@ export class SupabaseAuthService {
       if (data.user) {
         // Ensure user profile exists in our users table
         await this.ensureUserProfile(data.user);
-        // Return the user from the signIn response, not by calling getCurrentUser again
-        // This avoids session issues that occur when calling getCurrentUser immediately after signIn
-        return { user: this.mapAuthUserToUser(data.user), error: null };
+        // Get the full user profile with correct role from database
+        const currentUser = await this.getCurrentUser();
+        return { user: currentUser, error: null };
       }
 
       return { user: null, error: 'No user data returned' };
@@ -61,7 +61,9 @@ export class SupabaseAuthService {
       if (data.user) {
         // Create user profile in our users table
         await this.createUserProfile(data.user, memberNumber);
-        return { user: this.mapAuthUserToUser(data.user), error: null };
+        // Get the full user profile with correct role from database
+        const currentUser = await this.getCurrentUser();
+        return { user: currentUser, error: null };
       }
 
       return { user: null, error: 'No user data returned' };
@@ -107,6 +109,8 @@ export class SupabaseAuthService {
         return null;
       }
 
+      console.log('Session user ID:', session.user?.id);
+
       const { data: { user }, error } = await supabase.auth.getUser();
       
       if (error) {
@@ -119,15 +123,19 @@ export class SupabaseAuthService {
             .eq('uid', session.user.id)
             .single();
 
+          console.log('Fallback query result:', { userProfile, profileError });
+
           if (!profileError && userProfile) {
-            return {
+            const result = {
               id: userProfile.uid,
               uid: userProfile.uid,
               email: userProfile.email,
               role: userProfile.role || 'member',
-              memberNumber: userProfile.member_number,
+              memberNumber: userProfile.membernumber,
               created_at: userProfile.created_at || new Date().toISOString(),
             };
+            console.log('Returning fallback user:', result);
+            return result;
           }
         }
         return null;
@@ -135,27 +143,36 @@ export class SupabaseAuthService {
 
       if (!user) return null;
 
+      console.log('Auth user ID:', user.id);
+
       // Get user profile from our users table to get the correct role and member number
       const { data: userProfile, error: profileError } = await supabase
         .from('users')
-        .select('role, member_number, created_at')
+        .select('role, membernumber, created_at')
         .eq('uid', user.id)
         .single();
+
+      console.log('User profile query result:', { userProfile, profileError });
 
       if (profileError) {
         console.error('Get user profile error:', profileError);
         // Return basic user info if profile doesn't exist
-        return this.mapAuthUserToUser(user);
+        const result = this.mapAuthUserToUser(user);
+        console.log('Returning mapped user (no profile):', result);
+        return result;
       }
 
-      return {
+      const result = {
         id: user.id,
         uid: user.id,
         email: user.email!,
         role: userProfile?.role || 'member',
-        memberNumber: userProfile?.member_number,
+        memberNumber: userProfile?.membernumber,
         created_at: userProfile?.created_at || new Date().toISOString(),
       };
+      
+      console.log('Returning full user with profile:', result);
+      return result;
     } catch (error) {
       console.error('Get user error:', error);
       return null;
@@ -216,9 +233,9 @@ export class SupabaseAuthService {
         role: 'member', // Default role
       };
 
-      // Only include member_number if the column exists and value is provided
+      // Only include membernumber if the column exists and value is provided
       if (memberNumber) {
-        userProfile.member_number = memberNumber;
+        userProfile.membernumber = memberNumber;
       }
 
       const { error } = await supabase
@@ -227,9 +244,9 @@ export class SupabaseAuthService {
 
       if (error) {
         console.error('Create user profile error:', error);
-        // If member_number column doesn't exist, try without it
-        if (error.code === 'PGRST204' && error.message?.includes('member_number')) {
-          delete userProfile.member_number;
+        // If membernumber column doesn't exist, try without it
+        if (error.code === 'PGRST204' && error.message?.includes('membernumber')) {
+          delete userProfile.membernumber;
           const { error: retryError } = await supabase
             .from('users')
             .insert(userProfile);

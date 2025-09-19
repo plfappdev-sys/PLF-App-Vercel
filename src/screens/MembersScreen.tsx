@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { 
   Title, 
   Card, 
@@ -8,11 +8,17 @@ import {
   List,
   ActivityIndicator,
   Chip,
-  Searchbar
+  Searchbar,
+  Menu,
+  Dialog,
+  Portal,
+  Paragraph,
+  TextInput
 } from 'react-native-paper';
 import { useAuth } from '../contexts/SupabaseAuthContext';
-import RealMemberService from '../services/RealMemberService';
-import { Member } from '../types/index';
+import { SupabaseMemberService } from '../services/supabaseMemberService';
+import { SupabaseUserService } from '../services/supabaseUserService';
+import { Member, User, UserRole } from '../types/index';
 
 const MembersScreen: React.FC = () => {
   const { user: currentUser } = useAuth();
@@ -21,14 +27,67 @@ const MembersScreen: React.FC = () => {
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'good' | 'owing'>('all');
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [roleDialogVisible, setRoleDialogVisible] = useState(false);
+  const [linkDialogVisible, setLinkDialogVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('member');
+  const [selectedMemberNumber, setSelectedMemberNumber] = useState('');
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedMemberForMenu, setSelectedMemberForMenu] = useState<Member | null>(null);
 
   const loadMembers = async () => {
     try {
-      const allMembers = await RealMemberService.getAllMembers();
-      setMembers(allMembers);
-      setFilteredMembers(allMembers);
+      const allMembers = await SupabaseMemberService.getAllMembers();
+      
+      // Add null/undefined checks for member data
+      const safeMembers = allMembers.map(member => ({
+        ...member,
+        memberNumber: member.memberNumber || '',
+        personalInfo: member.personalInfo || { 
+          firstName: '', 
+          lastName: '', 
+          fullName: 'Unknown Member' 
+        },
+        financialInfo: member.financialInfo || { 
+          totalContributions: 0,
+          currentBalance: 0, 
+          outstandingAmount: 0,
+          percentageOutstanding: 0,
+          balanceBroughtForward: 0,
+          plannedContributions: 0,
+          actualContributions: 0,
+          currentInterestEarned: 0,
+          totalInterestEarned: 0,
+          currentInterestCharged: 0,
+          totalInterestCharged: 0,
+          lastInterestCalculation: new Date(),
+          interestRate: 0
+        },
+        membershipStatus: member.membershipStatus || { 
+          isActive: true, 
+          standingCategory: 'good' 
+        },
+        interestSettings: member.interestSettings || {
+          calculationMethod: 'daily',
+          compounding: true,
+          taxDeduction: 0
+        },
+        contributionHistory: member.contributionHistory || [],
+        loanHistory: member.loanHistory || [],
+        interestHistory: member.interestHistory || [],
+        lastUpdated: member.lastUpdated || new Date()
+      }));
+      
+      setMembers(safeMembers);
+      setFilteredMembers(safeMembers);
     } catch (error) {
       console.error('Error loading members:', error);
+      // Fallback to empty array if Supabase fails
+      setMembers([]);
+      setFilteredMembers([]);
     } finally {
       setLoading(false);
     }
@@ -60,8 +119,9 @@ const MembersScreen: React.FC = () => {
     setFilteredMembers(filtered);
   }, [searchQuery, filter, members]);
 
-  const formatCurrency = (amount: number) => {
-    return `R ${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  const formatCurrency = (amount: number | undefined | null) => {
+    const safeAmount = amount || 0;
+    return `R ${safeAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
   };
 
   const getStandingColor = (standing: string) => {
@@ -85,6 +145,79 @@ const MembersScreen: React.FC = () => {
       default: return 'Unknown';
     }
   };
+
+  // Load all users for role assignment
+  const loadUsers = async () => {
+    if (!currentUser || currentUser.role !== 'superuser') return;
+    
+    setLoadingUsers(true);
+    try {
+      const allUsers = await SupabaseUserService.getAllUsers();
+      setUsers(allUsers);
+    } catch (error) {
+      console.error('Error loading users:', error);
+      Alert.alert('Error', 'Failed to load users');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  // Assign role to user
+  const assignRole = async (userId: string, newRole: UserRole) => {
+    if (!currentUser || currentUser.role !== 'superuser') {
+      Alert.alert('Permission Denied', 'Only superusers can assign roles');
+      return;
+    }
+
+    try {
+      await SupabaseUserService.updateUserRole(userId, newRole, currentUser.uid);
+      Alert.alert('Success', `Role updated to ${newRole}`);
+      setRoleDialogVisible(false);
+      loadUsers(); // Refresh users list
+    } catch (error) {
+      console.error('Error assigning role:', error);
+      Alert.alert('Error', 'Failed to assign role');
+    }
+  };
+
+  // Link user to member
+  const linkUserToMember = async (userId: string, memberNumber: string) => {
+    if (!currentUser || currentUser.role !== 'superuser') {
+      Alert.alert('Permission Denied', 'Only superusers can link users to members');
+      return;
+    }
+
+    try {
+      await SupabaseUserService.linkUserToMember(userId, memberNumber);
+      Alert.alert('Success', `User linked to member ${memberNumber}`);
+      setLinkDialogVisible(false);
+      loadUsers(); // Refresh users list
+    } catch (error) {
+      console.error('Error linking user to member:', error);
+      Alert.alert('Error', 'Failed to link user to member');
+    }
+  };
+
+  // Open role assignment dialog
+  const openRoleDialog = (user: User) => {
+    if (currentUser?.role !== 'superuser') return;
+    
+    setSelectedUser(user);
+    setSelectedRole(user.role);
+    setRoleDialogVisible(true);
+  };
+
+  // Open member linking dialog
+  const openLinkDialog = (user: User) => {
+    if (currentUser?.role !== 'superuser') return;
+    
+    setSelectedUser(user);
+    setSelectedMemberNumber(user.memberNumber || '');
+    setLinkDialogVisible(true);
+  };
+
+  // Check if current user is superuser
+  const isSuperUser = currentUser?.role === 'superuser';
 
   if (loading) {
     return (
@@ -246,6 +379,149 @@ const MembersScreen: React.FC = () => {
           </Button>
         </Card.Content>
       </Card>
+
+      {/* Superuser Management Section - Only visible to superusers */}
+      {isSuperUser && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.cardTitle}>Superuser Management</Title>
+            <Text style={styles.superuserSubtitle}>
+              Advanced user management features
+            </Text>
+            
+            <Button 
+              mode="contained" 
+              style={styles.actionButton}
+              icon="account-multiple"
+              onPress={loadUsers}
+              loading={loadingUsers}
+            >
+              Manage User Roles
+            </Button>
+            <Button 
+              mode="outlined" 
+              style={styles.actionButton}
+              icon="link"
+              onPress={() => {
+                loadUsers();
+                Alert.alert('Info', 'Use the "Manage User Roles" button first to load users, then use the action menu on each user to link to members');
+              }}
+            >
+              Link Users to Members
+            </Button>
+          </Card.Content>
+        </Card>
+      )}
+
+      {/* User List for Superuser Management */}
+      {isSuperUser && users.length > 0 && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.cardTitle}>User Management ({users.length} users)</Title>
+            
+            {users.map((user, index) => (
+              <List.Item
+                key={user.uid}
+                title={`${user.email} (${user.role})`}
+                description={`Member: ${user.memberNumber || 'Not linked'} • Created: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown date'}`}
+                left={props => (
+                  <List.Icon 
+                    {...props} 
+                    icon="account" 
+                    color={user.role === 'superuser' ? '#FF5722' : user.role === 'admin' ? '#2196F3' : '#4CAF50'}
+                  />
+                )}
+                right={props => (
+                  <View style={styles.userActions}>
+                    <Button 
+                      mode="outlined" 
+                      compact
+                      onPress={() => openRoleDialog(user)}
+                      style={styles.smallButton}
+                    >
+                      Change Role
+                    </Button>
+                    <Button 
+                      mode="outlined" 
+                      compact
+                      onPress={() => openLinkDialog(user)}
+                      style={styles.smallButton}
+                    >
+                      Link Member
+                    </Button>
+                  </View>
+                )}
+                style={[
+                  styles.memberItem,
+                  index < users.length - 1 && styles.memberItemBorder
+                ]}
+              />
+            ))}
+          </Card.Content>
+        </Card>
+      )}
+
+      {/* Role Assignment Dialog */}
+      <Portal>
+        <Dialog visible={roleDialogVisible} onDismiss={() => setRoleDialogVisible(false)}>
+          <Dialog.Title>Assign User Role</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Select a new role for {selectedUser?.email}</Paragraph>
+            <View style={styles.roleOptions}>
+              {(['superuser', 'admin', 'executive', 'member'] as UserRole[]).map(role => (
+                <Chip
+                  key={role}
+                  selected={selectedRole === role}
+                  onPress={() => setSelectedRole(role)}
+                  style={styles.roleChip}
+                  selectedColor="white"
+                >
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </Chip>
+              ))}
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setRoleDialogVisible(false)}>Cancel</Button>
+            <Button 
+              onPress={() => selectedUser && assignRole(selectedUser.uid, selectedRole)}
+              mode="contained"
+            >
+              Assign Role
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
+
+      {/* Member Linking Dialog */}
+      <Portal>
+        <Dialog visible={linkDialogVisible} onDismiss={() => setLinkDialogVisible(false)}>
+          <Dialog.Title>Link User to Member</Dialog.Title>
+          <Dialog.Content>
+            <Paragraph>Link {selectedUser?.email} to a member number</Paragraph>
+            <TextInput
+              label="Member Number"
+              value={selectedMemberNumber}
+              onChangeText={setSelectedMemberNumber}
+              style={styles.memberInput}
+              keyboardType="numeric"
+            />
+            <Paragraph style={styles.helpText}>
+              Enter the member number this user should be linked to
+            </Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setLinkDialogVisible(false)}>Cancel</Button>
+            <Button 
+              onPress={() => selectedUser && linkUserToMember(selectedUser.uid, selectedMemberNumber)}
+              mode="contained"
+              disabled={!selectedMemberNumber}
+            >
+              Link Member
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 };
@@ -345,6 +621,38 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: 10,
+  },
+  superuserSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 15,
+  },
+  userActions: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  smallButton: {
+    minWidth: 0,
+    paddingHorizontal: 8,
+  },
+  roleOptions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  roleChip: {
+    backgroundColor: '#f0f0f0',
+  },
+  memberInput: {
+    marginTop: 10,
+  },
+  helpText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
 

@@ -19,6 +19,7 @@ import LoanApplicationScreen from '../screens/LoanApplicationScreen';
 import LoanApprovalScreen from '../screens/LoanApprovalScreen';
 import DepositApprovalScreen from '../screens/transactions/DepositApprovalScreen';
 import MemberApprovalScreen from '../screens/MemberApprovalScreen'; // Will create this screen
+import MyFundsScreen from '../screens/MyFundsScreen';
 
 // Placeholder screens for other tabs
 import { View, Text, StyleSheet } from 'react-native';
@@ -88,6 +89,23 @@ const getTabsForRole = (role: UserRole) => {
     });
   }
 
+  // Add My Funds tab for members (replace Announcements placeholder)
+  if (role === 'member') {
+    // Replace Announcements with My Funds for members
+    const myFundsTab = {
+      name: 'MyFunds',
+      component: MyFundsScreen,
+      icon: 'account-balance',
+      label: 'My Funds'
+    };
+    
+    // Find and replace the Announcements tab
+    const announcementsIndex = baseTabs.findIndex(tab => tab.name === 'Announcements');
+    if (announcementsIndex !== -1) {
+      baseTabs[announcementsIndex] = myFundsTab;
+    }
+  }
+
   return baseTabs;
 };
 
@@ -98,6 +116,9 @@ const MainTabNavigator: React.FC = () => {
   if (!user) return null;
 
   const tabs = getTabsForRole(user.role as UserRole);
+
+  console.log('User role:', user.role);
+  console.log('Generated tabs:', tabs.map(t => t.name));
 
   return (
     <Tab.Navigator

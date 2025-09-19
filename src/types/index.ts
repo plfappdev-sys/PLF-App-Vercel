@@ -78,6 +78,7 @@ export interface RootStackParamList {
   Members: undefined;
   Reports: undefined;
   Announcements: undefined;
+  MyFunds: undefined;
   DepositApproval: undefined;
   MemberManagement: undefined;
   Main: undefined;

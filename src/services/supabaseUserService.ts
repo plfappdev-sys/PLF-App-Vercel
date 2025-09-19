@@ -45,7 +45,7 @@ export class SupabaseUserService {
           verificationStatus: row.account_status?.verification_documents?.verification_status || 'pending'
         }
       },
-      memberNumber: row.member_number || '',
+      memberNumber: row.membernumber || '',
       createdAt: this.safeToDate(row.created_at),
       updatedAt: this.safeToDate(row.updated_at),
       createdBy: row.created_by || ''
@@ -127,8 +127,6 @@ export class SupabaseUserService {
         .from('users')
         .update({
           role: newRole,
-          updated_at: new Date().toISOString(),
-          last_updated_by: updatedBy,
         })
         .eq('uid', userId);
 
@@ -156,8 +154,6 @@ export class SupabaseUserService {
         .from('users')
         .update({
           account_status: { is_active: isActive },
-          updated_at: new Date().toISOString(),
-          last_updated_by: updatedBy,
         })
         .eq('uid', userId);
 
@@ -190,9 +186,6 @@ export class SupabaseUserService {
             is_verified: isApproved,
             verification_documents: { verification_status: isApproved ? 'approved' : 'rejected' }
           },
-          updated_at: new Date().toISOString(),
-          approved_by: isApproved ? approvedBy : null,
-          approval_notes: notes || '',
         })
         .eq('uid', userId);
 
@@ -220,10 +213,7 @@ export class SupabaseUserService {
     updatedBy: string
   ): Promise<void> {
     try {
-      const updateData: any = {
-        updated_at: new Date().toISOString(),
-        last_updated_by: updatedBy,
-      };
+      const updateData: any = {};
 
       if (updates.personalInfo) {
         updateData.personal_info = {
@@ -237,7 +227,7 @@ export class SupabaseUserService {
       }
 
       if (updates.memberNumber !== undefined) {
-        updateData.member_number = updates.memberNumber;
+        updateData.membernumber = updates.memberNumber;
       }
 
       const { error } = await supabase
@@ -287,8 +277,7 @@ export class SupabaseUserService {
       const { error: userError } = await supabase
         .from('users')
         .update({
-          member_number: memberNumber,
-          updated_at: new Date().toISOString(),
+          membernumber: memberNumber,
         })
         .eq('uid', userId);
 
@@ -296,18 +285,9 @@ export class SupabaseUserService {
         throw userError;
       }
 
-      // Update member record with user link (if members table exists)
-      const { error: memberError } = await supabase
-        .from('members')
-        .update({
-          user_id: userId,
-          last_updated: new Date().toISOString(),
-        })
-        .eq('member_number', memberNumber);
-
-      if (memberError && !memberError.message.includes('relation "members" does not exist')) {
-        console.error('Error updating member record:', memberError);
-      }
+      // Note: Members table update is commented out since the schema doesn't have user_id column
+      // This will be implemented once the members table schema is properly updated
+      console.log(`User ${userId} linked to member number ${memberNumber}`);
     } catch (error) {
       console.error('Error linking user to member:', error);
       throw error;

@@ -4,6 +4,16 @@ import Decimal from 'decimal.js';
 // Configure decimal.js for financial precision
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP });
 
+// Official PLF interest rates as per AGM Resolutions and Constitution
+export const PLF_INTEREST_RATES = {
+  // Loan interest rate: 20% p.a. as per Resolution PLF-AGM/2023/007
+  LOAN_INTEREST_RATE: 0.20,
+  // Penalty interest rate: 40% p.a. (20% + 20% penalty) after 3 months
+  PENALTY_INTEREST_RATE: 0.40,
+  // Late fee rate: 7% as per Constitution Clause 12
+  LATE_FEE_RATE: 0.07
+};
+
 export class InterestCalculationService {
   // Calculate daily interest (compound or simple)
   static calculateDailyInterest(
@@ -48,11 +58,10 @@ export class InterestCalculationService {
     // Calculate interest charged on outstanding amount (loans)
     let interestCharged = 0;
     if (financialInfo.outstandingAmount > 0) {
-      // Loan interest rate is typically higher - using 2x savings rate for demo
-      const loanRate = financialInfo.interestRate * 2;
+      // Use official PLF loan interest rate: 20% p.a. as per Resolution PLF-AGM/2023/007
       interestCharged = this.calculateDailyInterest(
         financialInfo.outstandingAmount,
-        loanRate,
+        PLF_INTEREST_RATES.LOAN_INTEREST_RATE,
         daysSinceLastCalculation,
         settings.compounding
       );
@@ -251,7 +260,7 @@ export class InterestCalculationService {
 
     const projectedCharged = this.calculateDailyInterest(
       member.financialInfo.outstandingAmount,
-      member.financialInfo.interestRate * 2, // Higher rate for loans
+      PLF_INTEREST_RATES.LOAN_INTEREST_RATE, // 20% p.a. as per Resolution PLF-AGM/2023/007
       days,
       member.interestSettings.compounding
     );
@@ -268,5 +277,40 @@ export class InterestCalculationService {
       calculationMethod: member.interestSettings.calculationMethod,
       compounding: member.interestSettings.compounding
     };
+  }
+
+  // Calculate late payment fee (7% as per Constitution Clause 12)
+  static calculateLateFee(outstandingBalance: number): number {
+    const balanceDec = new Decimal(outstandingBalance);
+    const lateFee = balanceDec.times(PLF_INTEREST_RATES.LATE_FEE_RATE);
+    return lateFee.toNumber();
+  }
+
+  // Calculate penalty interest for overdue loans (40% p.a. after 3 months)
+  static calculatePenaltyInterest(
+    outstandingAmount: number,
+    daysOverdue: number,
+    compounding: boolean = true
+  ): number {
+    return this.calculateDailyInterest(
+      outstandingAmount,
+      PLF_INTEREST_RATES.PENALTY_INTEREST_RATE,
+      daysOverdue,
+      compounding
+    );
+  }
+
+  // Check if loan is overdue for penalty interest (more than 90 days)
+  static isLoanOverdue(loanDate: Date): boolean {
+    const today = new Date();
+    const daysDifference = Math.ceil((today.getTime() - loanDate.getTime()) / (1000 * 60 * 60 * 24));
+    return daysDifference > 90;
+  }
+
+  // Get days overdue for penalty calculation
+  static getDaysOverdue(loanDate: Date): number {
+    const today = new Date();
+    const daysDifference = Math.ceil((today.getTime() - loanDate.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysDifference - 90); // Only count days beyond 90 days
   }
 }

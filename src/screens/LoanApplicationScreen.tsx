@@ -251,8 +251,9 @@ const LoanApplicationScreen: React.FC = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return `R ${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  const formatCurrency = (amount: number | undefined | null) => {
+    const safeAmount = amount || 0;
+    return `R ${safeAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
   };
 
 
@@ -593,7 +594,7 @@ const LoanApplicationScreen: React.FC = () => {
                         {member ? `Member ${guarantor.memberNumber}` : `Member ${guarantor.memberNumber}`}
                       </Text>
                       <Text style={styles.guarantorAmount}>
-                        Guarantee: R {parseFloat(guarantor.guaranteeAmount).toLocaleString('en-ZA')}
+                        Guarantee: R {(parseFloat(guarantor.guaranteeAmount) || 0).toLocaleString('en-ZA')}
                       </Text>
                     </View>
                     <Button 

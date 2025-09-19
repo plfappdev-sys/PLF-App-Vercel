@@ -1,0 +1,212 @@
+[
+  {
+    "member_number": "6",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "6",
+      "fullName": "Member 6"
+    },
+    "financial_info": {
+      "total_contributions": 5600.0,
+      "current_balance": 51965.104846997434,
+      "outstanding_amount": 0,
+      "balance_brought_forward": 23667.51764919493,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 0.0,
+      "current_interest_earned": 0.0,
+      "total_interest_earned": 0.0,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.699892",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 0.0
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "good"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.699892",
+    "last_updated": "2025-09-18T11:51:01.699892",
+    "created_at": "2025-09-18T11:51:01.699892"
+  },
+  {
+    "member_number": "24",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "24",
+      "fullName": "Member 24"
+    },
+    "financial_info": {
+      "total_contributions": 22900.0,
+      "current_balance": -14411.321489311636,
+      "outstanding_amount": 14411.321489311636,
+      "balance_brought_forward": -3821.110858614249,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 5500.0,
+      "current_interest_earned": 302.5,
+      "total_interest_earned": 302.5,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.707909",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 62.93153488782374
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "owing_65"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.707909",
+    "last_updated": "2025-09-18T11:51:01.707909",
+    "created_at": "2025-09-18T11:51:01.707909"
+  },
+  {
+    "member_number": "25",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "25",
+      "fullName": "Member 25"
+    },
+    "financial_info": {
+      "total_contributions": 12400.0,
+      "current_balance": 33283.41800329932,
+      "outstanding_amount": 0,
+      "balance_brought_forward": 15128.857702510119,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 750.0,
+      "current_interest_earned": 41.25,
+      "total_interest_earned": 41.25,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.707909",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 0.0
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "good"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.707909",
+    "last_updated": "2025-09-18T11:51:01.707909",
+    "created_at": "2025-09-18T11:51:01.707909"
+  },
+  {
+    "member_number": "54",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "54",
+      "fullName": "Member 54"
+    },
+    "financial_info": {
+      "total_contributions": 13150.0,
+      "current_balance": 20530.025433316383,
+      "outstanding_amount": 0,
+      "balance_brought_forward": 9786.259353594087,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 2000.0,
+      "current_interest_earned": 110.0,
+      "total_interest_earned": 110.0,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.707909",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 0.0
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "good"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.707909",
+    "last_updated": "2025-09-18T11:51:01.707909",
+    "created_at": "2025-09-18T11:51:01.707909"
+  },
+  {
+    "member_number": "55",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "55",
+      "fullName": "Member 55"
+    },
+    "financial_info": {
+      "total_contributions": 21910.0,
+      "current_balance": -17335.449373051415,
+      "outstanding_amount": 17335.449373051415,
+      "balance_brought_forward": -9589.321011955255,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 750.0,
+      "current_interest_earned": 41.25,
+      "total_interest_earned": 41.25,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.707909",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 79.1211746830279
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "owing_65_plus"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.707909",
+    "last_updated": "2025-09-18T11:51:01.707909",
+    "created_at": "2025-09-18T11:51:01.707909"
+  },
+  {
+    "member_number": "66",
+    "personal_info": {
+      "firstName": "Member",
+      "lastName": "66",
+      "fullName": "Member 66"
+    },
+    "financial_info": {
+      "total_contributions": 5000.0,
+      "current_balance": 64543.94260857459,
+      "outstanding_amount": 0,
+      "balance_brought_forward": 29832.820430449872,
+      "planned_contributions": 2400.0,
+      "actual_contributions": 0.0,
+      "current_interest_earned": 0.0,
+      "total_interest_earned": 0.0,
+      "current_interest_charged": 0,
+      "total_interest_charged": 0,
+      "last_interest_calculation": "2025-09-18T11:51:01.707909",
+      "interest_rate": 5.5,
+      "percentage_outstanding": 0.0
+    },
+    "membership_status": {
+      "isActive": true,
+      "standingCategory": "good"
+    },
+    "interest_settings": {
+      "calculationMethod": "daily",
+      "compounding": true,
+      "taxDeduction": 0
+    },
+    "join_date": "2025-09-18T11:51:01.707909",
+    "last_updated": "2025-09-18T11:51:01.707909",
+    "created_at": "2025-09-18T11:51:01.707909"
+  }
+]

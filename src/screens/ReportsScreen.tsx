@@ -19,6 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useAuth } from '../contexts/SupabaseAuthContext';
 import { ReportService } from '../services/ReportService';
 import { SupabaseReportService } from '../services/supabaseReportService';
+import { SupabaseMemberService } from '../services/supabaseMemberService';
 import { PDFReportGenerator } from '../services/PDFReportGenerator';
 import { downloadHTMLReport, downloadCSVReport, generateReportFilename } from '../utils/fileDownload';
 import RealMemberService from '../services/RealMemberService';
@@ -206,25 +207,36 @@ const ReportsScreen: React.FC = () => {
   // Load available members for selection
   const loadAvailableMembers = async () => {
     try {
-      // Get real member data from RealMemberService
-      const members = await RealMemberService.getAllMembers();
+      // Get real member data from SupabaseMemberService
+      const members = await SupabaseMemberService.getAllMembers();
       const availableMembersList = members.map(member => ({
         memberNumber: member.memberNumber,
         name: member.personalInfo?.fullName || `Member ${member.memberNumber}`
       }));
       setAvailableMembers(availableMembersList);
     } catch (error) {
-      console.error('Error loading members:', error);
-      // Fallback to mock data if real data fails - use actual member numbers from real data
-      const members = [
-        { memberNumber: 'Member 6', name: 'Christopher Naude (Mock)' },
-        { memberNumber: 'Member 24', name: 'Jeffrey Matlou (Mock)' },
-        { memberNumber: 'Member 25', name: 'Jonas Letlhaku (Mock)' },
-        { memberNumber: 'Member 54', name: 'Naomi Mokhine (Mock)' },
-        { memberNumber: 'Member 55', name: 'Nicholas Molale (Mock)' },
-        { memberNumber: 'Member 66', name: 'Refilwe Lentswe (Mock)' },
-      ];
-      setAvailableMembers(members);
+      console.error('Error loading members from Supabase:', error);
+      try {
+        // Fallback to RealMemberService if Supabase fails
+        const members = await RealMemberService.getAllMembers();
+        const availableMembersList = members.map(member => ({
+          memberNumber: member.memberNumber,
+          name: member.personalInfo?.fullName || `Member ${member.memberNumber}`
+        }));
+        setAvailableMembers(availableMembersList);
+      } catch (fallbackError) {
+        console.error('Error loading members from fallback:', fallbackError);
+        // Final fallback to mock data
+        const members = [
+          { memberNumber: '6', name: 'Christopher Naude (Mock)' },
+          { memberNumber: '24', name: 'Jeffrey Matlou (Mock)' },
+          { memberNumber: '25', name: 'Jonas Letlhaku (Mock)' },
+          { memberNumber: '54', name: 'Naomi Mokhine (Mock)' },
+          { memberNumber: '55', name: 'Nicholas Molale (Mock)' },
+          { memberNumber: '66', name: 'Refilwe Lentswe (Mock)' },
+        ];
+        setAvailableMembers(members);
+      }
     }
   };
 
@@ -257,6 +269,18 @@ const ReportsScreen: React.FC = () => {
             transactionType === 'all' ? undefined : transactionType as any,
             generatedBy
           );
+          break;
+        
+        case '4': // Monthly Contributions Report
+          reportData = await ReportService.generateMonthlyContributionsReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '5': // Loan Portfolio Report
+          reportData = await ReportService.generateLoanPortfolioReport(generatedBy);
           break;
         
         case '6': // Standing Analysis Report
@@ -388,6 +412,18 @@ const ReportsScreen: React.FC = () => {
           );
           break;
         
+        case '4': // Monthly Contributions Report
+          reportData = await ReportService.generateMonthlyContributionsReport(
+            startDate,
+            endDate,
+            generatedBy
+          );
+          break;
+        
+        case '5': // Loan Portfolio Report
+          reportData = await ReportService.generateLoanPortfolioReport(generatedBy);
+          break;
+        
         case '6': // Standing Analysis Report
           reportData = await ReportService.generateStandingAnalysisReport(generatedBy);
           break;
@@ -461,6 +497,26 @@ const ReportsScreen: React.FC = () => {
     if (selectedDate) {
       setEndDate(selectedDate);
     }
+  };
+
+  // Web-specific date handlers
+  const handleWebStartDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const date = new Date(event.target.value);
+    if (!isNaN(date.getTime())) {
+      setStartDate(date);
+    }
+  };
+
+  const handleWebEndDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const date = new Date(event.target.value);
+    if (!isNaN(date.getTime())) {
+      setEndDate(date);
+    }
+  };
+
+  // Format date for HTML input (YYYY-MM-DD)
+  const formatDateForInput = (date: Date) => {
+    return date.toISOString().split('T')[0];
   };
 
   return (
@@ -649,26 +705,54 @@ const ReportsScreen: React.FC = () => {
               <>
                 <Text style={styles.modalLabel}>Date Range</Text>
                 <View style={styles.dateContainer}>
-                  <TouchableOpacity 
-                    style={styles.dateInput}
-                    onPress={() => setShowStartDatePicker(true)}
-                  >
-                    <Text style={styles.dateText}>
-                      From: {formatDate(startDate)}
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.dateInput}
-                    onPress={() => setShowEndDatePicker(true)}
-                  >
-                    <Text style={styles.dateText}>
-                      To: {formatDate(endDate)}
-                    </Text>
-                  </TouchableOpacity>
+                  {/* Web platform uses HTML date inputs */}
+                  {Platform.OS === 'web' ? (
+                    <>
+                      <View style={styles.webDateInputContainer}>
+                        <Text style={styles.webDateLabel}>From:</Text>
+                        <input
+                          type="date"
+                          value={formatDateForInput(startDate)}
+                          onChange={handleWebStartDateChange}
+                          style={styles.webDateInput}
+                        />
+                      </View>
+                      <View style={styles.webDateInputContainer}>
+                        <Text style={styles.webDateLabel}>To:</Text>
+                        <input
+                          type="date"
+                          value={formatDateForInput(endDate)}
+                          onChange={handleWebEndDateChange}
+                          style={styles.webDateInput}
+                        />
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      {/* Mobile platforms use DateTimePicker */}
+                      <TouchableOpacity 
+                        style={styles.dateInput}
+                        onPress={() => setShowStartDatePicker(true)}
+                      >
+                        <Text style={styles.dateText}>
+                          From: {formatDate(startDate)}
+                        </Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={styles.dateInput}
+                        onPress={() => setShowEndDatePicker(true)}
+                      >
+                        <Text style={styles.dateText}>
+                          To: {formatDate(endDate)}
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
                 </View>
 
-                {showStartDatePicker && (
+                {/* DateTimePicker for mobile platforms */}
+                {Platform.OS !== 'web' && showStartDatePicker && (
                   <DateTimePicker
                     value={startDate}
                     mode="date"
@@ -677,7 +761,7 @@ const ReportsScreen: React.FC = () => {
                   />
                 )}
 
-                {showEndDatePicker && (
+                {Platform.OS !== 'web' && showEndDatePicker && (
                   <DateTimePicker
                     value={endDate}
                     mode="date"
@@ -927,6 +1011,26 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     marginHorizontal: 4,
+  },
+  // Web-specific date input styles
+  webDateInputContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    gap: 4,
+  },
+  webDateLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  webDateInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    fontSize: 14,
+    color: '#333',
   },
 });
 

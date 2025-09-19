@@ -1,292 +1,224 @@
 import { supabase } from '../../supabase.config';
+import { Member, FundStatistics } from '../types/index';
 
 export class SupabaseMemberService {
-  // Initialize member data (placeholder for now)
-  static async initializeMemberData(): Promise<void> {
-    console.log('Member data initialization placeholder');
-  }
-
-  // Verify if a member number exists in the system
-  static async verifyMemberNumber(memberNumber: string): Promise<boolean> {
+  /**
+   * Get member by member number
+   */
+  static async getMemberByNumber(memberNumber: string): Promise<Member | null> {
     try {
-      // This would typically check against a members table
-      // For now, we'll simulate some validation
-      if (!memberNumber || memberNumber.trim() === '') {
-        return false;
-      }
-      
-      // Simple validation - member numbers should start with "member" followed by numbers
-      const memberRegex = /^member\d+$/i;
-      return memberRegex.test(memberNumber);
-    } catch (error) {
-      console.error('Error verifying member number:', error);
-      return false;
-    }
-  }
-
-  // Check if a member number is already taken by a user
-  static async isMemberNumberTaken(memberNumber: string): Promise<boolean> {
-    try {
-      // Check if any user has this member number
       const { data, error } = await supabase
-        .from('users')
-        .select('member_number')
+        .from('members')
+        .select('*')
         .eq('member_number', memberNumber)
         .single();
 
       if (error) {
-        // If no user found with this member number, it's available
-        if (error.code === 'PGRST116') {
-          return false;
-        }
-        console.error('Error checking if member number is taken:', error);
-        return false;
+        console.error('Error fetching member:', error);
+        return null;
       }
 
-      // Member number exists and is taken
-      return true;
+      // Convert database snake_case to TypeScript camelCase
+      if (data) {
+        return {
+          memberNumber: data.member_number,
+          userId: data.user_id,
+          personalInfo: data.personal_info,
+          financialInfo: data.financial_info,
+          contributionHistory: data.contribution_history || [],
+          loanHistory: data.loan_history || [],
+          interestHistory: data.interest_history || [],
+          membershipStatus: data.membership_status,
+          interestSettings: data.interest_settings,
+          lastUpdated: new Date(data.last_updated)
+        } as Member;
+      }
+
+      return null;
     } catch (error) {
-      console.error('Error checking if member number is taken:', error);
-      return false;
+      console.error('Exception in getMemberByNumber:', error);
+      return null;
     }
   }
 
-  // Link a member number to a user
-  static async linkMemberToUser(memberNumber: string, userId: string): Promise<void> {
+  /**
+   * Validate if a member number exists and return member data
+   */
+  static async validateMemberNumber(memberNumber: string): Promise<{
+    isValid: boolean;
+    memberData?: Partial<Member>;
+    error?: string;
+  }> {
     try {
+      const member = await this.getMemberByNumber(memberNumber);
+      
+      if (!member) {
+        return {
+          isValid: false,
+          error: 'Member number not found'
+        };
+      }
+
+      return {
+        isValid: true,
+        memberData: {
+          memberNumber: member.memberNumber,
+          personalInfo: member.personalInfo,
+          financialInfo: member.financialInfo,
+          membershipStatus: member.membershipStatus
+        }
+      };
+    } catch (error) {
+      console.error('Error validating member number:', error);
+      return {
+        isValid: false,
+        error: 'Error validating member number'
+      };
+    }
+  }
+
+  /**
+   * Link user account to existing member
+   */
+  static async linkUserToMember(userId: string, memberNumber: string): Promise<{
+    success: boolean;
+    error?: string;
+  }> {
+    try {
+      // First check if member exists
+      const member = await this.getMemberByNumber(memberNumber);
+      if (!member) {
+        return {
+          success: false,
+          error: 'Member not found'
+        };
+      }
+
       // Update user record with member number
       const { error } = await supabase
         .from('users')
-        .update({
-          member_number: memberNumber,
-          updated_at: new Date().toISOString(),
+        .update({ 
+          membernumber: memberNumber,
+          updated_at: new Date().toISOString()
         })
         .eq('uid', userId);
 
       if (error) {
-        throw error;
+        console.error('Error linking user to member:', error);
+        return {
+          success: false,
+          error: 'Failed to link user account'
+        };
       }
 
-      // Also create a record in member_numbers table if it exists
-      const { error: memberNumberError } = await supabase
-        .from('member_numbers')
-        .insert({
-          member_number: memberNumber,
-          user_id: userId,
-          linked_at: new Date().toISOString()
-        });
-
-      if (memberNumberError && !memberNumberError.message.includes('relation "member_numbers" does not exist')) {
-        console.error('Error creating member number record:', memberNumberError);
-      }
+      return { success: true };
     } catch (error) {
-      console.error('Error linking member to user:', error);
-      throw error;
+      console.error('Exception in linkUserToMember:', error);
+      return {
+        success: false,
+        error: 'Unexpected error occurred'
+      };
     }
   }
 
-  // Get user by member number
-  static async getUserByMemberNumber(memberNumber: string): Promise<string | null> {
+  /**
+   * Check if member number is already linked to a user
+   */
+  static async isMemberNumberLinked(memberNumber: string): Promise<boolean> {
     try {
       const { data, error } = await supabase
         .from('users')
         .select('uid')
-        .eq('member_number', memberNumber)
+        .eq('membernumber', memberNumber)
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          return null; // No user found with this member number
-        }
-        console.error('Error getting user by member number:', error);
-        return null;
+        // No user found with this member number
+        return false;
       }
 
-      return data.uid;
+      return !!data;
     } catch (error) {
-      console.error('Error getting user by member number:', error);
-      return null;
+      console.error('Error checking member number link:', error);
+      return false;
     }
   }
 
-  // Create a new member record
-  static async createMember(memberData: {
-    memberNumber: string;
-    firstName: string;
-    lastName: string;
-    idNumber: string;
-    joinDate: Date;
-  }): Promise<void> {
+
+  /**
+   * Update member financial information
+   */
+  static async updateMemberFinancials(
+    memberNumber: string, 
+    updates: Partial<Member['financialInfo']>
+  ): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('members')
-        .insert({
-          member_number: memberData.memberNumber,
-          first_name: memberData.firstName,
-          last_name: memberData.lastName,
-          id_number: memberData.idNumber,
-          join_date: memberData.joinDate.toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          status: 'active'
-        });
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error creating member:', error);
-      throw error;
-    }
-  }
-
-  // Get member details
-  static async getMember(memberNumber: string): Promise<any> {
-    try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('*')
-        .eq('member_number', memberNumber)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          return null; // Member not found
-        }
-        console.error('Error getting member:', error);
-        return null;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error getting member:', error);
-      return null;
-    }
-  }
-
-  // Get all members
-  static async getAllMembers(): Promise<any[]> {
-    try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error getting all members:', error);
-        return [];
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error getting all members:', error);
-      return [];
-    }
-  }
-
-  // Update member information
-  static async updateMember(memberNumber: string, updates: any): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('members')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
+        .update({ 
+          financial_info: updates,
+          last_updated: new Date().toISOString()
         })
         .eq('member_number', memberNumber);
 
       if (error) {
-        throw error;
+        console.error('Error updating member financials:', error);
+        return false;
       }
+
+      return true;
     } catch (error) {
-      console.error('Error updating member:', error);
-      throw error;
+      console.error('Exception in updateMemberFinancials:', error);
+      return false;
     }
   }
 
-  // Delete member
-  static async deleteMember(memberNumber: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('members')
-        .delete()
-        .eq('member_number', memberNumber);
-
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error deleting member:', error);
-      throw error;
-    }
-  }
-
-  // Search members by name or member number
-  static async searchMembers(query: string): Promise<any[]> {
+  /**
+   * Search members by name or number
+   */
+  static async searchMembers(query: string): Promise<Member[]> {
     try {
       const { data, error } = await supabase
         .from('members')
         .select('*')
-        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,member_number.ilike.%${query}%`)
-        .order('created_at', { ascending: false });
+        .or(`member_number.ilike.%${query}%,personal_info->>fullName.ilike.%${query}%`)
+        .limit(10);
 
       if (error) {
         console.error('Error searching members:', error);
         return [];
       }
 
-      return data;
+      return data as Member[];
     } catch (error) {
-      console.error('Error searching members:', error);
+      console.error('Exception in searchMembers:', error);
       return [];
     }
   }
 
-  // Get member statistics
-  static async getMemberStatistics(): Promise<{
-    totalMembers: number;
-    activeMembers: number;
-    inactiveMembers: number;
-    membersByStatus: Record<string, number>;
-  }> {
+  /**
+   * Get fund statistics - matches RealMemberService API
+   * Enhanced with comprehensive null checks and error handling
+   */
+  static async getFundStatistics(): Promise<FundStatistics> {
     try {
-      const members = await this.getAllMembers();
-      
-      const stats = {
-        totalMembers: members.length,
-        activeMembers: members.filter(m => m.status === 'active').length,
-        inactiveMembers: members.filter(m => m.status === 'inactive').length,
-        membersByStatus: {
-          active: members.filter(m => m.status === 'active').length,
-          inactive: members.filter(m => m.status === 'inactive').length,
-          pending: members.filter(m => m.status === 'pending').length,
-        },
-      };
+      // Get all members to calculate statistics
+      const { data: members, error } = await supabase
+        .from('members')
+        .select('*');
 
-      return stats;
-    } catch (error) {
-      console.error('Error getting member statistics:', error);
-      return {
-        totalMembers: 0,
-        activeMembers: 0,
-        inactiveMembers: 0,
-        membersByStatus: { active: 0, inactive: 0, pending: 0 },
-      };
-    }
-  }
+      if (error) {
+        console.error('Error fetching members for statistics:', error);
+        // Return safe default values instead of throwing
+        return this.getDefaultFundStatistics();
+      }
 
-  // Get fund statistics (similar to RealMemberService.getFundStatistics)
-  static async getFundStatistics(): Promise<{
-    totalMembers: number;
-    totalFundValue: number;
-    totalLoansOutstanding: number;
-    totalContributionsThisMonth: number;
-    membersByStanding: Record<string, number>;
-  }> {
-    try {
-      const members = await this.getAllMembers();
-      
-      // Calculate statistics from real data
+      // Handle case where members data is null or undefined
+      if (!members || !Array.isArray(members)) {
+        console.warn('No members data found, returning default statistics');
+        return this.getDefaultFundStatistics();
+      }
+
       let totalFundValue = 0;
       let totalOutstanding = 0;
       const membersByStanding = {
@@ -299,55 +231,171 @@ export class SupabaseMemberService {
         owing_65_plus: 0
       };
 
-      // Calculate values from member data
+      // Calculate statistics from database data with comprehensive null checks
       members.forEach((member: any) => {
-        const closingBalance = member.current_balance || 0;
-        const outstanding = member.outstanding_amount || 0;
+        // Safe access to nested properties with fallback defaults
+        const financialInfo = member?.financial_info || {};
+        const currentBalance = typeof financialInfo?.current_balance === 'number' 
+          ? financialInfo.current_balance 
+          : 0;
         
-        totalFundValue += closingBalance;
-        totalOutstanding += outstanding;
+        const outstandingAmount = typeof financialInfo?.outstanding_amount === 'number'
+          ? financialInfo.outstanding_amount
+          : 0;
+        
+        totalFundValue += currentBalance;
+        totalOutstanding += outstandingAmount;
 
-        // Categorize by outstanding percentage (simplified)
-        const standing = this.getStandingCategory(outstanding);
-        membersByStanding[standing as keyof typeof membersByStanding]++;
+        // Safe access to membership status with comprehensive null checking
+        const membershipStatus = member?.membership_status || {};
+        const standingCategory = typeof membershipStatus?.standingCategory === 'string'
+          ? membershipStatus.standingCategory
+          : 'good';
+        
+        // Safe categorization with fallback
+        if (standingCategory && membersByStanding.hasOwnProperty(standingCategory)) {
+          membersByStanding[standingCategory as keyof typeof membersByStanding]++;
+        } else {
+          membersByStanding.good++; // Default to good if unknown category
+        }
       });
 
+      // Return statistics with guaranteed valid values
       return {
         totalMembers: members.length,
         totalFundValue,
         totalLoansOutstanding: totalOutstanding,
-        totalContributionsThisMonth: 0, // TODO: Implement actual calculation
+        totalContributionsThisMonth: 0, // This would need actual transaction data
         membersByStanding
       };
     } catch (error) {
-      console.error('Error getting fund statistics:', error);
-      // Return empty statistics on error
-      return {
-        totalMembers: 0,
-        totalFundValue: 0,
-        totalLoansOutstanding: 0,
-        totalContributionsThisMonth: 0,
-        membersByStanding: {
-          good: 0,
-          owing_10: 0,
-          owing_20: 0,
-          owing_30: 0,
-          owing_50: 0,
-          owing_65: 0,
-          owing_65_plus: 0
-        }
-      };
+      console.error('Exception in getFundStatistics:', error);
+      // Return safe default values instead of throwing to prevent app crashes
+      return this.getDefaultFundStatistics();
     }
   }
 
-  // Helper to determine standing category
-  private static getStandingCategory(outstanding: number): string {
-    if (outstanding === 0) return 'good';
-    if (outstanding <= 240) return 'owing_10';
-    if (outstanding <= 480) return 'owing_20';
-    if (outstanding <= 720) return 'owing_30';
-    if (outstanding <= 1200) return 'owing_50';
-    if (outstanding <= 1560) return 'owing_65';
-    return 'owing_65_plus';
+  /**
+   * Returns safe default fund statistics to prevent undefined property errors
+   */
+  private static getDefaultFundStatistics(): FundStatistics {
+    return {
+      totalMembers: 0,
+      totalFundValue: 0,
+      totalLoansOutstanding: 0,
+      totalContributionsThisMonth: 0,
+      membersByStanding: {
+        good: 0,
+        owing_10: 0,
+        owing_20: 0,
+        owing_30: 0,
+        owing_50: 0,
+        owing_65: 0,
+        owing_65_plus: 0
+      }
+    };
+  }
+
+  /**
+   * Get member by member number - alias for getMemberByNumber to match RealMemberService API
+   */
+  static async getMember(memberNumber: string): Promise<Member | null> {
+    return this.getMemberByNumber(memberNumber);
+  }
+
+  /**
+   * Verify member number exists - matches RealMemberService API
+   */
+  static async verifyMemberNumber(memberNumber: string): Promise<boolean> {
+    try {
+      const member = await this.getMemberByNumber(memberNumber);
+      return !!member;
+    } catch (error) {
+      console.error('Error verifying member number:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get all members in expected format - matches RealMemberService API
+   */
+  static async getAllMembers(): Promise<Member[]> {
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .order('member_number');
+
+      if (error) {
+        console.error('Error fetching members:', error);
+        return [];
+      }
+
+      // Convert database format to Member interface
+      return data.map((member: any) => ({
+        memberNumber: member.member_number,
+        userId: member.user_id,
+        personalInfo: member.personal_info,
+        financialInfo: member.financial_info,
+        contributionHistory: member.contribution_history || [],
+        loanHistory: member.loan_history || [],
+        interestHistory: member.interest_history || [],
+        membershipStatus: member.membership_status,
+        interestSettings: member.interest_settings,
+        lastUpdated: new Date(member.last_updated)
+      })) as Member[];
+    } catch (error) {
+      console.error('Exception in getAllMembers:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get user ID by member number - matches MemberService API
+   */
+  static async getUserByMemberNumber(memberNumber: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('uid')
+        .eq('membernumber', memberNumber)
+        .single();
+
+      if (error) {
+        console.error('Error getting user by member number:', error);
+        return null;
+      }
+
+      return data?.uid || null;
+    } catch (error) {
+      console.error('Exception in getUserByMemberNumber:', error);
+      return null;
+    }
   }
 }
+
+// Fallback to mock data if Supabase is not available
+export class MockMemberService {
+  static async getMemberByNumber(memberNumber: string): Promise<Member | null> {
+    // This would be replaced with actual mock data logic
+    return null;
+  }
+
+  static async validateMemberNumber(memberNumber: string): Promise<{
+    isValid: boolean;
+    memberData?: Partial<Member>;
+    error?: string;
+  }> {
+    return {
+      isValid: false,
+      error: 'Mock service - member validation not implemented'
+    };
+  }
+
+  static async isMemberNumberLinked(memberNumber: string): Promise<boolean> {
+    return false;
+  }
+}
+
+// Export the appropriate service based on environment
+export const MemberService = process.env.NODE_ENV === 'test' ? MockMemberService : SupabaseMemberService;

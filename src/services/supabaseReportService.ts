@@ -1,6 +1,7 @@
 import { Member, Transaction, FundStatistics } from '../types/index';
 import { SupabaseMemberService } from './supabaseMemberService';
 import { SupabaseUserService } from './supabaseUserService';
+import { SupabaseTransactionService } from './supabaseTransactionService';
 import { InterestReportService } from './InterestReportService';
 import { supabase } from '../../supabase.config';
 
@@ -30,9 +31,9 @@ export class SupabaseReportService {
       // Calculate fund overview using real data
       const totalFundValue = fundStats.totalFundValue;
       const totalMembers = fundStats.totalMembers;
-      const activeMembers = members.filter(m => m.status === 'active').length;
-      const totalContributions = members.reduce((sum, m) => sum + (m.total_contributions || 0), 0);
-      const totalDisbursements = members.reduce((sum, m) => sum + (m.total_loans || 0), 0);
+      const activeMembers = members.filter(m => m.membershipStatus?.isActive).length;
+      const totalContributions = members.reduce((sum, m) => sum + (m.financialInfo?.totalContributions || 0), 0);
+      const totalDisbursements = members.reduce((sum, m) => sum + (m.financialInfo?.outstandingAmount || 0), 0);
       const availableFunds = totalFundValue;
       const netCashFlow = totalContributions - totalDisbursements;
 
@@ -113,19 +114,19 @@ export class SupabaseReportService {
       // Extract member data
       const personalInfo = {
         fullName: user ? `${user.personalInfo?.firstName} ${user.personalInfo?.lastName}` : `Member ${memberNumber}`,
-        memberNumber: member.member_number || memberNumber,
+        memberNumber: member.memberNumber || memberNumber,
         contactInfo: user?.personalInfo?.phoneNumber || 'N/A',
-        joinDate: member.join_date ? new Date(member.join_date) : new Date(),
+        joinDate: member.lastUpdated || new Date(),
       };
 
       const financialSummary = {
-        currentBalance: member.current_balance || 0,
-        totalContributions: member.total_contributions || 0,
-        totalDisbursements: member.total_loans || 0,
-        outstandingAmount: member.outstanding_amount || 0,
-        percentageOutstanding: member.total_contributions > 0 ? 
-          ((member.outstanding_amount || 0) / member.total_contributions) * 100 : 0,
-        standingCategory: member.status || 'active',
+        currentBalance: member.financialInfo?.currentBalance || 0,
+        totalContributions: member.financialInfo?.totalContributions || 0,
+        totalDisbursements: member.financialInfo?.outstandingAmount || 0,
+        outstandingAmount: member.financialInfo?.outstandingAmount || 0,
+        percentageOutstanding: member.financialInfo?.totalContributions > 0 ? 
+          ((member.financialInfo?.outstandingAmount || 0) / member.financialInfo?.totalContributions) * 100 : 0,
+        standingCategory: member.membershipStatus?.standingCategory || 'good',
       };
 
       // Calculate contribution history (placeholder)
@@ -235,41 +236,41 @@ export class SupabaseReportService {
   // Helper method to calculate fund statistics from real data
   private static async calculateFundStatistics(members: any[], users: any[]): Promise<FundStatistics> {
     const totalMembers = members.length;
-    const totalFundValue = members.reduce((sum, m) => sum + (m.current_balance || 0), 0);
-    const totalLoansOutstanding = members.reduce((sum, m) => sum + (m.outstanding_amount || 0), 0);
+    const totalFundValue = members.reduce((sum, m) => sum + (m.financialInfo?.currentBalance || 0), 0);
+    const totalLoansOutstanding = members.reduce((sum, m) => sum + (m.financialInfo?.outstandingAmount || 0), 0);
     const totalContributionsThisMonth = 0; // Would need transaction data
 
     // Calculate member standing breakdown
     const membersByStanding = {
-      good: members.filter(m => m.status === 'active' && (m.outstanding_amount || 0) === 0).length,
+      good: members.filter(m => m.membershipStatus?.isActive && (m.financialInfo?.outstandingAmount || 0) === 0).length,
       owing_10: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) <= 0.1;
       }).length,
       owing_20: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.1 && (outstanding / contributions) <= 0.2;
       }).length,
       owing_30: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.2 && (outstanding / contributions) <= 0.3;
       }).length,
       owing_50: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.3 && (outstanding / contributions) <= 0.5;
       }).length,
       owing_65: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.5 && (outstanding / contributions) <= 0.65;
       }).length,
       owing_65_plus: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.65;
       }).length,
     };
@@ -286,35 +287,35 @@ export class SupabaseReportService {
   // Helper method to calculate member standing breakdown
   private static calculateMemberStandingBreakdown(members: any[]): any {
     return {
-      goodStanding: members.filter(m => m.status === 'active' && (m.outstanding_amount || 0) === 0).length,
+      goodStanding: members.filter(m => m.membershipStatus?.isActive && (m.financialInfo?.outstandingAmount || 0) === 0).length,
       owing10Percent: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) <= 0.1;
       }).length,
       owing20Percent: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.1 && (outstanding / contributions) <= 0.2;
       }).length,
       owing30Percent: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.2 && (outstanding / contributions) <= 0.3;
       }).length,
       owing50Percent: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.3 && (outstanding / contributions) <= 0.5;
       }).length,
       owing65Percent: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.5 && (outstanding / contributions) <= 0.65;
       }).length,
       owing65Plus: members.filter(m => {
-        const outstanding = m.outstanding_amount || 0;
-        const contributions = m.total_contributions || 1;
+        const outstanding = m.financialInfo?.outstandingAmount || 0;
+        const contributions = m.financialInfo?.totalContributions || 1;
         return outstanding > 0 && (outstanding / contributions) > 0.65;
       }).length,
     };
@@ -347,7 +348,7 @@ export class SupabaseReportService {
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('member_number', memberNumber)
+        .eq('membernumber', memberNumber)
         .order('date', { ascending: false })
         .limit(20);
 

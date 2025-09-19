@@ -1,0 +1,156 @@
+PLF INTEREST CALCULATIONS DOCUMENTATION
+========================================
+
+This document details the formulas, equations, and interest rate percentages used in the People's Liberator Fund (PLF) application calculations, aligned with the official PLF rules and resolutions.
+
+OFFICIAL PLF INTEREST RATES
+---------------------------
+
+As per AGM Resolutions and Constitution:
+
+1. LOAN INTEREST RATE: 20% per annum
+   - Source: Resolution PLF-AGM/2023/007
+   - Used for all outstanding loan balances
+
+2. PENALTY INTEREST RATE: 40% per annum
+   - Applied after 3 months (90 days) of overdue loans
+   - Comprises 20% base loan interest + 20% penalty
+
+3. LATE FEE RATE: 7% of outstanding balance
+   - Source: Constitution Clause 12
+   - Applied as a one-time fee for late payments
+
+INTEREST CALCULATION FORMULAS
+-----------------------------
+
+1. DAILY COMPOUND INTEREST FORMULA:
+   ---------------------------------
+   A = P(1 + r/n)^(n*t) - P
+   
+   Where:
+   - A = Interest amount
+   - P = Principal amount
+   - r = Annual interest rate (decimal)
+   - n = Number of compounding periods per year (365 for daily)
+   - t = Time in years
+
+   Simplified for daily calculation:
+   Daily Interest = P * (1 + r/365)^days - P
+
+2. SIMPLE INTEREST FORMULA:
+   ------------------------
+   I = P * r * t
+   
+   Where:
+   - I = Interest amount
+   - P = Principal amount
+   - r = Annual interest rate (decimal)
+   - t = Time in years
+
+   Simplified for daily calculation:
+   Daily Interest = P * r * (days/365)
+
+3. LATE FEE CALCULATION:
+   ---------------------
+   Late Fee = Outstanding Balance * 0.07
+
+4. PENALTY INTEREST CALCULATION:
+   -----------------------------
+   Penalty Interest = Outstanding Amount * (1 + 0.40/365)^days_overdue - Outstanding Amount
+   (where days_overdue = days beyond 90 days grace period)
+
+IMPLEMENTATION DETAILS
+----------------------
+
+The PLF application uses the following calculation methods:
+
+1. COMPOUNDING FREQUENCY: Daily compounding
+   - Interest is calculated and accrued daily
+   - Both savings interest and loan interest use daily compounding
+
+2. PRECISION: Financial precision with decimal.js
+   - Uses 10 decimal places precision
+   - ROUND_HALF_UP rounding method for financial accuracy
+
+3. DAY COUNT CONVENTION: Actual/365
+   - Uses actual number of days between calculations
+   - 365 days per year (no leap year adjustment)
+
+4. INTEREST TYPES:
+   - EARNED INTEREST: On positive member balances (savings)
+   - CHARGED INTEREST: On outstanding loan balances at 20% p.a.
+   - PENALTY INTEREST: On overdue loans (>90 days) at 40% p.a.
+
+CALCULATION EXAMPLES
+--------------------
+
+Example 1: Daily Interest on Savings (R50,000 at 5%)
+-----------------------------------------------------
+Principal: R50,000
+Annual Rate: 5% (0.05)
+Days: 1
+Calculation: 50000 * (1 + 0.05/365)^1 - 50000 ≈ R6.85
+
+Example 2: Daily Interest on Loan (R25,000 at 20%)
+---------------------------------------------------
+Principal: R25,000
+Annual Rate: 20% (0.20)
+Days: 1
+Calculation: 25000 * (1 + 0.20/365)^1 - 25000 ≈ R13.70
+
+Example 3: Late Fee Calculation (R10,000 outstanding)
+-----------------------------------------------------
+Outstanding Balance: R10,000
+Late Fee Rate: 7% (0.07)
+Calculation: 10000 * 0.07 = R700
+
+Example 4: Penalty Interest (R15,000 overdue for 120 days)
+----------------------------------------------------------
+Outstanding Amount: R15,000
+Penalty Rate: 40% (0.40)
+Days Overdue: 30 days (120 total - 90 grace period)
+Calculation: 15000 * (1 + 0.40/365)^30 - 15000 ≈ R495.89
+
+AUDIT TRAIL AND REPORTING
+-------------------------
+
+The system maintains comprehensive audit trails:
+
+1. INTEREST ACCRUAL RECORDS:
+   - Unique accrual IDs for tracking
+   - Timestamped calculations
+   - Principal amounts and rates used
+   - Calculation method details
+
+2. TRANSACTION RECORDS:
+   - Separate transactions for earned and charged interest
+   - System-generated with approval workflow
+   - Detailed descriptions and audit trails
+
+3. MEMBER BALANCE UPDATES:
+   - Current and total interest tracking
+   - Last calculation timestamp
+   - Real-time balance updates
+
+COMPLIANCE WITH PLF RULES
+-------------------------
+
+All calculations are designed to comply with:
+
+1. AGM Resolution PLF-AGM/2023/007: 20% loan interest rate
+2. Constitution Clause 12: 7% late fee
+3. Standard financial practices for interest calculation
+4. Daily compounding as per fund policy
+
+The system ensures accurate, transparent, and auditable interest calculations that align with the PLF's official rules and resolutions.
+
+TESTING AND VALIDATION
+----------------------
+
+All calculations are thoroughly tested with:
+- Unit tests for individual calculation methods
+- Integration tests for complete member interest processing
+- Edge case testing (zero balances, zero rates, etc.)
+- Precision validation against manual calculations
+
+The test suite ensures mathematical accuracy and compliance with PLF regulations.

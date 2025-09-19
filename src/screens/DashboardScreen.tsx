@@ -65,8 +65,9 @@ const DashboardScreen: React.FC = () => {
     loadDashboardData();
   };
 
-  const formatCurrency = (amount: number) => {
-    return `R ${amount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  const formatCurrency = (amount: number | undefined | null) => {
+    const safeAmount = amount || 0;
+    return `R ${safeAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
   };
 
   const getStandingColor = (standing: string) => {
