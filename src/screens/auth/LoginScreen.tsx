@@ -94,9 +94,6 @@ const LoginScreen: React.FC = () => {
           </Text>
         ) : null}
         
-        <Text style={styles.helpText}>
-          SuperUser Login: superuser@plf.com / Wawa@PLF2025
-        </Text>
         
         <TouchableOpacity onPress={() => navigation.navigate('AuthSignUp')}>
           <Text style={styles.linkText}>

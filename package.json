@@ -10,8 +10,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "postinstall": "node scripts/patch-firebase.js",
-    "vercel-build": "expo build:web",
-    "build": "expo build:web",
+    "vercel-build": "npx expo export",
+    "build": "npx expo export",
     "dev": "expo start --web"
   },
   "dependencies": {

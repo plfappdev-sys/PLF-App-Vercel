@@ -5,18 +5,20 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "web-build"
+        "distDir": "dist",
+        "buildCommand": "npx expo export --platform web"
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/web-build/$1"
+      "dest": "/dist/$1"
     }
   ],
   "env": {
-    "EXPO_PUBLIC_SUPABASE_URL": "@expo_public_supabase_url",
-    "EXPO_PUBLIC_SUPABASE_ANON_KEY": "@expo_public_supabase_anon_key"
-  }
+    "EXPO_PUBLIC_SUPABASE_URL": "https://zdnyhzasvifrskbostgn.supabase.co",
+    "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbnloemFzdmlmcnNrYm9zdGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjQ0ODQsImV4cCI6MjA3MzYwMDQ4NH0.s_AXhoRM9tV4F166Bhd5fG7Z14kLA0iz0l08dlzZvnM"
+  },
+  "buildCommand": "npx expo export --platform web"
 }
