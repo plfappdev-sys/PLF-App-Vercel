@@ -113,7 +113,11 @@ const getTabsForRole = (role: UserRole) => {
 const MainTabNavigator: React.FC = () => {
   const { user } = useAuth();
   
-  if (!user) return null;
+  if (!user) {
+    // This should not happen as the parent AppNavigator handles auth state
+    // But return empty view instead of null to prevent navigation issues
+    return <View style={{ flex: 1, backgroundColor: PLFTheme.colors.primaryBeige }} />;
+  }
 
   const tabs = getTabsForRole(user.role as UserRole);
 

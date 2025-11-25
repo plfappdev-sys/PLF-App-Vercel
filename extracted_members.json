@@ -1,0 +1,447 @@
+[
+  {
+    "member_id": "Member 1",
+    "join_date": "2018-08-14T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 2",
+    "join_date": "2019-02-16T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 3",
+    "join_date": "2018-07-30T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 4",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 5",
+    "join_date": "2018-07-04T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 6",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 7",
+    "join_date": "2021-10-27T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 8",
+    "join_date": "2018-07-23T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 9",
+    "join_date": "2018-07-21T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 10",
+    "join_date": "2020-06-30T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 11",
+    "join_date": "2018-08-15T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 12",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 13",
+    "join_date": "2018-07-28T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 14",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 15",
+    "join_date": NaN,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 16",
+    "join_date": "2018-07-28T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 17",
+    "join_date": "2019-01-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 18",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 19",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 20",
+    "join_date": "2018-07-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 21",
+    "join_date": "2018-08-20T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 22",
+    "join_date": "2018-08-26T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 23",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 24",
+    "join_date": "2018-08-27T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 25",
+    "join_date": "2018-06-29T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 26",
+    "join_date": "2018-07-04T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 27",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 28",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 29",
+    "join_date": "2018-08-31T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 30",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 31",
+    "join_date": "2018-07-28T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 32",
+    "join_date": "2018-08-22T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 33",
+    "join_date": NaN,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 34",
+    "join_date": "2018-08-15T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 35",
+    "join_date": NaN,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 36",
+    "join_date": "2019-08-20T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 37",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 38",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 39",
+    "join_date": "2018-08-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 40",
+    "join_date": "2018-11-29T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 41",
+    "join_date": "2019-07-22T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 42",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 43",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 44",
+    "join_date": "2018-08-01T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 45",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 46",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 47",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 48",
+    "join_date": "2018-07-28T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 49",
+    "join_date": "2018-08-01T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 50",
+    "join_date": "2018-07-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 51",
+    "join_date": "2018-07-21T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 52",
+    "join_date": "2018-07-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 53",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 54",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 55",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 56",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 57",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 58",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 59",
+    "join_date": "2018-08-20T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 60",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 61",
+    "join_date": "2018-08-21T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 62",
+    "join_date": "2018-08-21T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 63",
+    "join_date": "2018-07-31T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 64",
+    "join_date": "2018-07-31T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 65",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 66",
+    "join_date": "2018-08-01T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 67",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 68",
+    "join_date": "2019-04-26T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 69",
+    "join_date": "2018-07-28T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 70",
+    "join_date": "2018-10-18T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 71",
+    "join_date": "2018-08-31T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 72",
+    "join_date": "2018-08-02T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 73",
+    "join_date": "2018-09-05T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 74",
+    "join_date": "2018-08-25T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 75",
+    "join_date": "2018-08-18T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 76",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 77",
+    "join_date": "2018-07-29T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 78",
+    "join_date": "2018-08-15T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 79",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 80",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 81",
+    "join_date": "2019-07-30T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 82",
+    "join_date": "2018-08-21T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 83",
+    "join_date": "2018-09-17T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 84",
+    "join_date": "2018-06-29T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 85",
+    "join_date": "2018-10-15T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 86",
+    "join_date": "2019-12-04T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 87",
+    "join_date": "2018-07-24T00:00:00",
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 88",
+    "join_date": null,
+    "source_sheet": "2019-2020 New"
+  },
+  {
+    "member_id": "Member 89",
+    "join_date": "2018-07-03T00:00:00",
+    "source_sheet": "2019-2020 New"
+  }
+]

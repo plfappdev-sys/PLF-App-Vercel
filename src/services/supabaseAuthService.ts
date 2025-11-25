@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase.config';
+import { supabase } from '../config/supabase';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 
 export interface User {

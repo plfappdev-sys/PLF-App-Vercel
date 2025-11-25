@@ -3,7 +3,7 @@ import { SupabaseMemberService } from './supabaseMemberService';
 import { SupabaseUserService } from './supabaseUserService';
 import { SupabaseTransactionService } from './supabaseTransactionService';
 import { InterestReportService } from './InterestReportService';
-import { supabase } from '../../supabase.config';
+import { supabase } from '../config/supabase';
 
 export interface ReportData {
   title: string;

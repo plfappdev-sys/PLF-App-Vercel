@@ -1,0 +1,10 @@
+Important Note
+
+Check "C:\Projects\Test\September\V5\PLF-App-Clean\TryingNewLogicForPLF.txt"
+
+It contains the steps for our implementation.
+Remember to always update it and mark the tasks that we have completed. After the task is complete, notify me and suggest the next step. Remember to update the doc.
+
+Also use "C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\NewBusinessLogicImplementationNotes.txt" to make notes of all the steps we are taking and implementing. All the tech we use and which versions should be noted. Errors we come across should be noted with their solutions. This will be useful if we come across it again.
+
+Let us take it step by step

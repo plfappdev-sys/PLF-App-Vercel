@@ -1,0 +1,18 @@
+[
+  {
+    "id": "f248b57f-7972-45aa-9392-c282fa492190",
+    "year_start": "2025-07-01",
+    "year_end": "2026-06-30",
+    "year_name": "2025/2026",
+    "is_current": true,
+    "savings_interest_rate": 0.05,
+    "loan_interest_rate": 0.2,
+    "penalty_interest_rate": 0.4,
+    "monthly_contribution_amount": 200,
+    "late_fee_percentage": 0.07,
+    "is_active": true,
+    "created_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_at": "2025-09-19T06:55:36.997177+00:00",
+    "created_by": null
+  }
+]

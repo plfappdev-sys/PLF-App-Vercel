@@ -1,0 +1,36 @@
+[
+  {
+    "id": 8,
+    "created_at": "2025-09-17T15:54:55.960993+00:00",
+    "membernumber": null,
+    "membership_info": {},
+    "created_by": null,
+    "uid": "dce885c9-3b8f-47f7-939d-2514db8ab58f",
+    "email": "superuser@plf.com",
+    "role": "superuser",
+    "accountstatus": "{\"isVerified\":true,\"status\":\"active\"}",
+    "personalinfo": "{\"firstName\":\"Super\",\"lastName\":\"User\",\"fullName\":\"Super User\"}",
+    "updatedat": "2025-09-17T15:54:55.960993+00:00",
+    "createdby": "system",
+    "lastupdatedby": null,
+    "approvedby": null,
+    "approvalnotes": null
+  },
+  {
+    "id": 10,
+    "created_at": "2025-09-17T17:39:41.437228+00:00",
+    "membernumber": "66",
+    "membership_info": {},
+    "created_by": null,
+    "uid": "183ec6b5-296e-404f-991e-e968306c487c",
+    "email": "oratile@tyriie.co.za",
+    "role": "superuser",
+    "accountstatus": "{\"isVerified\":true,\"status\":\"active\"}",
+    "personalinfo": "{\"firstName\":\"Oratile\",\"lastName\":\"Tyriie\",\"fullName\":\"Oratile Tyriie\"}",
+    "updatedat": "2025-09-17T17:39:41.437228+00:00",
+    "createdby": "system",
+    "lastupdatedby": null,
+    "approvedby": null,
+    "approvalnotes": null
+  }
+]

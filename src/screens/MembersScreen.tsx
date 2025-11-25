@@ -313,42 +313,49 @@ const MembersScreen: React.FC = () => {
             {filteredMembers.length} {filter !== 'all' ? filter : ''} Members
           </Title>
           
-          {filteredMembers.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
-                No members found matching your criteria
-              </Text>
-            </View>
-          ) : (
-            filteredMembers.map((member, index) => (
-              <List.Item
-                key={member.memberNumber}
-                title={`${member.personalInfo?.fullName || `Member ${member.memberNumber}`} (${member.memberNumber})`}
-                description={`Balance: ${formatCurrency(member.financialInfo.currentBalance)} • Outstanding: ${formatCurrency(member.financialInfo.outstandingAmount)}`}
-                left={props => (
-                  <List.Icon 
-                    {...props} 
-                    icon="account" 
-                    color="#228B22"
-                  />
-                )}
-                right={props => (
-                  <View style={styles.memberRight}>
-                    <Chip 
-                      style={[styles.standingChip, { backgroundColor: getStandingColor(member.membershipStatus.standingCategory) }]}
-                      textStyle={styles.standingChipText}
-                    >
-                      {getStandingText(member.membershipStatus.standingCategory)}
-                    </Chip>
+            {filteredMembers.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>
+                  No members found matching your criteria
+                </Text>
+              </View>
+            ) : (
+              filteredMembers.map((member, index) => {
+                // Ensure we have proper member name display
+                const memberName = member.personalInfo?.fullName || 
+                                 (member.personalInfo?.firstName && member.personalInfo?.lastName 
+                                  ? `${member.personalInfo.firstName} ${member.personalInfo.lastName}`
+                                  : `Member ${member.memberNumber}`);
+                
+                return (
+                  <View key={member.memberNumber}>
+                    <List.Item
+                      title={memberName}
+                      description={`${member.memberNumber} • Balance: ${formatCurrency(member.financialInfo.currentBalance)} • Outstanding: ${formatCurrency(member.financialInfo.outstandingAmount)}`}
+                      left={props => (
+                        <List.Icon 
+                          {...props} 
+                          icon="account" 
+                          color="#228B22"
+                        />
+                      )}
+                      style={[
+                        styles.memberItem,
+                        index < filteredMembers.length - 1 && styles.memberItemBorder
+                      ]}
+                    />
+                    <View style={styles.standingContainer}>
+                      <Chip 
+                        style={[styles.standingChip, { backgroundColor: getStandingColor(member.membershipStatus.standingCategory) }]}
+                        textStyle={styles.standingChipText}
+                      >
+                        {getStandingText(member.membershipStatus.standingCategory)}
+                      </Chip>
+                    </View>
                   </View>
-                )}
-                style={[
-                  styles.memberItem,
-                  index < filteredMembers.length - 1 && styles.memberItemBorder
-                ]}
-              />
-            ))
-          )}
+                );
+              })
+            )}
         </Card.Content>
       </Card>
 
@@ -602,13 +609,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 4,
   },
+  standingContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
   standingChip: {
-    height: 24,
+    height: 28,
+    minWidth: 80,
+    justifyContent: 'center',
   },
   standingChipText: {
-    fontSize: 10,
+    fontSize: 11,
     color: 'white',
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   emptyState: {
     padding: 20,

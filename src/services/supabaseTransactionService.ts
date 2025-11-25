@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase.config';
+import { supabase } from '../config/supabase';
 import { Transaction, DepositForm } from '../types/index';
 
 export class SupabaseTransactionService {
@@ -480,18 +480,23 @@ export class SupabaseTransactionService {
 
       if (!member) return;
 
+      // Safely handle null values with proper defaults
+      const currentBalance = member.current_balance !== null ? member.current_balance : 0;
+      const totalContributions = member.total_contributions !== null ? member.total_contributions : 0;
+      const totalRepayments = member.total_repayments !== null ? member.total_repayments : 0;
+
       let updateData: any = {};
       
       if (type === 'deposit') {
         updateData = {
-          current_balance: (member.current_balance || 0) + amount,
-          total_contributions: (member.total_contributions || 0) + amount,
+          current_balance: currentBalance + amount,
+          total_contributions: totalContributions + amount,
           updated_at: new Date().toISOString()
         };
       } else if (type === 'repayment') {
         updateData = {
-          current_balance: (member.current_balance || 0) - amount,
-          total_repayments: (member.total_repayments || 0) + amount,
+          current_balance: currentBalance - amount,
+          total_repayments: totalRepayments + amount,
           updated_at: new Date().toISOString()
         };
       }
@@ -520,9 +525,13 @@ export class SupabaseTransactionService {
 
       if (!loan) return;
 
+      // Safely handle null values with proper defaults
+      const remainingBalance = loan.remaining_balance !== null ? loan.remaining_balance : 0;
+      const totalPaid = loan.total_paid !== null ? loan.total_paid : 0;
+
       const updateData = {
-        remaining_balance: Math.max(0, (loan.remaining_balance || 0) - amount),
-        total_paid: (loan.total_paid || 0) + amount,
+        remaining_balance: Math.max(0, remainingBalance - amount),
+        total_paid: totalPaid + amount,
         updated_at: new Date().toISOString()
       };
 

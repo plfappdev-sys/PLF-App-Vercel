@@ -1,0 +1,4 @@
+# Requirements for PLF Data Migration Script
+supabase==2.19.0
+pandas==2.0.3
+python-dotenv==1.0.1

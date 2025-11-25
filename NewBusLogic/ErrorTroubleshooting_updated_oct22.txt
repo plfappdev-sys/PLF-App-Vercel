@@ -1,0 +1,186 @@
+# PLF Database Schema Mismatch Error Troubleshooting
+## Created: October 22, 2025
+## Updated: October 22, 2025 - Database Schema Mismatch Identified
+
+## Error 11: Database Schema Mismatch - Missing Columns for Excel Data Import
+**Date**: October 22, 2025
+**Error**: "Could not find the 'membership_fee' column of 'members' in the schema cache"
+**Status**: IDENTIFIED - REQUIRES MANUAL SQL EXECUTION
+
+### Root Cause:
+- Database schema doesn't match Excel file structure
+- Missing columns needed for complete data replacement from Excel file
+- Previous data migration scripts assumed columns existed that don't exist
+
+### Missing Columns Identified:
+1. **membership_fee** - From Excel "Membership Fee (Once-Off)" column
+2. **closing_balance** - From Excel "Closing Balance" column  
+3. **share_value** - From Excel "Share Value" column
+4. **date_joined** - From Excel "Date Join" column (note: 'join_date' exists but needs mapping)
+
+### Current Members Table Structure:
+- id
+- created_at
+- member_number
+- personal_info
+- financial_info
+- membership_status
+- interest_settings
+- contribution_history
+- loan_history
+- interest_history
+- last_updated
+- join_date
+- user_id
+- catch_up_fee
+- monthly_contribution
+
+### Excel File Structure (2024-2025 sheet):
+- Member
+- Date Join
+- Membership Fee (Once-Off)
+- Expected Contribution (Current Year)
+- Balance Brought Forward
+- Estimated 12 Months Contribution (Jul 2023-June 2024)
+- Total Contribution for 12 Months
+- Total outstanding contribution for 12 Months
+- **Closing Balance**
+- Total Bank Charges @ 1,1%
+- Total Interest Earned @ 5,5%
+- Penalty July 2023- June 2024
+- Capped Penalties Current Financial Year
+- **Share Value**
+- Monthly contribution columns for each month
+
+### Solution:
+**Manual SQL Execution Required in Supabase SQL Editor**
+
+Execute the following SQL commands in the Supabase SQL Editor:
+
+```sql
+-- Add membership_fee column
+ALTER TABLE members 
+ADD COLUMN IF NOT EXISTS membership_fee DECIMAL(10,2) DEFAULT 0.00;
+
+-- Add closing_balance column (from Excel "Closing Balance")
+ALTER TABLE members 
+ADD COLUMN IF NOT EXISTS closing_balance DECIMAL(10,2) DEFAULT 0.00;
+
+-- Add share_value column (from Excel "Share Value")
+ALTER TABLE members 
+ADD COLUMN IF NOT EXISTS share_value DECIMAL(10,2) DEFAULT 0.00;
+
+-- Add date_joined column (from Excel "Date Join")
+ALTER TABLE members 
+ADD COLUMN IF NOT EXISTS date_joined DATE;
+
+-- Update existing join_date to date_joined if needed
+UPDATE members 
+SET date_joined = join_date 
+WHERE date_joined IS NULL AND join_date IS NOT NULL;
+
+-- Verify the changes
+SELECT 
+    column_name, 
+    data_type, 
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_name = 'members' 
+    AND column_name IN ('membership_fee', 'closing_balance', 'share_value', 'date_joined')
+ORDER BY column_name;
+```
+
+### Steps to Execute:
+1. Go to Supabase Dashboard → SQL Editor
+2. Copy and paste the SQL commands above
+3. Execute each command separately or all at once
+4. Verify the columns were added successfully
+
+### Files Created:
+- `check-database-schema.py` - Script to analyze current database structure
+- `fix-missing-columns.sql` - SQL commands to add missing columns
+- `execute-sql-script.py` - Python script to execute SQL (limited by Supabase API)
+- `execute-sql-node.js` - Node.js script to execute SQL (limited by Supabase API)
+
+### Impact:
+- Data replacement script will work once columns are added
+- Complete Excel data can be imported to database
+- All financial fields from Excel will be properly stored
+
+### Prevention:
+- Future schema changes should be documented and tested
+- Data migration scripts should verify column existence before attempting operations
+- Consider using database migration tools for schema management
+
+## Error 12: Supabase Client Limitations for DDL Operations
+**Date**: October 22, 2025
+**Error**: "SyncClient' object has no attribute 'execute'" and "ALTER TABLE commands need manual execution"
+**Status**: RESOLVED WITH WORKAROUND
+
+### Root Cause:
+- Supabase JavaScript/Python clients don't support raw SQL execution for DDL operations
+- ALTER TABLE, CREATE TABLE, etc. cannot be executed through the REST API
+- Only SELECT, INSERT, UPDATE, DELETE operations are supported via the client libraries
+
+### Solution:
+- Manual execution of DDL commands in Supabase SQL Editor
+- Documented the required SQL commands for manual execution
+
+### Workaround:
+- Use Supabase Dashboard SQL Editor for schema changes
+- For automated deployments, use Supabase CLI or migration tools
+
+## Next Steps:
+1. **Execute SQL Commands Manually** in Supabase SQL Editor
+2. **Verify Schema Changes** using the verification query
+3. **Run Data Replacement Script** again to import Excel data
+4. **Test Application** with new data structure
+
+## Priority: High
+- Blocks complete data replacement from Excel file
+- Essential for accurate financial data storage
+- Required for proper application functionality
+
+## STATUS UPDATE - OCTOBER 22, 2025 ✅
+**Current Status**: DATA SUCCESSFULLY IMPORTED - App reading from wrong data source
+**Root Cause**: Financial data imported to `member_balances` table but app reading from old `financial_info` field
+**Solution Implemented**: Updated `SupabaseMemberService` to read from `member_balances` table
+
+## PROBLEM RESOLUTION ✅
+**Financial Data Status**: 
+- ✅ **89 member balances successfully imported** from Excel file
+- ✅ **Total Fund Value: R4,953,521.30** (not 0.00!)
+- ✅ **Member names showing correctly** in database
+- ✅ **All member balances showing actual amounts** (not 0.00)
+
+**App Issue**: 
+- ❌ **Dashboard showing 0.00** - Fixed by updating `getFundStatistics()` to read from `member_balances`
+- ❌ **Member screen showing 0.00** - Fixed by updating `getMemberByNumber()` and `getAllMembers()` to read from `member_balances`
+
+## SOLUTION IMPLEMENTED
+Updated `src/services/supabaseMemberService.ts` to:
+1. **Read from member_balances table** for financial data
+2. **Fallback to financial_info** if balance data not available
+3. **Calculate total fund value** from actual savings balances
+4. **Display member names correctly** from members table
+
+## VERIFICATION
+Run the following commands to verify:
+```bash
+node check-member-balances.js  # Shows actual financial data
+node check-financial-data.js   # May still show 0.00 (uses old method)
+```
+
+**Expected App Behavior Now**:
+- ✅ Dashboard shows **Total Fund Value: R4,953,521.30**
+- ✅ Member screen shows **actual balances** (not 0.00)
+- ✅ Member names display correctly
+- ✅ Total Members: 89 (correct count)
+
+## NEXT STEPS
+1. **Test the app** to confirm balances are now showing correctly
+2. **Update other services** if they also read from old financial_info field
+3. **Consider migrating** old financial_info data to member_balances table
+
+**Priority**: High (data display issue resolved)

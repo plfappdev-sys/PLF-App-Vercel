@@ -149,13 +149,13 @@ export class ReportService {
   // Generate Member Statement Report
   static async generateMemberStatementReport(memberNumber: string, generatedBy: string): Promise<ReportData> {
     try {
-      const member = await MockMemberService.getMemberByNumber(memberNumber);
+      const member = await SupabaseMemberService.getMemberByNumber(memberNumber);
       if (!member) {
         throw new Error(`Member ${memberNumber} not found`);
       }
 
-      const contributions = await MockMemberService.getMemberContributions(memberNumber);
-      const recentTransactions = await MockMemberService.getRecentTransactions();
+      const contributions = member.contributionHistory || [];
+      const recentTransactions = await SupabaseTransactionService.getRecentTransactions();
 
       // Extract member data
       const personalInfo = {
@@ -235,7 +235,7 @@ export class ReportService {
     generatedBy?: string
   ): Promise<ReportData> {
     try {
-      const allTransactions = await MockMemberService.getRecentTransactions();
+      const allTransactions = await SupabaseTransactionService.getRecentTransactions();
       
       // Filter transactions by date range and type
       let filteredTransactions = allTransactions.filter(t => {
@@ -297,17 +297,17 @@ export class ReportService {
       try {
         console.log('Starting Promise.all for standing analysis report');
         [members, fundStats] = await Promise.all([
-          MockMemberService.getAllMembers(),
-          MockMemberService.getFundStatistics()
+          SupabaseMemberService.getAllMembers(),
+          SupabaseMemberService.getFundStatistics()
         ]);
         console.log('Promise.all for standing analysis completed successfully');
       } catch (promiseError) {
         console.error('Promise.all failed for standing analysis:', promiseError);
         // Fallback: try to get data individually
         console.log('Starting fallback data retrieval for standing analysis');
-        members = await MockMemberService.getAllMembers();
+        members = await SupabaseMemberService.getAllMembers();
         console.log('Members retrieved for standing analysis:', members.length);
-        fundStats = await MockMemberService.getFundStatistics();
+        fundStats = await SupabaseMemberService.getFundStatistics();
         console.log('Fund stats retrieved in fallback for standing analysis:', fundStats);
       }
       
@@ -409,7 +409,7 @@ export class ReportService {
     generatedBy: string
   ): Promise<ReportData> {
     try {
-      const members = await MockMemberService.getAllMembers();
+      const members = await SupabaseMemberService.getAllMembers();
       
       // Generate interest report using the InterestReportService
       const interestReport = InterestReportService.generateFundInterestSummary(
@@ -456,7 +456,7 @@ export class ReportService {
     generatedBy: string
   ): Promise<ReportData> {
     try {
-      const members = await MockMemberService.getAllMembers();
+      const members = await SupabaseMemberService.getAllMembers();
       
       // Generate interest report using the InterestReportService
       const interestReport = InterestReportService.generateFundInterestSummary(
@@ -503,12 +503,12 @@ export class ReportService {
     generatedBy: string
   ): Promise<ReportData> {
     try {
-      const member = await MockMemberService.getMemberByNumber(memberNumber);
+      const member = await SupabaseMemberService.getMemberByNumber(memberNumber);
       if (!member) {
         throw new Error(`Member ${memberNumber} not found`);
       }
 
-      const members = await MockMemberService.getAllMembers();
+      const members = await SupabaseMemberService.getAllMembers();
       const interestReport = InterestReportService.generateFundInterestSummary(
         members,
         startDate,
@@ -563,8 +563,8 @@ export class ReportService {
     generatedBy: string
   ): Promise<ReportData> {
     try {
-      const members = await MockMemberService.getAllMembers();
-      const transactions = await MockMemberService.getRecentTransactions();
+      const members = await SupabaseMemberService.getAllMembers();
+      const transactions = await SupabaseTransactionService.getRecentTransactions();
       
       // Filter contributions within date range
       const contributions = transactions.filter(t => 
@@ -627,7 +627,7 @@ export class ReportService {
   // Generate Loan Portfolio Report
   static async generateLoanPortfolioReport(generatedBy: string): Promise<ReportData> {
     try {
-      const members = await MockMemberService.getAllMembers();
+      const members = await SupabaseMemberService.getAllMembers();
       
       // Filter members with outstanding loans
       const borrowers = members.filter(member => (member.financialInfo?.outstandingAmount || 0) > 0);
@@ -679,7 +679,7 @@ export class ReportService {
     generatedBy: string
   ): Promise<ReportData> {
     try {
-      const members = await MockMemberService.getAllMembers();
+      const members = await SupabaseMemberService.getAllMembers();
       
       // Generate interest report using the InterestReportService
       const interestReport = InterestReportService.generateFundInterestSummary(

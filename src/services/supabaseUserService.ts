@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase.config';
+import { supabase } from '../config/supabase';
 import { User, UserRole } from '../types/index';
 
 export class SupabaseUserService {

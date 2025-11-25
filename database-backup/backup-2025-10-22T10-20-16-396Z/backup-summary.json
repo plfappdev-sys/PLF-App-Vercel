@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-10-22T10:20:16.401Z",
+  "supabaseUrl": "https://zdnyhzasvifrskbostgn.supabase.co",
+  "tables": {
+    "users": {
+      "recordCount": 6,
+      "status": "success"
+    },
+    "members": {
+      "recordCount": 89,
+      "status": "success"
+    },
+    "transactions": {
+      "recordCount": 0,
+      "status": "success"
+    },
+    "loans": {
+      "recordCount": 0,
+      "status": "success"
+    },
+    "interest_accruals": {
+      "recordCount": 0,
+      "status": "success"
+    },
+    "contributions": {
+      "recordCount": 0,
+      "status": "success"
+    },
+    "member_balances": {
+      "recordCount": 0,
+      "status": "success"
+    },
+    "financial_years": {
+      "recordCount": 1,
+      "status": "success"
+    },
+    "system_settings": {
+      "recordCount": 4,
+      "status": "success"
+    },
+    "audit_logs": {
+      "recordCount": 0,
+      "status": "success"
+    }
+  },
+  "totalRecords": 100,
+  "successfulTables": 10,
+  "totalTables": 10
+}

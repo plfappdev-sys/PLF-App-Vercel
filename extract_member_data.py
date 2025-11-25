@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Set
 
 class MemberDataExtractor:
     def __init__(self):
-        self.excel_file_path = r"C:\Projects\Test\September\V5\Resources\PLFDocs\Peoples Liberator Fund Contributions 2025 App.xlsx"
+        self.excel_file_path = "NewBusLogic/Peoples Liberator Fund Contributions 2025 AppUPDATED.xlsx"
         self.sheet_name = "2024-2025"
         
     def get_all_member_rows(self) -> Dict[int, str]:
@@ -41,7 +41,7 @@ class MemberDataExtractor:
             # Prepare the result structure
             result = {
                 "extraction_info": {
-                    "source_file": "Peoples Liberator Fund Contributions 2025 App.xlsx",
+                "source_file": "Peoples Liberator Fund Contributions 2025 AppUPDATED.xlsx",
                     "sheet_name": self.sheet_name,
                     "extraction_date": datetime.now().isoformat(),
                     "total_members_requested": 0,

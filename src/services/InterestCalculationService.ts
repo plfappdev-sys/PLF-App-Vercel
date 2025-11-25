@@ -1,18 +1,11 @@
 import { Member, InterestAccrual, Transaction } from '../types/index';
 import Decimal from 'decimal.js';
+import { FinancialYearService, InterestRates } from './FinancialYearService';
+import { MemberBalanceService } from './MemberBalanceService';
+import { PLF_INTEREST_RATES } from './InterestConstants';
 
 // Configure decimal.js for financial precision
 Decimal.set({ precision: 10, rounding: Decimal.ROUND_HALF_UP });
-
-// Official PLF interest rates as per AGM Resolutions and Constitution
-export const PLF_INTEREST_RATES = {
-  // Loan interest rate: 20% p.a. as per Resolution PLF-AGM/2023/007
-  LOAN_INTEREST_RATE: 0.20,
-  // Penalty interest rate: 40% p.a. (20% + 20% penalty) after 3 months
-  PENALTY_INTEREST_RATE: 0.40,
-  // Late fee rate: 7% as per Constitution Clause 12
-  LATE_FEE_RATE: 0.07
-};
 
 export class InterestCalculationService {
   // Calculate daily interest (compound or simple)
@@ -36,20 +29,28 @@ export class InterestCalculationService {
     }
   }
 
+  // Get current interest rates from database or fallback to hardcoded rates
+  static async getCurrentInterestRates(): Promise<InterestRates> {
+    return FinancialYearService.getCurrentInterestRates();
+  }
+
   // Calculate interest for a member based on their balance and settings
-  static calculateMemberInterest(
+  static async calculateMemberInterest(
     member: Member,
     daysSinceLastCalculation: number = 1
-  ): { interestEarned: number; interestCharged: number } {
+  ): Promise<{ interestEarned: number; interestCharged: number }> {
     const financialInfo = member.financialInfo;
     const settings = member.interestSettings;
+    
+    // Get current interest rates from database
+    const rates = await this.getCurrentInterestRates();
     
     // Calculate interest earned on positive balance (savings)
     let interestEarned = 0;
     if (financialInfo.currentBalance > 0) {
       interestEarned = this.calculateDailyInterest(
         financialInfo.currentBalance,
-        financialInfo.interestRate,
+        rates.savingsRate, // Use configurable savings rate
         daysSinceLastCalculation,
         settings.compounding
       );
@@ -58,10 +59,10 @@ export class InterestCalculationService {
     // Calculate interest charged on outstanding amount (loans)
     let interestCharged = 0;
     if (financialInfo.outstandingAmount > 0) {
-      // Use official PLF loan interest rate: 20% p.a. as per Resolution PLF-AGM/2023/007
+      // Use configurable loan interest rate
       interestCharged = this.calculateDailyInterest(
         financialInfo.outstandingAmount,
-        PLF_INTEREST_RATES.LOAN_INTEREST_RATE,
+        rates.loanRate, // Use configurable loan rate
         daysSinceLastCalculation,
         settings.compounding
       );
@@ -75,7 +76,9 @@ export class InterestCalculationService {
     memberNumber: string,
     interestEarned: number,
     interestCharged: number,
-    calculationDate: Date = new Date()
+    calculationDate: Date = new Date(),
+    interestRate?: number,
+    principalAmount?: number
   ): InterestAccrual {
     const accrualId = `accrual_${memberNumber}_${calculationDate.getTime()}`;
     
@@ -85,8 +88,8 @@ export class InterestCalculationService {
       calculationDate,
       periodStart: new Date(calculationDate.getTime() - 24 * 60 * 60 * 1000), // Previous day
       periodEnd: calculationDate,
-      principalAmount: 0, // Will be set by caller based on context
-      interestRate: 0,    // Will be set by caller based on context
+      principalAmount: principalAmount || 0,
+      interestRate: interestRate || 0,
       interestAmount: interestEarned + interestCharged,
       interestType: interestEarned > 0 ? 'earned' : 'charged',
       compounding: true,
@@ -103,7 +106,9 @@ export class InterestCalculationService {
     amount: number,
     interestType: 'earned' | 'charged',
     accrualId: string,
-    calculationDate: Date = new Date()
+    calculationDate: Date = new Date(),
+    interestRate?: number,
+    principalAmount?: number
   ): Transaction {
     const transactionId = `interest_${interestType}_${memberNumber}_${calculationDate.getTime()}`;
     
@@ -133,8 +138,8 @@ export class InterestCalculationService {
         details: { accrualId, calculationMethod: 'daily_compound' }
       }],
       interestDetails: {
-        principalAmount: 0, // Will be set by caller
-        interestRate: 0,    // Will be set by caller
+        principalAmount: principalAmount || 0,
+        interestRate: interestRate || 0,
         period: 1,          // 1 day
         calculationDate,
         accrualId,
@@ -178,10 +183,13 @@ export class InterestCalculationService {
     const transactions: Transaction[] = [];
     const calculationDate = new Date();
 
+    // Get current rates once for all members
+    const rates = await this.getCurrentInterestRates();
+
     for (const member of members) {
       try {
         // Calculate interest for this member
-        const { interestEarned, interestCharged } = this.calculateMemberInterest(member);
+        const { interestEarned, interestCharged } = await this.calculateMemberInterest(member);
         
         if (interestEarned === 0 && interestCharged === 0) {
           // No interest to calculate for this member
@@ -189,12 +197,14 @@ export class InterestCalculationService {
           continue;
         }
 
-        // Create accrual record
+        // Create accrual record with rate information
         const accrual = this.createInterestAccrual(
           member.memberNumber,
           interestEarned,
           interestCharged,
-          calculationDate
+          calculationDate,
+          interestEarned > 0 ? rates.savingsRate : rates.loanRate,
+          interestEarned > 0 ? member.financialInfo.currentBalance : member.financialInfo.outstandingAmount
         );
         accruals.push(accrual);
 
@@ -205,7 +215,9 @@ export class InterestCalculationService {
             interestEarned,
             'earned',
             accrual.accrualId,
-            calculationDate
+            calculationDate,
+            rates.savingsRate,
+            member.financialInfo.currentBalance
           );
           transactions.push(earnedTransaction);
         }
@@ -216,13 +228,35 @@ export class InterestCalculationService {
             interestCharged,
             'charged',
             accrual.accrualId,
-            calculationDate
+            calculationDate,
+            rates.loanRate,
+            member.financialInfo.outstandingAmount
           );
           transactions.push(chargedTransaction);
         }
 
-        // Update member balances
+        // Update member balances in memory
         const updatedMember = this.updateMemberBalances(member, interestEarned, interestCharged);
+        
+        // Persist balance changes to database if available
+        try {
+          if (await MemberBalanceService.isDatabaseAvailable()) {
+            // Get member ID (assuming member has an id field)
+            const memberId = (member as any).id || await this.getMemberIdFromNumber(member.memberNumber);
+            if (memberId) {
+              await MemberBalanceService.updateBalanceWithInterest(
+                memberId,
+                interestEarned,
+                interestCharged,
+                accrual.accrualId
+              );
+            }
+          }
+        } catch (dbError) {
+          console.warn(`Failed to persist balance changes for member ${member.memberNumber}:`, dbError);
+          // Continue with in-memory updates even if database persistence fails
+        }
+        
         updatedMembers.push(updatedMember);
 
       } catch (error) {
@@ -236,31 +270,34 @@ export class InterestCalculationService {
   }
 
   // Calculate interest for a specific date range
-  static calculateInterestForPeriod(
+  static async calculateInterestForPeriod(
     principal: number,
     annualRate: number,
     startDate: Date,
     endDate: Date,
     compounding: boolean = true
-  ): number {
+  ): Promise<number> {
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     return this.calculateDailyInterest(principal, annualRate, days, compounding);
   }
 
   // Generate interest report for a member
-  static generateInterestReport(member: Member, startDate: Date, endDate: Date): any {
+  static async generateInterestReport(member: Member, startDate: Date, endDate: Date): Promise<any> {
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Get current rates for accurate reporting
+    const rates = await this.getCurrentInterestRates();
     
     const projectedEarned = this.calculateDailyInterest(
       member.financialInfo.currentBalance,
-      member.financialInfo.interestRate,
+      rates.savingsRate, // Use configurable savings rate
       days,
       member.interestSettings.compounding
     );
 
     const projectedCharged = this.calculateDailyInterest(
       member.financialInfo.outstandingAmount,
-      PLF_INTEREST_RATES.LOAN_INTEREST_RATE, // 20% p.a. as per Resolution PLF-AGM/2023/007
+      rates.loanRate, // Use configurable loan rate
       days,
       member.interestSettings.compounding
     );
@@ -270,7 +307,8 @@ export class InterestCalculationService {
       period: { startDate, endDate, days },
       currentBalance: member.financialInfo.currentBalance,
       outstandingAmount: member.financialInfo.outstandingAmount,
-      interestRate: member.financialInfo.interestRate,
+      savingsInterestRate: rates.savingsRate,
+      loanInterestRate: rates.loanRate,
       projectedInterestEarned: projectedEarned,
       projectedInterestCharged: projectedCharged,
       netProjectedInterest: projectedEarned - projectedCharged,
@@ -279,22 +317,50 @@ export class InterestCalculationService {
     };
   }
 
-  // Calculate late payment fee (7% as per Constitution Clause 12)
-  static calculateLateFee(outstandingBalance: number): number {
-    const balanceDec = new Decimal(outstandingBalance);
-    const lateFee = balanceDec.times(PLF_INTEREST_RATES.LATE_FEE_RATE);
-    return lateFee.toNumber();
+  // Calculate late payment penalty (5.5% monthly as per updated business logic)
+  static calculateLatePenalty(
+    balanceBroughtForward: number,
+    currentMonthContribution: number
+  ): number {
+    const totalAmount = new Decimal(balanceBroughtForward).plus(currentMonthContribution);
+    const penalty = totalAmount.times(PLF_INTEREST_RATES.LATE_PENALTY_RATE);
+    return penalty.toNumber();
   }
 
-  // Calculate penalty interest for overdue loans (40% p.a. after 3 months)
-  static calculatePenaltyInterest(
+  // Calculate next month penalty (5.5% monthly as per updated business logic)
+  static calculateNextMonthPenalty(
+    amountDue: number,
+    currentMonthContribution: number
+  ): number {
+    const totalAmount = new Decimal(amountDue).plus(currentMonthContribution);
+    const penalty = totalAmount.times(PLF_INTEREST_RATES.LATE_PENALTY_RATE);
+    return penalty.toNumber();
+  }
+
+  // Calculate monthly penalty for outstanding contributions
+  static calculateMonthlyPenalty(
+    outstandingAmount: number,
+    monthsOverdue: number
+  ): number {
+    const outstandingDec = new Decimal(outstandingAmount);
+    const penaltyRate = new Decimal(PLF_INTEREST_RATES.LATE_PENALTY_RATE);
+    
+    // Calculate compound penalty: P * (1 + r)^n - P
+    const factor = new Decimal(1).plus(penaltyRate);
+    const totalAmount = outstandingDec.times(factor.pow(monthsOverdue));
+    return totalAmount.minus(outstandingDec).toNumber();
+  }
+
+  // Calculate penalty interest for overdue loans using configurable penalty rate
+  static async calculatePenaltyInterest(
     outstandingAmount: number,
     daysOverdue: number,
     compounding: boolean = true
-  ): number {
+  ): Promise<number> {
+    const rates = await this.getCurrentInterestRates();
     return this.calculateDailyInterest(
       outstandingAmount,
-      PLF_INTEREST_RATES.PENALTY_INTEREST_RATE,
+      rates.penaltyRate, // Use configurable penalty rate
       daysOverdue,
       compounding
     );
@@ -312,5 +378,18 @@ export class InterestCalculationService {
     const today = new Date();
     const daysDifference = Math.ceil((today.getTime() - loanDate.getTime()) / (1000 * 60 * 60 * 24));
     return Math.max(0, daysDifference - 90); // Only count days beyond 90 days
+  }
+
+  // Helper method to get member ID from member number
+  private static async getMemberIdFromNumber(memberNumber: string): Promise<number | null> {
+    try {
+      // This would typically query the database to get member ID from member number
+      // For now, we'll return null and handle it gracefully
+      console.warn(`Member ID lookup not implemented for member number: ${memberNumber}`);
+      return null;
+    } catch (error) {
+      console.error(`Error getting member ID for ${memberNumber}:`, error);
+      return null;
+    }
   }
 }

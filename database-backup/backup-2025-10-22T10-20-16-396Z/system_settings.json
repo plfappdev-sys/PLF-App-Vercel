@@ -1,0 +1,54 @@
+[
+  {
+    "id": "65b6fd70-28c5-4870-bed7-0c19b28dcb62",
+    "setting_key": "system_name",
+    "setting_value": "PLF Management System",
+    "setting_type": "string",
+    "category": "general",
+    "description": "Name of the PLF system",
+    "is_public": true,
+    "requires_admin": false,
+    "created_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_by": null
+  },
+  {
+    "id": "dbd40ce1-eaf7-4ea8-a65a-740f9dd6e8c8",
+    "setting_key": "monthly_contribution",
+    "setting_value": "200.00",
+    "setting_type": "number",
+    "category": "contributions",
+    "description": "Monthly contribution amount",
+    "is_public": true,
+    "requires_admin": false,
+    "created_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_by": null
+  },
+  {
+    "id": "f26f1bc3-6eea-4955-953e-af8700518eb9",
+    "setting_key": "system_version",
+    "setting_value": "2.0.0",
+    "setting_type": "string",
+    "category": "general",
+    "description": "Current system version",
+    "is_public": true,
+    "requires_admin": false,
+    "created_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_by": null
+  },
+  {
+    "id": "ffb20da8-23c0-45fb-a34f-6d9214113f2d",
+    "setting_key": "late_fee_percentage",
+    "setting_value": "0.07",
+    "setting_type": "number",
+    "category": "fees",
+    "description": "Late fee percentage applied on 8th of month",
+    "is_public": true,
+    "requires_admin": false,
+    "created_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_at": "2025-09-19T06:55:36.997177+00:00",
+    "updated_by": null
+  }
+]

@@ -7,12 +7,15 @@ import {
   Button, 
   ActivityIndicator,
   Chip,
-  Divider
+  Divider,
+  Badge
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/SupabaseAuthContext';
 import RealMemberService from '../services/RealMemberService';
 import { SupabaseMemberService } from '../services/supabaseMemberService';
+import { MemberBalanceService, MemberBalanceRecord } from '../services/MemberBalanceService';
+import { ContributionService, ContributionRecord } from '../services/ContributionService';
 import { Member } from '../types/index';
 import { PLFTheme } from '../theme/colors';
 
@@ -23,6 +26,9 @@ const DashboardScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [memberData, setMemberData] = useState<Member | null>(null);
   const [fundStats, setFundStats] = useState<any>(null);
+  const [memberBalance, setMemberBalance] = useState<MemberBalanceRecord | null>(null);
+  const [currentContribution, setCurrentContribution] = useState<ContributionRecord | null>(null);
+  const [contributionStats, setContributionStats] = useState<any>(null);
 
   const loadDashboardData = async () => {
     try {
@@ -31,11 +37,32 @@ const DashboardScreen: React.FC = () => {
       setFundStats(stats);
 
       // Load member-specific data if user is a member
-      // For now, we'll use mock data since the real member data isn't integrated yet
-      if (currentUser?.role === 'member') {
-        // TODO: Replace with actual member data integration
-        const mockMember = await RealMemberService.getMemberByNumber('6'); // Using a test member number
-        setMemberData(mockMember);
+      if (currentUser?.role === 'member' && currentUser?.memberNumber) {
+        try {
+          // Get member data from database
+          const member = await SupabaseMemberService.getMemberByNumber(currentUser.memberNumber);
+          setMemberData(member);
+
+          // Get member ID from member data to use with new services
+          if (member) {
+            // Get member balance from new MemberBalanceService
+            const balance = await MemberBalanceService.getBalanceByMemberNumber(currentUser.memberNumber);
+            setMemberBalance(balance);
+
+            // Get current month contribution status
+            const contribution = await ContributionService.getCurrentMonthContribution(member.id);
+            setCurrentContribution(contribution);
+
+            // Get contribution statistics
+            const stats = await ContributionService.getMemberContributionStats(member.id);
+            setContributionStats(stats);
+          }
+        } catch (memberError) {
+          console.error('Error loading member-specific data:', memberError);
+          // Fallback to mock data if new services fail
+          const mockMember = await RealMemberService.getMemberByNumber(currentUser.memberNumber);
+          setMemberData(mockMember);
+        }
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -89,6 +116,17 @@ const DashboardScreen: React.FC = () => {
       case 'owing_65': return 'Owing 65%';
       case 'owing_65_plus': return 'Owing 65%+';
       default: return 'Unknown';
+    }
+  };
+
+  const getContributionStatusColor = (status: string) => {
+    switch (status) {
+      case 'paid': return PLFTheme.colors.success;
+      case 'partial': return PLFTheme.colors.warning;
+      case 'overdue': return PLFTheme.colors.error;
+      case 'waived': return PLFTheme.colors.info;
+      case 'pending': 
+      default: return PLFTheme.colors.mediumGray;
     }
   };
 
@@ -178,29 +216,184 @@ const DashboardScreen: React.FC = () => {
             </Card.Content>
           </Card>
 
+          {/* Enhanced Financial Summary with new business logic data */}
           <Card style={styles.card}>
             <Card.Content>
               <Title style={styles.cardTitle}>My Financial Summary</Title>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Current Balance:</Text>
-                <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.currentBalance)}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Total Contributions:</Text>
-                <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.totalContributions)}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Outstanding Amount:</Text>
-                <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
-                  {formatCurrency(memberData.financialInfo.outstandingAmount)}
-                </Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Planned Contributions:</Text>
-                <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.plannedContributions)}</Text>
-              </View>
+              
+              {/* Use new MemberBalanceService data if available, fallback to old data */}
+              {memberBalance ? (
+                <>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Savings Balance:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.success }]}>
+                      {formatCurrency(memberBalance.savings_balance)}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Loan Balance:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                      {formatCurrency(memberBalance.loan_balance)}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Net Balance:</Text>
+                    <Text style={[styles.statValue, { 
+                      color: memberBalance.net_balance >= 0 ? PLFTheme.colors.success : PLFTheme.colors.error 
+                    }]}>
+                      {formatCurrency(memberBalance.net_balance)}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Available for Withdrawal:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
+                      {formatCurrency(memberBalance.available_for_withdrawal)}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Available for Loan:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGold }]}>
+                      {formatCurrency(memberBalance.available_for_loan)}
+                    </Text>
+                  </View>
+                </>
+              ) : (
+                // Fallback to old financial info structure
+                <>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Current Balance:</Text>
+                    <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.currentBalance)}</Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Total Contributions:</Text>
+                    <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.totalContributions)}</Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Outstanding Amount:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                      {formatCurrency(memberData.financialInfo.outstandingAmount)}
+                    </Text>
+                  </View>
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Planned Contributions:</Text>
+                    <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.plannedContributions)}</Text>
+                  </View>
+                </>
+              )}
             </Card.Content>
           </Card>
+
+          {/* Contribution Status Section */}
+          {currentContribution && (
+            <Card style={styles.card}>
+              <Card.Content>
+                <Title style={styles.cardTitle}>Current Contribution Status</Title>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Month:</Text>
+                  <Text style={styles.statValue}>
+                    {currentContribution.contribution_month.toLocaleDateString('en-ZA', { 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })}
+                  </Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Amount Due:</Text>
+                  <Text style={styles.statValue}>{formatCurrency(currentContribution.amount_due)}</Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Amount Paid:</Text>
+                  <Text style={[styles.statValue, { 
+                    color: currentContribution.amount_paid >= currentContribution.amount_due ? 
+                      PLFTheme.colors.success : PLFTheme.colors.warning 
+                  }]}>
+                    {formatCurrency(currentContribution.amount_paid)}
+                  </Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Status:</Text>
+                  <Chip 
+                    style={[styles.statusChip, { 
+                      backgroundColor: getContributionStatusColor(currentContribution.status) 
+                    }]}
+                    textStyle={styles.statusChipText}
+                  >
+                    {currentContribution.status.toUpperCase()}
+                  </Chip>
+                </View>
+                
+                {currentContribution.late_fee_applied && (
+                  <View style={styles.statRow}>
+                    <Text style={[styles.statLabel, { color: PLFTheme.colors.error }]}>Late Fee:</Text>
+                    <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                      {formatCurrency(currentContribution.late_fee_amount)}
+                    </Text>
+                  </View>
+                )}
+                
+                {currentContribution.status === 'overdue' && (
+                  <View style={styles.warningContainer}>
+                    <Text style={styles.warningText}>
+                      ⚠️ Your contribution is overdue. Please make payment to avoid additional late fees.
+                    </Text>
+                  </View>
+                )}
+              </Card.Content>
+            </Card>
+          )}
+
+          {/* Contribution Statistics */}
+          {contributionStats && (
+            <Card style={styles.card}>
+              <Card.Content>
+                <Title style={styles.cardTitle}>Contribution History</Title>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Total Paid:</Text>
+                  <Text style={[styles.statValue, { color: PLFTheme.colors.success }]}>
+                    {formatCurrency(contributionStats.total_paid)}
+                  </Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Total Outstanding:</Text>
+                  <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                    {formatCurrency(contributionStats.total_outstanding)}
+                  </Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Total Late Fees:</Text>
+                  <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                    {formatCurrency(contributionStats.total_late_fees)}
+                  </Text>
+                </View>
+                
+                <Divider style={styles.divider} />
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Paid Contributions:</Text>
+                  <Text style={styles.statValue}>{contributionStats.paid_count}</Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Pending Contributions:</Text>
+                  <Text style={styles.statValue}>{contributionStats.pending_count}</Text>
+                </View>
+                
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>Overdue Contributions:</Text>
+                  <Text style={[styles.statValue, { color: contributionStats.overdue_count > 0 ? PLFTheme.colors.error : PLFTheme.colors.black }]}>
+                    {contributionStats.overdue_count}
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
+          )}
         </>
       )}
 
@@ -387,6 +580,31 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: PLFTheme.spacing.sm,
+  },
+  // New styles for contribution status UI
+  statusChip: {
+    alignSelf: 'flex-start',
+    minHeight: 24,
+  },
+  statusChipText: {
+    color: PLFTheme.colors.white,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  warningContainer: {
+    backgroundColor: PLFTheme.colors.warning + '20', // 20% opacity
+    padding: PLFTheme.spacing.sm,
+    borderRadius: PLFTheme.borderRadius.sm,
+    marginTop: PLFTheme.spacing.sm,
+  },
+  warningText: {
+    color: PLFTheme.colors.warning,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  divider: {
+    marginVertical: PLFTheme.spacing.md,
+    backgroundColor: PLFTheme.colors.mediumGray,
   },
 });
 

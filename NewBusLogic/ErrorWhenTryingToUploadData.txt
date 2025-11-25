@@ -1,0 +1,207 @@
+PS C:\Projects\Test\September\V5\PLF-App-Clean> python complete-data-replacement.py
+Starting PLF Complete Data Replacement...
+============================================================
+Verifying Excel file...
+C:\Users\orati\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\openpyxl\worksheet\_reader.py:329: UserWarning: Sparkline Group extension is not supported and will be removed
+  warn(msg)
+Excel file verified. Sheets found: ['Recon', '2018-2019 B STATEMENT ', ' 2018-2019', '2019-2020 New', '2020-2021 New', '2021-2022 (A) New', '2021-2022 (B)', '2022-2023', '2022 Mar-Jun', '2023-2024', '2024-2025', 'Capped Penalties', 'Claims Processed ', 'Terminations', 'Stokfella Fees', 'Interest Earned ', 'FNB PLF ', 'Catch up Fee', 'Dashboard', 'Sheet1', 'Sheet3', 'Sheet4', 'Sheet2']
+Clearing existing data (except superusers)...
+Preserving 2 superusers
+Cleared members table
+Cleared transactions table
+Cleared loans table
+Cleared interest_accruals table
+Cleared contributions table
+Cleared member_balances table
+Cleared audit_logs table
+Cleared non-superuser users
+Data clearing completed successfully
+Extracting member data from Excel...
+Extracted 89 members from Excel
+Importing members to database...
+Imported member: Babotshedi Malibe (M001)
+Imported member: Belinda  Kelly (M002)
+Imported member: Boitshoko Dire (M003)
+Imported member: Boitshoko Selekanyane (M004)
+Imported member: Boitumelo  Marumo (M005)
+Imported member: Christopher Naude (M006)
+Imported member: Collen Zolile Mbengo (M007)
+Imported member: Collin Oliphant (M008)
+Imported member: Daniel Moepeng (M009)
+Imported member: Dikagisho  Mokoma (M010)
+Imported member: Doni Mosimanekgosi (M011)
+Imported member: Dumisane  Mtotoba (M012)
+Imported member: Ekofo Lofembe (M013)
+Imported member: Elizabeth Nakuphi Thabeng (M014)
+Imported member: Ephraim Mbulelo Zukane (M015)
+Imported member: Euvodia Mothibi (M016)
+Imported member: Freddy  Sonakile (M017)
+Imported member: Gaithitjwe   Letlhaku (M018)
+Imported member: Gasebakwe Mankuroane (M019)
+Imported member: Gideon Diole (M020)
+Imported member: Gladness Mokgosi (M021)
+Imported member: Gosego Molale (M022)
+Imported member: Jaftha Nkashe (M023)
+Imported member: Jeff Matlou (M024)
+Imported member: Jonas Letlhaku (M025)
+Imported member: Jonas Moeng (M026)
+Imported member: Joseph Sekgalo (M027)
+Imported member: Josiah Gaotlhaolwe Montwedi (M028)
+Imported member: Julia  Mtyela (M029)
+Imported member: Justice Mxolisi Tyobeka (M030)
+Imported member: Kabelo  Morubane (M031)
+Imported member: Kagiso Isaac Phetoe (M032)
+Imported member: Kagiso Mokaila (M033)
+Imported member: Katlego  Khotsholo (M034)
+Imported member: Keatlaretse Poo (M035)
+Imported member: Kebonemotse Lebotse (M036)
+Imported member: Kedibone  Morokhu (M037)
+Imported member: Kegomoditswe Kgosimore (M038)
+Imported member: Kgomodile Loate (M039)
+Imported member: Lebogang Mafora (M040)
+Imported member: Lekgowa  Mahole (M041)
+Imported member: Lenyatso Shadi (M042)
+Imported member: Lesego Bokaba (M043)
+Imported member: Macbeth Masupha Sello (M044)
+Imported member: Matshediso Ellen Tyobeka (M045)
+Imported member: Matshidiso  Maleshane (M046)
+Imported member: Michael Boitumelo Kenosi Suping (M047)
+Imported member: Mmantsho lamone (M048)
+Imported member: Mmapako kgagane (M049)
+Imported member: Mncedisi Sibiya (M050)
+Imported member: Monaco frans makwaeba (M051)
+Imported member: Mpho  Pilane (M052)
+Imported member: Mthobeli Keyizana (M053)
+Imported member: Naomi  Mokhine (M054)
+Imported member: Nicholas  Molale (M055)
+Imported member: Nomalizo Florence Sebanyoni (M056)
+Imported member: Obakeng Kgosiemang (M057)
+Imported member: Ontiretse Molefe (M058)
+Imported member: Ookame Molale (M059)
+Imported member: Oratile Belicent Letlhogile (M060)
+Imported member: Patrick Mateane (M061)
+Imported member: Pauline Mogomotsi (M062)
+Imported member: PHILLIO THABISO MTYELA (M063)
+Imported member: Phineas Mpho Kgajane (M064)
+Imported member: Poloko  khabae (M065)
+Imported member: Refilwe Lentswe (M066)
+Imported member: Rosinah Letlhaku (M067)
+Imported member: Simon  Mamatlhodi (M068)
+Imported member: Sina Molale (M069)
+Imported member: Sophy buthelezi (M070)
+Imported member: Stella Dintoe (M071)
+Imported member: Sylvia Mokhadi (M072)
+Imported member: Tabane Matshego (M073)
+Imported member: Tebogo Itshegetseng (M074)
+Imported member: Thabo Moeti (M075)
+Imported member: Thapelo Cornelius Moseki (M076)
+Imported member: Thembi Moepeng (M077)
+Imported member: Thenjiwe Shazi (M078)
+Imported member: Theona Molokela (M079)
+Imported member: Tlotlego Evodia Mankuroane (M080)
+Imported member: Tryphina  Kelly (M081)
+Imported member: Tshepang  Setlhogo (M082)
+Imported member: Tsholofelo Maleshane (M083)
+Imported member: Tumelo  Letlhaku (M084)
+Imported member: Vhuthihi Makhado (M085)
+Imported member: Violet Molefe (M086)
+Imported member: wellington  galogakwe (M087)
+Imported member: Winnie Gaaratwe (M088)
+Imported member: Zandie Mancotywa (M089)
+Successfully imported 89 members
+Creating initial member balances...
+Created balance for Babotshedi Malibe: R32191.613034515183
+Created balance for Belinda  Kelly: R39153.8952109713
+Created balance for Boitshoko Dire: R81690.41275543183
+Created balance for Boitshoko Selekanyane: R92731.24140713604
+Created balance for Boitumelo  Marumo: R48239.50461265659
+Created balance for Christopher Naude: R51965.104846997434
+Created balance for Collen Zolile Mbengo: R94429.83043047517
+Created balance for Collin Oliphant: R76594.64568541449
+Created balance for Daniel Moepeng: R45142.319917754125
+Created balance for Dikagisho  Mokoma: R74692.22192105014
+Created balance for Doni Mosimanekgosi: R41348.92345112799
+Created balance for Dumisane  Mtotoba: R24787.147045445185
+Created balance for Ekofo Lofembe: R37527.098148615
+Created balance for Elizabeth Nakuphi Thabeng: R87866.78453388023
+Created balance for Ephraim Mbulelo Zukane: R76594.64568541449
+Created balance for Euvodia Mothibi: R83389.00177877094
+Created balance for Freddy  Sonakile: R-27898.11025611574
+Created balance for Gaithitjwe   Letlhaku: R16978.096772088487
+Created balance for Gasebakwe Mankuroane: R70967.9717709457
+Created balance for Gideon Diole: R36932.5919904463
+Created balance for Gladness Mokgosi: R84238.29629044048
+Created balance for Gosego Molale: R46309.378573932714
+Created balance for Jaftha Nkashe: R90183.3578721274
+Created balance for Jeff Matlou: R-16378.074230731636
+Created balance for Jonas Letlhaku: R31997.841140449316
+Created balance for Jonas Moeng: R71989.2133221527
+Created balance for Joseph Sekgalo: R85087.59080211005
+Created balance for Josiah Gaotlhaolwe Montwedi: R90183.3578721274
+Created balance for Julia  Mtyela: R47718.63228864966
+Created balance for Justice Mxolisi Tyobeka: R13120.24903710399
+Created balance for Kabelo  Morubane: R-407.86703582991277
+Created balance for Kagiso Isaac Phetoe: R83958.98648644047
+Created balance for Kagiso Mokaila: R91881.94689546648
+Created balance for Katlego  Khotsholo: R80839.7786487149
+Created balance for Keatlaretse Poo: R80035.38484370646
+Created balance for Kebonemotse Lebotse: R66403.11154537986
+Created balance for Kedibone  Morokhu: R65978.46428954507
+Created balance for Kegomoditswe Kgosimore: R90183.3578721274
+Created balance for Kgomodile Loate: R75660.421722578
+Created balance for Lebogang Mafora: R38376.39266028456
+Created balance for Lekgowa  Mahole: R63912.05350871895
+Created balance for Lenyatso Shadi: R52166.330518556795
+Created balance for Lesego Bokaba: R4927.5666531478255
+Created balance for Macbeth Masupha Sello: R46869.3377769801
+Created balance for Matshediso Ellen Tyobeka: R-5963.282574198639
+Created balance for Matshidiso  Maleshane: R72398.59091563689
+Created balance for Michael Boitumelo Kenosi Suping: R-186.76806115132024
+Created balance for Mmantsho lamone: R27109.5984585599
+Created balance for Mmapako kgagane: R91032.65238379691
+Created balance for Mncedisi Sibiya: R86786.17982544917
+Created balance for Monaco frans makwaeba: R93155.88866297083
+Created balance for Mpho  Pilane: R45170.74875364099
+Created balance for Mthobeli Keyizana: R19946.701757055223
+Created balance for Naomi  Mokhine: R17416.360591162385
+Created balance for Nicholas  Molale: R-17335.449373051415
+Created balance for Nomalizo Florence Sebanyoni: R62912.272914139976
+Created balance for Obakeng Kgosiemang: R85936.8853137796
+Created balance for Ontiretse Molefe: R88484.76884878826
+Created balance for Ookame Molale: R14379.980715835962
+Created balance for Oratile Belicent Letlhogile: R91881.94689546648
+Created balance for Patrick Mateane: R68950.99508038851
+Created balance for Pauline Mogomotsi: R64704.522522040745
+Created balance for PHILLIO THABISO MTYELA: R88399.83939762128
+Created balance for Phineas Mpho Kgajane: R91881.94689546648
+Created balance for Poloko  khabae: R74046.76215040585
+Created balance for Refilwe Lentswe: R64543.94260857459
+Created balance for Rosinah Letlhaku: R31582.036566928116
+Created balance for Simon  Mamatlhodi: R51965.104846997434
+Created balance for Sina Molale: R11769.914299885751
+Created balance for Sophy buthelezi: R61307.34447536254
+Created balance for Stella Dintoe: R86786.17982544917
+Created balance for Sylvia Mokhadi: R23964.138280487547
+Created balance for Tabane Matshego: R48439.258681801264
+Created balance for Tebogo Itshegetseng: R40245.294497662566
+Created balance for Thabo Moeti: R75745.35117374494
+Created balance for Thapelo Cornelius Moseki: R91881.94689546648
+Created balance for Thembi Moepeng: R56211.57740534519
+Created balance for Thenjiwe Shazi: R88484.76884878826
+Created balance for Theona Molokela: R78293.23470875359
+Created balance for Tlotlego Evodia Mankuroane: R35341.76110051226
+Created balance for Tryphina  Kelly: R7616.252533646553
+Created balance for Tshepang  Setlhogo: R39225.68717195411
+Created balance for Tsholofelo Maleshane: R74046.76215040585
+Created balance for Tumelo  Letlhaku: R53239.046614501756
+Created balance for Vhuthihi Makhado: R27005.616623035952
+Created balance for Violet Molefe: R93580.53591880562
+Created balance for wellington  galogakwe: R70729.91164010683
+Created balance for Winnie Gaaratwe: R89334.06336045783
+Created balance for Zandie Mancotywa: R20510.392748056118
+Initial balances created successfully
+Setting up financial years...
+Error setting up financial years: {'message': 'invalid input syntax for type uuid: ""', 'code': '22P02', 'hint': None, 'details': None}
+Financial year setup failed. Exiting.
+
+❌ Data replacement failed. Please check the errors above.
