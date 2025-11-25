@@ -9,7 +9,10 @@
     "web": "expo start --web",
     "test": "jest",
     "test:watch": "jest --watch",
-    "postinstall": "node scripts/patch-firebase.js"
+    "postinstall": "node scripts/patch-firebase.js",
+    "vercel-build": "expo build:web",
+    "build": "expo build:web",
+    "dev": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-runtime": "^5.0.4",
