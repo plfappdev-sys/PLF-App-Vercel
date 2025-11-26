@@ -302,7 +302,7 @@ export class SupabaseMemberService {
 
       // Calculate statistics from member_balances table
       balances.forEach((balance: any) => {
-        // FIX: Total Fund Value should be sum of actual contributions, not savings balance
+        // FIX: Total Fund Value should be sum of savings_balance, not total_contributions
         const totalContributions = typeof balance?.total_contributions === 'number'
           ? balance.total_contributions
           : 0;
@@ -315,8 +315,8 @@ export class SupabaseMemberService {
           ? balance.net_balance
           : savingsBalance;
         
-        // FIX: Use total_contributions for Total Fund Value (sum of all actual contributions by members)
-        totalFundValue += totalContributions;
+        // FIX: Use savings_balance for Total Fund Value (sum of all actual savings by members)
+        totalFundValue += savingsBalance;
         
         // Calculate outstanding amount based on negative net balance
         if (netBalance < 0) {
