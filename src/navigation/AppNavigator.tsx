@@ -22,7 +22,7 @@ import MemberApprovalScreen from '../screens/MemberApprovalScreen'; // Will crea
 import MyFundsScreen from '../screens/MyFundsScreen';
 
 // Placeholder screens for other tabs
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 
 const AnnouncementsScreen = () => (
   <View style={styles.placeholderContainer}>
@@ -185,7 +185,12 @@ const AppNavigator: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    // Show a simple loading screen instead of returning null
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={PLFTheme.colors.primaryGreen} />
+      </View>
+    );
   }
 
   return (
@@ -232,7 +237,15 @@ const AppNavigator: React.FC = () => {
             />
           </>
         ) : (
-          <Stack.Screen name="Auth" component={AuthStackNavigator} />
+          <Stack.Screen 
+            name="Auth" 
+            component={AuthStackNavigator}
+            options={{
+              // Prevent going back to authenticated screens
+              gestureEnabled: false,
+              headerLeft: () => null
+            }}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>
@@ -240,6 +253,12 @@ const AppNavigator: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: PLFTheme.colors.lightGray,
+  },
   placeholderContainer: {
     flex: 1,
     justifyContent: 'center',
