@@ -433,15 +433,17 @@ export class SupabaseMemberService {
       members.forEach((member: any) => {
         // Safe access to nested properties with fallback defaults
         const financialInfo = member?.financial_info || {};
-        const currentBalance = typeof financialInfo?.current_balance === 'number' 
-          ? financialInfo.current_balance 
-          : 0;
+        const actualContributions = typeof financialInfo?.actual_contributions === 'number'
+          ? financialInfo.actual_contributions
+          : (typeof financialInfo?.total_contributions === 'number'
+            ? financialInfo.total_contributions
+            : 0);
         
         const outstandingAmount = typeof financialInfo?.outstanding_amount === 'number'
           ? financialInfo.outstanding_amount
           : 0;
         
-        totalFundValue += currentBalance;
+        totalFundValue += actualContributions;
         totalOutstanding += outstandingAmount;
 
         // Safe access to membership status with comprehensive null checking
@@ -507,23 +509,21 @@ export class SupabaseMemberService {
 
       // Calculate statistics from members table
       members.forEach((member: any) => {
-        // Calculate current balance from various fields
-        // Use savings_balance if available in financial_info, otherwise use total_contributions
+        // Calculate actual contributions made by member
+        // Use actual_contributions if available, otherwise fall back to total_contributions
         const financialInfo = member?.financial_info || {};
-        const currentBalance = typeof financialInfo?.current_balance === 'number'
-          ? financialInfo.current_balance
-          : (typeof financialInfo?.savings_balance === 'number'
-            ? financialInfo.savings_balance
-            : (typeof financialInfo?.total_contributions === 'number'
-              ? financialInfo.total_contributions
-              : 0));
+        const actualContributions = typeof financialInfo?.actual_contributions === 'number'
+          ? financialInfo.actual_contributions
+          : (typeof financialInfo?.total_contributions === 'number'
+            ? financialInfo.total_contributions
+            : 0);
 
         // Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
         // Also check financial_info.outstanding_amount as fallback
         const outstandingAmount = (member.catch_up_fee || 0) + 
                                  (financialInfo.outstanding_amount || 0);
 
-        totalFundValue += currentBalance;
+        totalFundValue += actualContributions;
         totalOutstanding += outstandingAmount;
 
         // Categorize members based on outstanding percentage
