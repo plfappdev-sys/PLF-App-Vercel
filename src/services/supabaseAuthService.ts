@@ -88,13 +88,11 @@ export class SupabaseAuthService {
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
-        console.error('Session error:', error);
         return null;
       }
 
       return session;
     } catch (error) {
-      console.error('Get session error:', error);
       return null;
     }
   }
@@ -105,16 +103,12 @@ export class SupabaseAuthService {
       // First check if we have a valid session
       const session = await this.getCurrentSession();
       if (!session) {
-        console.log('No active session available');
         return null;
       }
-
-      console.log('Session user ID:', session.user?.id);
 
       const { data: { user }, error } = await supabase.auth.getUser();
       
       if (error) {
-        console.error('Get user error:', error);
         // Try to get user directly from users table using session user ID
         if (session.user?.id) {
           const { data: userProfile, error: profileError } = await supabase
@@ -123,10 +117,8 @@ export class SupabaseAuthService {
             .eq('uid', session.user.id)
             .single();
 
-          console.log('Fallback query result:', { userProfile, profileError });
-
           if (!profileError && userProfile) {
-            const result = {
+            return {
               id: userProfile.uid,
               uid: userProfile.uid,
               email: userProfile.email,
@@ -134,16 +126,12 @@ export class SupabaseAuthService {
               memberNumber: userProfile.membernumber,
               created_at: userProfile.created_at || new Date().toISOString(),
             };
-            console.log('Returning fallback user:', result);
-            return result;
           }
         }
         return null;
       }
 
       if (!user) return null;
-
-      console.log('Auth user ID:', user.id);
 
       // Get user profile from our users table to get the correct role and member number
       const { data: userProfile, error: profileError } = await supabase
@@ -152,17 +140,12 @@ export class SupabaseAuthService {
         .eq('uid', user.id)
         .single();
 
-      console.log('User profile query result:', { userProfile, profileError });
-
       if (profileError) {
-        console.error('Get user profile error:', profileError);
         // Return basic user info if profile doesn't exist
-        const result = this.mapAuthUserToUser(user);
-        console.log('Returning mapped user (no profile):', result);
-        return result;
+        return this.mapAuthUserToUser(user);
       }
 
-      const result = {
+      return {
         id: user.id,
         uid: user.id,
         email: user.email!,
@@ -170,9 +153,6 @@ export class SupabaseAuthService {
         memberNumber: userProfile?.membernumber,
         created_at: userProfile?.created_at || new Date().toISOString(),
       };
-      
-      console.log('Returning full user with profile:', result);
-      return result;
     } catch (error) {
       console.error('Get user error:', error);
       return null;
@@ -277,20 +257,34 @@ export class SupabaseAuthService {
     return supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
       
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Get user with correct role from database
-        const user = await this.getCurrentUser();
-        callback(user);
-      } else if (event === 'SIGNED_OUT') {
-        callback(null);
-      } else if (event === 'INITIAL_SESSION' && session?.user) {
-        // Handle initial session when app starts with existing auth
-        const user = await this.getCurrentUser();
-        callback(user);
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        // Handle token refresh
-        const user = await this.getCurrentUser();
-        callback(user);
+      try {
+        if (event === 'SIGNED_IN' && session?.user) {
+          // Get user with correct role from database
+          const user = await this.getCurrentUser();
+          callback(user);
+        } else if (event === 'SIGNED_OUT') {
+          // Immediately set user to null on sign out
+          console.log('User signed out, setting user to null');
+          callback(null);
+        } else if (event === 'INITIAL_SESSION' && session?.user) {
+          // Handle initial session when app starts with existing auth
+          const user = await this.getCurrentUser();
+          callback(user);
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          // Handle token refresh
+          const user = await this.getCurrentUser();
+          callback(user);
+        } else if (event === 'USER_UPDATED' && session?.user) {
+          // Handle user updates
+          const user = await this.getCurrentUser();
+          callback(user);
+        }
+      } catch (error) {
+        console.error('Error in auth state change handler:', error);
+        // If there's an error, still try to update the callback
+        if (event === 'SIGNED_OUT') {
+          callback(null);
+        }
       }
     });
   }
