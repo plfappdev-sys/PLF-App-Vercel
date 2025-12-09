@@ -605,18 +605,30 @@ export class SupabaseMemberService {
   /**
    * Get all members in expected format - matches RealMemberService API
    * FIXED: Numeric ordering and outstanding amount calculation
+   * ADDED: Timeout mechanism to prevent hanging
    */
   static async getAllMembers(): Promise<Member[]> {
+    console.log('DEBUG: getAllMembers() started');
     try {
+      // Add timeout to prevent hanging queries
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout after 8 seconds')), 8000)
+      );
+
+      console.log('DEBUG: Querying members table');
       // Get all members WITHOUT ordering (we'll sort numerically on client side)
-      const { data: members, error } = await supabase
+      const queryPromise = supabase
         .from('members')
         .select('*');
+
+      const { data: members, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
 
       if (error) {
         console.error('Error fetching members:', error);
         return [];
       }
+
+      console.log(`DEBUG: Found ${members?.length || 0} members in database`);
 
       // Get all member balances
       const { data: balances, error: balancesError } = await supabase

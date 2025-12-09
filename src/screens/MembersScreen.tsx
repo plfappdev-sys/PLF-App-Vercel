@@ -39,8 +39,11 @@ const MembersScreen: React.FC = () => {
   const [selectedMemberForMenu, setSelectedMemberForMenu] = useState<Member | null>(null);
 
   const loadMembers = async () => {
+    console.log('DEBUG: loadMembers() started');
     try {
+      console.log('DEBUG: Calling SupabaseMemberService.getAllMembers()');
       const allMembers = await SupabaseMemberService.getAllMembers();
+      console.log(`DEBUG: getAllMembers() returned ${allMembers?.length || 0} members`);
       
       // Add null/undefined checks for member data
       const safeMembers = allMembers.map(member => ({
@@ -81,20 +84,55 @@ const MembersScreen: React.FC = () => {
         lastUpdated: member.lastUpdated || new Date()
       }));
       
+      console.log('DEBUG: Setting members state');
       setMembers(safeMembers);
       setFilteredMembers(safeMembers);
+      console.log('DEBUG: Members loaded successfully');
     } catch (error) {
       console.error('Error loading members:', error);
       // Fallback to empty array if Supabase fails
       setMembers([]);
       setFilteredMembers([]);
     } finally {
+      console.log('DEBUG: Setting loading to false');
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadMembers();
+    let isMounted = true;
+    
+    const loadMembersWithTimeout = async () => {
+      try {
+        await loadMembers();
+      } catch (error) {
+        console.error('Error in loadMembers:', error);
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn('Members loading timeout - forcing loading to false');
+        setLoading(false);
+        // Optionally set an error state or show a message
+        Alert.alert(
+          'Loading Timeout',
+          'Members list is taking longer than expected. Please try again.',
+          [{ text: 'OK', onPress: () => {} }]
+        );
+      }
+    }, 10000); // 10 second timeout
+
+    loadMembersWithTimeout();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
