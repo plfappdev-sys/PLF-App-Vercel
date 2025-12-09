@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   settingKey: {
     fontSize: 16,
     fontWeight: '600',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   settingType: {
     fontSize: 12,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginRight: 8,
   },
   settingValue: {
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 8,
   },
   input: {
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     fontSize: 14,
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   editButtons: {
     flexDirection: 'row',

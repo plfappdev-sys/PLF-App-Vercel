@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   standingChip: {
     alignSelf: 'flex-start',

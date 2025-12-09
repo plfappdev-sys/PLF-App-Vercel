@@ -387,7 +387,7 @@ const DashboardScreen: React.FC = () => {
                 
                 <View style={styles.statRow}>
                   <Text style={styles.statLabel}>Overdue Contributions:</Text>
-                  <Text style={[styles.statValue, { color: contributionStats.overdue_count > 0 ? PLFTheme.colors.error : PLFTheme.colors.black }]}>
+                  <Text style={[styles.statValue, { color: contributionStats.overdue_count > 0 ? PLFTheme.colors.error : PLFTheme.colors.darkGray }]}>
                     {contributionStats.overdue_count}
                   </Text>
                 </View>
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   membershipInfo: {
     marginTop: PLFTheme.spacing.sm,
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
   standingCount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   actionButtons: {
     marginTop: PLFTheme.spacing.md,

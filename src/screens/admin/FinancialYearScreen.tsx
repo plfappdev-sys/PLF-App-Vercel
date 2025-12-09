@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   yearTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 8,
   },
   currentBadge: {
@@ -705,7 +705,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 8,
   },
   input: {
@@ -715,7 +715,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     fontSize: 14,
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   checkboxContainer: {
     marginBottom: 20,
@@ -744,7 +744,7 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 14,
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   modalButtons: {
     flexDirection: 'row',

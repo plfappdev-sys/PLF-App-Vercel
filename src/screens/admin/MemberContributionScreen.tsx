@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   memberNumber: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
   },
   memberName: {
     fontSize: 14,
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: 14,
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     fontWeight: '500',
   },
   contributionValue: {
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   editLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 8,
   },
   contributionInput: {
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     fontSize: 16,
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 16,
   },
   editButtons: {

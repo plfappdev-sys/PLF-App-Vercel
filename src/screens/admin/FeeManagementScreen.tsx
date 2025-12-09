@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   toggleLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 4,
   },
   toggleDescription: {
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
   settingKey: {
     fontSize: 14,
     fontWeight: '500',
-    color: PLFTheme.colors.black,
+    color: PLFTheme.colors.darkGray,
     marginBottom: 4,
   },
   settingDescription: {
