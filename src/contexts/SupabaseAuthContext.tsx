@@ -32,9 +32,18 @@ export const SupabaseAuthProvider: React.FC<SupabaseAuthProviderProps> = ({ chil
         console.error('Auth initialization error:', error);
         setUser(null);
       } finally {
+        // Always set loading to false after initialization
         setLoading(false);
       }
     };
+
+    // Add a timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Auth initialization taking too long, forcing loading to false');
+        setLoading(false);
+      }
+    }, 5000); // 5 second timeout
 
     initializeAuth();
 
@@ -45,6 +54,7 @@ export const SupabaseAuthProvider: React.FC<SupabaseAuthProviderProps> = ({ chil
     });
 
     return () => {
+      clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
   }, []);
@@ -91,17 +101,22 @@ export const SupabaseAuthProvider: React.FC<SupabaseAuthProviderProps> = ({ chil
   const signOut = async () => {
     try {
       setLoading(true);
+      // Clear user state immediately to prevent UI from showing authenticated content
+      setUser(null);
+      
       const result = await SupabaseAuthService.signOut();
       
-      if (!result.error) {
-        setUser(null);
-      }
+      // Force a small delay to ensure auth state changes are processed
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      // Even if there's an error, ensure user is cleared
+      setUser(null);
       return { error: errorMessage };
     } finally {
+      // Always set loading to false after sign out attempt
       setLoading(false);
     }
   };
