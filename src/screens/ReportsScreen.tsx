@@ -201,32 +201,53 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
-  // State for member menu visibility
+  // State for member menu visibility and anchor
   const [showMemberMenu, setShowMemberMenu] = useState(false);
+  const [menuAnchor, setMenuAnchor] = useState({ x: 0, y: 0 });
 
   // Load available members for selection
   const loadAvailableMembers = async () => {
     try {
+      console.log('Loading available members for reports...');
       // Get real member data from SupabaseMemberService
       const members = await SupabaseMemberService.getAllMembers();
+      console.log(`Retrieved ${members.length} members from Supabase`);
+      
+      if (members.length === 0) {
+        console.warn('No members found in Supabase, using fallback data');
+        throw new Error('No members found');
+      }
+      
       const availableMembersList = members.map(member => ({
         memberNumber: member.memberNumber,
         name: member.personalInfo?.fullName || `Member ${member.memberNumber}`
       }));
+      
+      console.log('Available members:', availableMembersList.length);
       setAvailableMembers(availableMembersList);
+      return availableMembersList;
     } catch (error) {
       console.error('Error loading members from Supabase:', error);
       try {
+        console.log('Trying RealMemberService fallback...');
         // Fallback to RealMemberService if Supabase fails
         const members = await RealMemberService.getAllMembers();
+        console.log(`Retrieved ${members.length} members from RealMemberService`);
+        
+        if (members.length === 0) {
+          throw new Error('No members in RealMemberService');
+        }
+        
         const availableMembersList = members.map(member => ({
           memberNumber: member.memberNumber,
           name: member.personalInfo?.fullName || `Member ${member.memberNumber}`
         }));
         setAvailableMembers(availableMembersList);
+        return availableMembersList;
       } catch (fallbackError) {
         console.error('Error loading members from fallback:', fallbackError);
         // Final fallback to mock data
+        console.log('Using mock data as final fallback');
         const members = [
           { memberNumber: '6', name: 'Christopher Naude (Mock)' },
           { memberNumber: '24', name: 'Jeffrey Matlou (Mock)' },
@@ -234,8 +255,12 @@ const ReportsScreen: React.FC = () => {
           { memberNumber: '54', name: 'Naomi Mokhine (Mock)' },
           { memberNumber: '55', name: 'Nicholas Molale (Mock)' },
           { memberNumber: '66', name: 'Refilwe Lentswe (Mock)' },
+          { memberNumber: '1', name: 'Test Member 1 (Mock)' },
+          { memberNumber: '2', name: 'Test Member 2 (Mock)' },
+          { memberNumber: '3', name: 'Test Member 3 (Mock)' },
         ];
         setAvailableMembers(members);
+        return members;
       }
     }
   };
@@ -776,35 +801,56 @@ const ReportsScreen: React.FC = () => {
             {selectedReport?.type === 'member' && (
               <>
                 <Text style={styles.modalLabel}>Select Member</Text>
-                <TouchableOpacity 
-                  style={styles.memberSelector}
-                  onPress={() => setShowMemberMenu(true)}
-                >
-                  <Text style={styles.memberSelectorText}>
-                    {selectedMember 
-                      ? availableMembers.find(m => m.memberNumber === selectedMember)?.name || selectedMember
-                      : 'Select a member...'
-                    }
-                  </Text>
-                </TouchableOpacity>
-                
-                <Menu
-                  visible={showMemberMenu}
-                  onDismiss={() => setShowMemberMenu(false)}
-                  anchor={{ x: 0, y: 0 }} // Position will be handled by the TouchableOpacity
-                >
-                  {availableMembers.map(member => (
-                    <Menu.Item
-                      key={member.memberNumber}
-                      onPress={() => {
-                        setSelectedMember(member.memberNumber);
-                        setShowMemberMenu(false);
-                      }}
-                      title={member.name}
-                      titleStyle={styles.memberItem}
-                    />
-                  ))}
-                </Menu>
+                {Platform.OS === 'web' ? (
+                  // Web platform uses HTML select
+                  <select
+                    value={selectedMember}
+                    onChange={(e) => setSelectedMember(e.target.value)}
+                    style={styles.webSelect}
+                  >
+                    <option value="">Select a member...</option>
+                    {availableMembers.map(member => (
+                      <option key={member.memberNumber} value={member.memberNumber}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  // Mobile platforms use TouchableOpacity with Menu
+                  <>
+                    <TouchableOpacity 
+                      style={styles.memberSelector}
+                      onPress={() => setShowMemberMenu(true)}
+                    >
+                      <Text style={styles.memberSelectorText}>
+                        {selectedMember 
+                          ? availableMembers.find(m => m.memberNumber === selectedMember)?.name || selectedMember
+                          : 'Select a member...'
+                        }
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    <Portal>
+                      <Menu
+                        visible={showMemberMenu}
+                        onDismiss={() => setShowMemberMenu(false)}
+                        anchor={{ x: 0, y: 0 }}
+                      >
+                        {availableMembers.map(member => (
+                          <Menu.Item
+                            key={member.memberNumber}
+                            onPress={() => {
+                              setSelectedMember(member.memberNumber);
+                              setShowMemberMenu(false);
+                            }}
+                            title={member.name}
+                            titleStyle={styles.memberItem}
+                          />
+                        ))}
+                      </Menu>
+                    </Portal>
+                  </>
+                )}
               </>
             )}
 
@@ -1031,6 +1077,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     fontSize: 14,
     color: '#333',
+  },
+  // Web-specific select styles
+  webSelect: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#fff',
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 20,
+    width: '100%',
   },
 });
 

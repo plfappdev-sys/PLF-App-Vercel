@@ -12,7 +12,7 @@ import {
   Chip
 } from 'react-native-paper';
 import { useAuth } from '../contexts/SupabaseAuthContext';
-import MockLoanService from '../services/MockLoanService';
+import SupabaseLoanService from '../services/SupabaseLoanService';
 import RealMemberService from '../services/RealMemberService';
 import { Member } from '../types/index';
 
@@ -193,7 +193,7 @@ const LoanApplicationScreen: React.FC = () => {
 
     setLoading(true);
     try {
-      const result = await MockLoanService.applyForLoan({
+      const result = await SupabaseLoanService.applyForLoan({
         memberNumber: currentUser.memberNumber,
         requestedAmount: parseFloat(formData.requestedAmount),
         loanTerm: parseInt(formData.loanTerm),

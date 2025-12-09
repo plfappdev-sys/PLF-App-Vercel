@@ -1,125 +1,106 @@
-const { createClient } = require('@supabase/supabase-js');
+const { SupabaseTransactionServiceFixed } = require('./src/services/supabaseTransactionService_fixed');
+const SupabaseLoanService = require('./src/services/SupabaseLoanService');
 
-const supabaseUrl = 'https://zdnyhzasvifrskbostgn.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbnloemFzdmlmcnNrYm9zdGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjQ0ODQsImV4cCI6MjA3MzYwMDQ4NH0.s_AXhoRM9tV4F166Bhd5fG7Z14kLA0iz0l08dlzZvnM';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-async function testTransactionFix() {
-  console.log('🧪 Testing Transaction Fix Implementation');
-  console.log('='.repeat(50));
+async function testDepositFunctionality() {
+  console.log('Testing deposit functionality...');
   
   try {
-    // Test 1: Check if transactions exist
-    console.log('\n📊 Test 1: Transaction Data');
-    const { data: transactions, error: txError } = await supabase
-      .from('transactions')
-      .select('*')
-      .limit(5);
+    // Test creating a deposit
+    const depositData = {
+      memberNumber: 'member 1', // Use an existing member number
+      amount: 1000,
+      description: 'Test deposit',
+      proofOfPayment: 'https://example.com/proof.jpg'
+    };
+
+    console.log('Creating deposit with data:', depositData);
     
-    if (txError) {
-      console.log('❌ Error:', txError.message);
-    } else {
-      console.log(`✅ Transactions found: ${transactions.length}`);
-      if (transactions.length > 0) {
-        console.log('Sample transactions:');
-        transactions.forEach(tx => {
-          console.log(`  - ${tx.transaction_type}: R${tx.amount} (${tx.status})`);
-        });
-      }
-    }
+    const transaction = await SupabaseTransactionServiceFixed.createDeposit(depositData);
+    console.log('✅ Deposit created successfully!');
+    console.log('Transaction ID:', transaction.transactionId);
+    console.log('Status:', transaction.status);
+    console.log('Amount:', transaction.amount);
     
-    // Test 2: Check if view exists and works
-    console.log('\n👀 Test 2: UUID-Compatible View');
-    const { data: viewData, error: viewError } = await supabase
-      .from('transactions_with_uuid')
-      .select('*')
-      .limit(3);
-    
-    if (viewError) {
-      console.log('❌ View error:', viewError.message);
-    } else {
-      console.log(`✅ View works: ${viewData.length} records`);
-      if (viewData.length > 0) {
-        console.log('View sample:');
-        viewData.forEach(item => {
-          console.log(`  - ID: ${item.id} (type: ${typeof item.id})`);
-          console.log(`    Member: ${item.member_number}, Amount: R${item.amount}`);
-        });
-      }
-    }
-    
-    // Test 3: Check foreign key relationship
-    console.log('\n🔗 Test 3: Foreign Key Relationship');
-    const { data: joinedData, error: joinError } = await supabase
-      .from('transactions')
-      .select('*, members!inner(member_number, personal_info)')
-      .limit(2);
-    
-    if (joinError) {
-      console.log('❌ Join error:', joinError.message);
-    } else {
-      console.log(`✅ Foreign key works: ${joinedData.length} joined records`);
-      if (joinedData.length > 0) {
-        console.log('Join sample:');
-        joinedData.forEach(item => {
-          console.log(`  - ${item.members.member_number}: ${item.transaction_type} R${item.amount}`);
-        });
-      }
-    }
-    
-    // Test 4: Check helper function
-    console.log('\n⚙️  Test 4: Helper Functions');
-    try {
-      const { data: funcData, error: funcError } = await supabase.rpc('get_member_id_by_number', {
-        member_number_text: '4'
-      });
-      
-      if (funcError) {
-        console.log('❌ Function error:', funcError.message);
-      } else {
-        console.log(`✅ Function works: Member ID = ${funcData}`);
-      }
-    } catch (funcErr) {
-      console.log('⚠️  Function test skipped (may not exist yet)');
-    }
-    
-    // Test 5: Check member transactions
-    console.log('\n👤 Test 5: Member-Specific Transactions');
-    const { data: memberTx, error: memberError } = await supabase
-      .from('transactions_with_uuid')
-      .select('*')
-      .eq('member_number', '4')
-      .limit(5);
-    
-    if (memberError) {
-      console.log('❌ Member query error:', memberError.message);
-    } else {
-      console.log(`✅ Member transactions: ${memberTx.length} for member 4`);
-      memberTx.forEach(tx => {
-        console.log(`  - ${tx.transaction_type}: R${tx.amount} (${tx.status})`);
-      });
-    }
-    
-    // Summary
-    console.log('\n📋 Summary');
-    console.log('='.repeat(30));
-    console.log('✅ Transaction data: Available');
-    console.log('✅ UUID view: Working');
-    console.log('✅ Foreign keys: Established');
-    console.log('✅ Member queries: Functional');
-    
-    if (transactions.length > 0) {
-      console.log('\n🎉 Transaction issues have been successfully fixed!');
-      console.log('The transaction history will now show data.');
-    } else {
-      console.log('\n⚠️  Transactions table is still empty.');
-      console.log('Please execute the fix_transaction_issues.sql script first.');
-    }
-    
+    return { success: true, transaction };
   } catch (error) {
-    console.error('❌ Test failed:', error);
+    console.error('❌ Error creating deposit:', error.message);
+    console.error('Full error:', error);
+    return { success: false, error: error.message };
   }
 }
 
-testTransactionFix().catch(console.error);
+async function testLoanFunctionality() {
+  console.log('\nTesting loan functionality...');
+  
+  try {
+    // Test creating a loan application
+    const loanData = {
+      memberNumber: 'member 1', // Use an existing member number
+      requestedAmount: 5000,
+      loanTerm: 12,
+      purpose: 'Test loan application',
+      guarantors: [
+        { memberNumber: 'member 2', guaranteeAmount: 2500 }
+      ],
+      employmentInfo: {
+        employerName: 'Test Company',
+        position: 'Test Position',
+        salaryDate: '25th of each month',
+        employmentDate: '2020-01-01',
+        employerAddress: '123 Test Street',
+        employerContact: '011-555-1234'
+      },
+      bankingDetails: {
+        bankName: 'Test Bank',
+        accountNumber: '123456789',
+        branchCode: '123456',
+        accountHolder: 'Test Account Holder'
+      },
+      nextOfKin: {
+        name: 'Test Next of Kin',
+        contactNumber: '082-555-6789',
+        relationship: 'Spouse'
+      }
+    };
+
+    console.log('Creating loan application with data:', loanData);
+    
+    const result = await SupabaseLoanService.applyForLoan(loanData);
+    
+    if (result.success) {
+      console.log('✅ Loan application created successfully!');
+      console.log('Loan ID:', result.loanId);
+    } else {
+      console.error('❌ Error creating loan application:', result.error);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('❌ Error creating loan application:', error.message);
+    console.error('Full error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function runTests() {
+  console.log('=== Testing Transaction Fixes ===\n');
+  
+  // Test deposit functionality
+  const depositResult = await testDepositFunctionality();
+  
+  // Test loan functionality
+  const loanResult = await testLoanFunctionality();
+  
+  console.log('\n=== Test Summary ===');
+  console.log('Deposit test:', depositResult.success ? '✅ PASSED' : '❌ FAILED');
+  console.log('Loan test:', loanResult.success ? '✅ PASSED' : '❌ FAILED');
+  
+  if (depositResult.success && loanResult.success) {
+    console.log('\n🎉 All tests passed! Deposit and loan buttons should now work.');
+  } else {
+    console.log('\n⚠️ Some tests failed. Check the errors above.');
+  }
+}
+
+// Run tests
+runTests().catch(console.error);

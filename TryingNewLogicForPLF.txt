@@ -322,7 +322,61 @@ This will activate the scheduled processing that powers the new business logic.
 
 **Production Ready**: The new business logic is fully implemented and activated with automated Edge Functions deployment.
 
-## CURRENT STATUS - DECEMBER 2, 2025 ✅
+## STATUS UPDATE - DECEMBER 9, 2025 ✅
+**Transactions Screen Deposit and Loan Request Buttons Fixed**: Resolved issue where deposit and loan request buttons on TransactionsScreen were not working
+
+**Issue Identified**: 
+- Deposit button was using mock service that didn't connect to real database
+- Loan request button navigated to LoanApplicationScreen which used MockLoanService
+- Buttons were non-functional for members trying to make deposits or request loans
+
+**Solution Implemented**:
+1. **Real Deposit Service Implementation**: Created `SupabaseTransactionServiceFixed` with real database integration
+   - `createDeposit()` method that inserts real transactions into Supabase
+   - Proper member ID lookup and transaction creation
+   - Integration with existing `transactions_with_uuid` view
+   - Approval workflow for exec roles and superusers
+   - Proof of payment verification support
+
+2. **Real Loan Service Implementation**: Created `SupabaseLoanService` with full loan application workflow
+   - `applyForLoan()` method that creates loan applications in Supabase
+   - Guarantor management with member validation
+   - Employment info, banking details, and next of kin storage
+   - Automatic transaction creation for loan applications
+   - Integration with existing loan approval workflow
+
+3. **UI Integration Updates**:
+   - Updated `TransactionsScreen.tsx` to use real `SupabaseTransactionServiceFixed`
+   - Updated `LoanApplicationScreen.tsx` to use real `SupabaseLoanService`
+   - Maintained existing modal-based deposit form with validation
+   - Preserved navigation to loan application form
+   - Added proper error handling and user feedback
+
+4. **Admin/Executive Approval Workflow**: 
+   - Deposit requests require approval from exec roles and superusers
+   - Proof of payment verification can be done via uploaded URL
+   - Loan applications go through existing approval process in LoanApprovalScreen
+   - Admin users can review pending transactions via DepositApprovalScreen
+
+**Technical Changes**:
+- Created `src/services/SupabaseLoanService.ts` with comprehensive loan application logic
+- Enhanced `src/services/supabaseTransactionService_fixed.ts` with real deposit functionality
+- Updated `src/screens/TransactionsScreen.tsx` to use real services
+- Updated `src/screens/LoanApplicationScreen.tsx` to use real services
+- Added proper TypeScript interfaces and error handling
+- Maintained existing role-based access control
+
+**Verification**:
+- ✅ Deposit button now creates real transactions in Supabase database
+- ✅ Loan request button creates real loan applications in Supabase database
+- ✅ Admin users can review pending transactions and loan applications
+- ✅ Form validation prevents invalid submissions
+- ✅ Success/error feedback provided to users
+- ✅ Transactions refresh after successful deposit
+- ✅ Guarantor validation and member lookup works correctly
+- ✅ All services verified with automated testing script
+
+## CURRENT STATUS - DECEMBER 9, 2025 ✅
 **Implementation Progress**: 95% Complete (Phases 1-4: 100% ✅, Phase 5: 0% ⚡)
 **Documentation Status**: All files reviewed and up to date
 **Immediate Next Step**: Clear React Native cache and rebuild app to ensure Lesego sees correct fund value (R 4,986,838.63)

@@ -133,24 +133,56 @@ export class SupabaseTransactionServiceFixed {
     }
   }
 
-  // Create a new deposit transaction (using the helper function)
+  // Create a new deposit transaction (using direct insert)
   static async createDeposit(depositData: DepositForm & { memberNumber: string }): Promise<Transaction> {
     try {
-      // Use the helper function for compatibility
-      const { data, error } = await supabase.rpc('create_deposit_transaction', {
-        p_member_number: depositData.memberNumber,
-        p_amount: depositData.amount,
-        p_description: depositData.description,
-        p_proof_of_payment_url: depositData.proofOfPayment
-      });
+      // First, get the member ID from the member number
+      const { data: memberData, error: memberError } = await supabase
+        .from('members')
+        .select('id')
+        .eq('member_number', depositData.memberNumber)
+        .single();
+
+      if (memberError) {
+        console.error('Error finding member:', memberError);
+        throw new Error(`Member ${depositData.memberNumber} not found`);
+      }
+
+      // Create the transaction directly
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert({
+          member_id: memberData.id,
+          transaction_type: 'deposit',
+          amount: depositData.amount,
+          description: depositData.description,
+          proof_of_payment_url: depositData.proofOfPayment || null,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select('*')
+        .single();
 
       if (error) {
         console.error('Error creating deposit:', error);
         throw error;
       }
 
-      // The RPC function returns the transaction data directly
-      return this.mapDbTransactionToInterface(data[0]);
+      // Get the full transaction with member info
+      const { data: fullTransaction, error: fetchError } = await supabase
+        .from('transactions_with_uuid')
+        .select('*')
+        .eq('id', data.id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching created transaction:', fetchError);
+        // Return the basic transaction if we can't get the full one
+        return this.mapDbTransactionToInterface(data);
+      }
+
+      return this.mapDbTransactionToInterface(fullTransaction);
     } catch (error) {
       console.error('Error in createDeposit:', error);
       throw error;
