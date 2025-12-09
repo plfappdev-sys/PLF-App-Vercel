@@ -20,29 +20,57 @@ export interface AuthSession {
 }
 
 export class SupabaseAuthService {
+  // Helper function to add timeout to any promise
+  private static async withTimeout<T>(promise: Promise<T>, timeoutMs: number = 8000): Promise<T> {
+    const timeoutPromise = new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(`Operation timed out after ${timeoutMs}ms`)), timeoutMs);
+    });
+    return Promise.race([promise, timeoutPromise]);
+  }
+
   // Sign in with email and password
   static async signIn(email: string, password: string): Promise<{ user: User | null; error: string | null }> {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await this.withTimeout(
+        supabase.auth.signInWithPassword({
+          email,
+          password,
+        }),
+        10000 // 10 second timeout for login
+      );
 
       if (error) {
         return { user: null, error: error.message };
       }
 
       if (data.user) {
-        // Ensure user profile exists in our users table
-        await this.ensureUserProfile(data.user);
-        // Get the full user profile with correct role from database
-        const currentUser = await this.getCurrentUser();
+        // Ensure user profile exists in our users table (with timeout)
+        await this.ensureUserProfile(data.user).catch(err => {
+          console.warn('Warning: ensureUserProfile failed:', err.message);
+          // Continue even if profile creation fails
+        });
+        
+        // Get the full user profile with correct role from database (with timeout)
+        const currentUser = await this.getCurrentUser().catch(err => {
+          console.warn('Warning: getCurrentUser failed after login:', err.message);
+          // Return basic user info if we can't get full profile
+          return {
+            id: data.user.id,
+            uid: data.user.id,
+            email: data.user.email!,
+            role: 'member',
+            created_at: new Date().toISOString(),
+          } as User;
+        });
+        
         return { user: currentUser, error: null };
       }
 
       return { user: null, error: 'No user data returned' };
     } catch (error) {
-      return { user: null, error: error instanceof Error ? error.message : 'Unknown error' };
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Sign in error:', errorMessage);
+      return { user: null, error: errorMessage };
     }
   }
 
@@ -100,32 +128,42 @@ export class SupabaseAuthService {
   // Get current user
   static async getCurrentUser(): Promise<User | null> {
     try {
-      // First check if we have a valid session
-      const session = await this.getCurrentSession();
+      // First check if we have a valid session (with timeout)
+      const session = await this.withTimeout(this.getCurrentSession(), 5000);
       if (!session) {
         return null;
       }
 
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const { data: { user }, error } = await this.withTimeout(
+        supabase.auth.getUser(),
+        5000
+      );
       
       if (error) {
-        // Try to get user directly from users table using session user ID
+        // Try to get user directly from users table using session user ID (with timeout)
         if (session.user?.id) {
-          const { data: userProfile, error: profileError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('uid', session.user.id)
-            .single();
+          try {
+            const queryPromise = Promise.resolve(supabase
+              .from('users')
+              .select('*')
+              .eq('uid', session.user.id)
+              .single()
+              .then(({ data: userProfile, error: profileError }) => ({ userProfile, profileError })));
+            
+            const { userProfile, profileError } = await this.withTimeout(queryPromise, 5000);
 
-          if (!profileError && userProfile) {
-            return {
-              id: userProfile.uid,
-              uid: userProfile.uid,
-              email: userProfile.email,
-              role: userProfile.role || 'member',
-              memberNumber: userProfile.membernumber,
-              created_at: userProfile.created_at || new Date().toISOString(),
-            };
+            if (!profileError && userProfile) {
+              return {
+                id: userProfile.uid,
+                uid: userProfile.uid,
+                email: userProfile.email,
+                role: userProfile.role || 'member',
+                memberNumber: userProfile.membernumber,
+                created_at: userProfile.created_at || new Date().toISOString(),
+              };
+            }
+          } catch (profileError) {
+            console.warn('Profile fetch failed:', profileError);
           }
         }
         return null;
@@ -133,26 +171,34 @@ export class SupabaseAuthService {
 
       if (!user) return null;
 
-      // Get user profile from our users table to get the correct role and member number
-      const { data: userProfile, error: profileError } = await supabase
-        .from('users')
-        .select('role, membernumber, created_at')
-        .eq('uid', user.id)
-        .single();
+      // Get user profile from our users table to get the correct role and member number (with timeout)
+      try {
+        const queryPromise = Promise.resolve(supabase
+          .from('users')
+          .select('role, membernumber, created_at')
+          .eq('uid', user.id)
+          .single()
+          .then(({ data: userProfile, error: profileError }) => ({ userProfile, profileError })));
+        
+        const { userProfile, profileError } = await this.withTimeout(queryPromise, 5000);
 
-      if (profileError) {
-        // Return basic user info if profile doesn't exist
+        if (profileError) {
+          // Return basic user info if profile doesn't exist
+          return this.mapAuthUserToUser(user);
+        }
+
+        return {
+          id: user.id,
+          uid: user.id,
+          email: user.email!,
+          role: userProfile?.role || 'member',
+          memberNumber: userProfile?.membernumber,
+          created_at: userProfile?.created_at || new Date().toISOString(),
+        };
+      } catch (profileError) {
+        console.warn('User profile fetch timed out, returning basic user info');
         return this.mapAuthUserToUser(user);
       }
-
-      return {
-        id: user.id,
-        uid: user.id,
-        email: user.email!,
-        role: userProfile?.role || 'member',
-        memberNumber: userProfile?.membernumber,
-        created_at: userProfile?.created_at || new Date().toISOString(),
-      };
     } catch (error) {
       console.error('Get user error:', error);
       return null;
