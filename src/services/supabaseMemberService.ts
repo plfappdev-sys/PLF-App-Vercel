@@ -38,10 +38,18 @@ export class SupabaseMemberService {
         const financialInfoData = memberData.financial_info || {};
         const outstandingAmount = (memberData.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
         
+        // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
+        // net_balance represents the actual current balance (savings - loans)
+        const currentBalance = balanceData ? 
+          (balanceData.net_balance !== undefined && balanceData.net_balance !== null ? 
+            balanceData.net_balance : balanceData.savings_balance || 0) : 
+          (memberData.financial_info && memberData.financial_info.current_balance !== undefined ? 
+            memberData.financial_info.current_balance : 0);
+        
         // Use actual balance data if available, otherwise use financial_info as fallback
         const financialInfo = balanceData ? {
           totalContributions: balanceData.savings_balance || 0,
-          currentBalance: balanceData.savings_balance || 0,
+          currentBalance: currentBalance,
           outstandingAmount: outstandingAmount,
           percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: 0,
@@ -309,37 +317,41 @@ export class SupabaseMemberService {
         owing_65_plus: 0
       };
 
-      // Calculate statistics from member_balances table with robust validation
-      let validBalanceCount = 0;
-      balances.forEach((balance: any) => {
-        // Validate balance object
-        if (!balance || typeof balance !== 'object') {
-          return; // Skip invalid entries
-        }
+        // Calculate statistics from member_balances table with robust validation
+        let validBalanceCount = 0;
+        balances.forEach((balance: any) => {
+          // Validate balance object
+          if (!balance || typeof balance !== 'object') {
+            return; // Skip invalid entries
+          }
 
-        // Extract values with comprehensive null/undefined checks
-        const totalContributions = typeof balance?.total_contributions === 'number'
-          ? balance.total_contributions
-          : 0;
-        
-        const savingsBalance = typeof balance?.savings_balance === 'number' 
-          ? balance.savings_balance 
-          : (typeof balance?.total_contributions === 'number' ? balance.total_contributions : 0);
-        
-        const netBalance = typeof balance?.net_balance === 'number'
-          ? balance.net_balance
-          : savingsBalance;
-        
-        // Only count valid balances
-        if (typeof savingsBalance === 'number' && !isNaN(savingsBalance)) {
-          totalFundValue += savingsBalance;
-          validBalanceCount++;
-        }
-        
-        // Calculate outstanding amount based on negative net balance
-        if (typeof netBalance === 'number' && netBalance < 0) {
-          totalOutstanding += Math.abs(netBalance);
-        }
+          // Extract values with comprehensive null/undefined checks
+          const totalContributions = typeof balance?.total_contributions === 'number'
+            ? balance.total_contributions
+            : 0;
+          
+          const savingsBalance = typeof balance?.savings_balance === 'number' 
+            ? balance.savings_balance 
+            : (typeof balance?.total_contributions === 'number' ? balance.total_contributions : 0);
+          
+          const loanBalance = typeof balance?.loan_balance === 'number'
+            ? balance.loan_balance
+            : 0;
+          
+          const netBalance = typeof balance?.net_balance === 'number'
+            ? balance.net_balance
+            : (savingsBalance - loanBalance);
+          
+          // Only count valid balances - use netBalance instead of savingsBalance
+          if (typeof netBalance === 'number' && !isNaN(netBalance)) {
+            totalFundValue += netBalance;
+            validBalanceCount++;
+          }
+          
+          // Calculate outstanding amount based on negative net balance
+          if (typeof netBalance === 'number' && netBalance < 0) {
+            totalOutstanding += Math.abs(netBalance);
+          }
 
         // Categorize members based on their net balance status
         if (typeof netBalance === 'number') {
@@ -658,9 +670,17 @@ export class SupabaseMemberService {
         const financialInfoData = member.financial_info || {};
         const outstandingAmount = (member.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
         
+        // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
+        // net_balance represents the actual current balance (savings - loans)
+        const currentBalance = balanceData ? 
+          (balanceData.net_balance !== undefined && balanceData.net_balance !== null ? 
+            balanceData.net_balance : balanceData.savings_balance || 0) : 
+          (member.financial_info && member.financial_info.current_balance !== undefined ? 
+            member.financial_info.current_balance : 0);
+        
         const financialInfo = balanceData ? {
           totalContributions: balanceData.total_contributions || 0,
-          currentBalance: balanceData.savings_balance || 0,
+          currentBalance: currentBalance,
           outstandingAmount: outstandingAmount,
           percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: 0,
