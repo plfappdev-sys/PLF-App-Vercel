@@ -307,8 +307,8 @@ export class ContributionService {
         throw new Error('Cannot apply late fee to non-overdue contribution');
       }
 
-      // Get late fee percentage from system settings or use default 7%
-      const lateFeePercentage = 0.07; // Default, could be fetched from system_settings
+      // Get late fee percentage from system settings or use default 5.5% (as per new calculation methodology)
+      const lateFeePercentage = 0.055; // Default 5.5% as per new calculation methodology
       const lateFeeAmount = contribution.amount_due * lateFeePercentage;
 
       const { data, error } = await supabase

@@ -277,12 +277,14 @@ export class SupabaseMemberService {
   /**
    * Get fund statistics - matches RealMemberService API
    * Enhanced with comprehensive null checks and error handling
-   * FIXED: Total Fund Value now calculates sum of actual contributions by members
-   * IMPROVED: Better fallback logic and data validation
-   * UPDATED: If member_balances is empty, try to calculate from members table financial_info
+   * UPDATED: New business logic implementation
+   * 1. Total Fund Contributions = Sum of all actual contributions received (savings_balance)
+   * 2. Total Outstanding Contributions = Sum of all positive net balances (money owed)
+   * 3. Good standing = Members with negative net balances (have credit)
+   * 4. Owing categories = Based on positive net balance amounts
    */
   static async getFundStatistics(): Promise<FundStatistics> {
-    console.log('DEBUG: getFundStatistics() called');
+    console.log('DEBUG: getFundStatistics() called with NEW business logic');
     try {
       // Try to get data from member_balances table first
       console.log('DEBUG: Fetching member_balances table...');
@@ -305,10 +307,10 @@ export class SupabaseMemberService {
         return await this.calculateFundStatisticsFromMembers();
       }
 
-      let totalFundValue = 0;
-      let totalOutstanding = 0;
+      let totalFundContributions = 0; // Sum of all actual contributions received (savings_balance)
+      let totalOutstandingContributions = 0; // Sum of all positive net balances (money owed)
       const membersByStanding = {
-        good: 0,
+        good: 0, // Members with negative net balances (have credit)
         owing_10: 0,
         owing_20: 0,
         owing_30: 0,
@@ -317,51 +319,49 @@ export class SupabaseMemberService {
         owing_65_plus: 0
       };
 
-        // Calculate statistics from member_balances table with robust validation
-        let validBalanceCount = 0;
-        balances.forEach((balance: any) => {
-          // Validate balance object
-          if (!balance || typeof balance !== 'object') {
-            return; // Skip invalid entries
-          }
+      // Calculate statistics from member_balances table with robust validation
+      let validBalanceCount = 0;
+      balances.forEach((balance: any) => {
+        // Validate balance object
+        if (!balance || typeof balance !== 'object') {
+          return; // Skip invalid entries
+        }
 
-          // Extract values with comprehensive null/undefined checks
-          const totalContributions = typeof balance?.total_contributions === 'number'
-            ? balance.total_contributions
-            : 0;
-          
-          const savingsBalance = typeof balance?.savings_balance === 'number' 
-            ? balance.savings_balance 
-            : (typeof balance?.total_contributions === 'number' ? balance.total_contributions : 0);
-          
-          const loanBalance = typeof balance?.loan_balance === 'number'
-            ? balance.loan_balance
-            : 0;
-          
-          const netBalance = typeof balance?.net_balance === 'number'
-            ? balance.net_balance
-            : (savingsBalance - loanBalance);
-          
-          // Only count valid balances - use netBalance instead of savingsBalance
-          if (typeof netBalance === 'number' && !isNaN(netBalance)) {
-            totalFundValue += netBalance;
-            validBalanceCount++;
-          }
-          
-          // Calculate outstanding amount based on negative net balance
-          if (typeof netBalance === 'number' && netBalance < 0) {
-            totalOutstanding += Math.abs(netBalance);
-          }
+        // Extract values with comprehensive null/undefined checks
+        const savingsBalance = typeof balance?.savings_balance === 'number' 
+          ? balance.savings_balance 
+          : 0;
+        
+        const loanBalance = typeof balance?.loan_balance === 'number'
+          ? balance.loan_balance
+          : 0;
+        
+        const netBalance = typeof balance?.net_balance === 'number'
+          ? balance.net_balance
+          : (savingsBalance - loanBalance);
+        
+        // Only count valid balances
+        if (typeof netBalance === 'number' && !isNaN(netBalance)) {
+          // NEW: Add to total fund contributions (actual money received)
+          totalFundContributions += savingsBalance;
+          validBalanceCount++;
+        }
+        
+        // NEW: Calculate outstanding contributions based on POSITIVE net balance (money owed)
+        if (typeof netBalance === 'number' && netBalance > 0) {
+          totalOutstandingContributions += netBalance;
+        }
 
-        // Categorize members based on their net balance status
+        // NEW: Categorize members based on NEW business logic
         if (typeof netBalance === 'number') {
-          if (netBalance >= 0) {
+          if (netBalance < 0) {
+            // NEW: Negative balance = Good standing (has credit)
             membersByStanding.good++;
-          } else {
-            // Calculate percentage of outstanding based on expected contributions
+          } else if (netBalance > 0) {
+            // NEW: Positive balance = Owing money, categorize by amount
             // Expected contributions: 83 months * R200 = R16,600
             const expectedContributions = 16600;
-            const outstandingPercentage = Math.abs(netBalance) / expectedContributions * 100;
+            const outstandingPercentage = netBalance / expectedContributions * 100;
             
             if (outstandingPercentage <= 10) {
               membersByStanding.owing_10++;
@@ -376,6 +376,9 @@ export class SupabaseMemberService {
             } else {
               membersByStanding.owing_65_plus++;
             }
+          } else {
+            // Zero balance - treat as good standing (no money owed)
+            membersByStanding.good++;
           }
         }
       });
@@ -393,11 +396,11 @@ export class SupabaseMemberService {
 
       const totalMembers = members && Array.isArray(members) ? members.length : validBalanceCount;
 
-      // Return statistics with guaranteed valid values
+      // Return statistics with NEW business logic
       return {
         totalMembers,
-        totalFundValue: Math.max(0, totalFundValue), // Ensure non-negative
-        totalLoansOutstanding: Math.max(0, totalOutstanding), // Ensure non-negative
+        totalFundValue: Math.max(0, totalFundContributions), // Renamed to totalFundContributions
+        totalLoansOutstanding: Math.max(0, totalOutstandingContributions), // Renamed to totalOutstandingContributions
         totalContributionsThisMonth: 0, // This would need actual transaction data
         membersByStanding
       };
@@ -722,22 +725,31 @@ export class SupabaseMemberService {
           interestRate: 0
         };
 
-        // Determine membership status based on net balance
+        // Determine membership status based on net balance - NEW BUSINESS LOGIC
         let standingCategory = 'good';
-        if (balanceData && balanceData.net_balance < 0) {
-          const outstandingPercentage = Math.abs(balanceData.net_balance) / 16600 * 100;
-          if (outstandingPercentage <= 10) {
-            standingCategory = 'owing_10';
-          } else if (outstandingPercentage <= 20) {
-            standingCategory = 'owing_20';
-          } else if (outstandingPercentage <= 30) {
-            standingCategory = 'owing_30';
-          } else if (outstandingPercentage <= 50) {
-            standingCategory = 'owing_50';
-          } else if (outstandingPercentage <= 65) {
-            standingCategory = 'owing_65';
+        if (balanceData && typeof balanceData.net_balance === 'number') {
+          if (balanceData.net_balance > 0) {
+            // Positive balance = member owes money, calculate outstanding percentage
+            const outstandingPercentage = balanceData.net_balance / 16600 * 100;
+            if (outstandingPercentage <= 10) {
+              standingCategory = 'owing_10';
+            } else if (outstandingPercentage <= 20) {
+              standingCategory = 'owing_20';
+            } else if (outstandingPercentage <= 30) {
+              standingCategory = 'owing_30';
+            } else if (outstandingPercentage <= 50) {
+              standingCategory = 'owing_50';
+            } else if (outstandingPercentage <= 65) {
+              standingCategory = 'owing_65';
+            } else {
+              standingCategory = 'owing_65_plus';
+            }
+          } else if (balanceData.net_balance < 0) {
+            // Negative balance = member has credit = good standing
+            standingCategory = 'good';
           } else {
-            standingCategory = 'owing_65_plus';
+            // Zero balance = good standing
+            standingCategory = 'good';
           }
         }
 

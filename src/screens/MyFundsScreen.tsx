@@ -63,8 +63,41 @@ const MyFundsScreen: React.FC = () => {
   };
 
   const formatCurrency = (amount: number | undefined | null) => {
-    const safeAmount = amount || 0;
+    // Handle null, undefined, or NaN by converting to 0
+    // Note: Negative values are preserved (e.g., -5934.26 remains -5934.26)
+    const safeAmount = amount === null || amount === undefined || isNaN(amount) ? 0 : amount;
     return `R ${safeAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  };
+
+  // NEW: Format balance based on new business logic
+  const formatBalanceDisplay = (balance: number | undefined | null) => {
+    const safeBalance = balance === null || balance === undefined || isNaN(balance) ? 0 : balance;
+    
+    if (safeBalance > 0) {
+      // Positive balance = Balance Due (member owes money)
+      return {
+        label: 'Balance Due',
+        amount: safeBalance,
+        color: PLFTheme.colors.error,
+        isPositive: true
+      };
+    } else if (safeBalance < 0) {
+      // Negative balance = Balance (member has credit)
+      return {
+        label: 'Balance',
+        amount: Math.abs(safeBalance), // Show absolute value
+        color: PLFTheme.colors.success,
+        isPositive: false
+      };
+    } else {
+      // Zero balance
+      return {
+        label: 'Balance',
+        amount: 0,
+        color: PLFTheme.colors.darkGray,
+        isPositive: false
+      };
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -220,24 +253,37 @@ const MyFundsScreen: React.FC = () => {
         <Card style={styles.card}>
           <Card.Content>
             <Title style={styles.cardTitle}>Financial Summary</Title>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Current Balance:</Text>
-              <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
-                {formatCurrency(memberData.financialInfo.currentBalance)}
-              </Text>
-            </View>
+            
+            {/* NEW: Balance display with new business logic */}
+            {(() => {
+              const balanceDisplay = formatBalanceDisplay(memberData.financialInfo.currentBalance);
+              return (
+                <View style={styles.statRow}>
+                  <Text style={styles.statLabel}>{balanceDisplay.label}:</Text>
+                  <Text style={[styles.statValue, { color: balanceDisplay.color }]}>
+                    {formatCurrency(balanceDisplay.amount)}
+                  </Text>
+                </View>
+              );
+            })()}
+            
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Total Contributions:</Text>
               <Text style={styles.statValue}>
                 {formatCurrency(memberData.financialInfo.totalContributions)}
               </Text>
             </View>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Outstanding Amount:</Text>
-              <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
-                {formatCurrency(memberData.financialInfo.outstandingAmount)}
-              </Text>
-            </View>
+            
+            {/* NEW: Outstanding Amount only shown if positive balance (owes money) */}
+            {memberData.financialInfo.currentBalance > 0 && (
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Outstanding Amount:</Text>
+                <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                  {formatCurrency(memberData.financialInfo.currentBalance)}
+                </Text>
+              </View>
+            )}
+            
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Planned Contributions:</Text>
               <Text style={styles.statValue}>
@@ -257,6 +303,20 @@ const MyFundsScreen: React.FC = () => {
               <Text style={styles.statLabel}>Interest Charged:</Text>
               <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
                 {formatCurrency(memberData.financialInfo.totalInterestCharged || 0)}
+              </Text>
+            </View>
+            
+            {/* NEW: Status explanation */}
+            <Divider style={styles.divider} />
+            <View style={styles.statusExplanation}>
+              <Text style={styles.explanationText}>
+                {memberData.financialInfo.currentBalance > 0 ? (
+                  <>⚠️ You have a <Text style={{ color: PLFTheme.colors.error, fontWeight: 'bold' }}>Balance Due</Text> of {formatCurrency(memberData.financialInfo.currentBalance)}. This amount is owed to PLF.</>
+                ) : memberData.financialInfo.currentBalance < 0 ? (
+                  <>✅ You have a <Text style={{ color: PLFTheme.colors.success, fontWeight: 'bold' }}>Balance</Text> of {formatCurrency(Math.abs(memberData.financialInfo.currentBalance))}. You have overpaid and have credit with PLF.</>
+                ) : (
+                  <>✅ Your balance is zero. You are up to date with your contributions.</>
+                )}
               </Text>
             </View>
           </Card.Content>
@@ -488,6 +548,17 @@ const styles = StyleSheet.create({
   },
   alertButton: {
     alignSelf: 'flex-start',
+  },
+  statusExplanation: {
+    backgroundColor: PLFTheme.colors.lightGray,
+    padding: PLFTheme.spacing.sm,
+    borderRadius: PLFTheme.borderRadius.sm,
+    marginTop: PLFTheme.spacing.sm,
+  },
+  explanationText: {
+    fontSize: 14,
+    color: PLFTheme.colors.darkGray,
+    lineHeight: 20,
   },
 });
 

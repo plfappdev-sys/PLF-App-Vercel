@@ -46,15 +46,23 @@ const MembersScreen: React.FC = () => {
       console.log(`DEBUG: getAllMembers() returned ${allMembers?.length || 0} members`);
       
       // Add null/undefined checks for member data
-      const safeMembers = allMembers.map(member => ({
-        ...member,
-        memberNumber: member.memberNumber || '',
-        personalInfo: member.personalInfo || { 
-          firstName: '', 
-          lastName: '', 
-          fullName: 'Unknown Member' 
-        },
-        financialInfo: member.financialInfo || { 
+      const safeMembers = allMembers.map(member => {
+        // Preserve the actual financial info if it exists, including negative balances
+        const financialInfo = member.financialInfo ? {
+          totalContributions: member.financialInfo.totalContributions || 0,
+          currentBalance: member.financialInfo.currentBalance || 0, // This preserves negative values
+          outstandingAmount: member.financialInfo.outstandingAmount || 0,
+          percentageOutstanding: member.financialInfo.percentageOutstanding || 0,
+          balanceBroughtForward: member.financialInfo.balanceBroughtForward || 0,
+          plannedContributions: member.financialInfo.plannedContributions || 0,
+          actualContributions: member.financialInfo.actualContributions || 0,
+          currentInterestEarned: member.financialInfo.currentInterestEarned || 0,
+          totalInterestEarned: member.financialInfo.totalInterestEarned || 0,
+          currentInterestCharged: member.financialInfo.currentInterestCharged || 0,
+          totalInterestCharged: member.financialInfo.totalInterestCharged || 0,
+          lastInterestCalculation: member.financialInfo.lastInterestCalculation || new Date(),
+          interestRate: member.financialInfo.interestRate || 0
+        } : { 
           totalContributions: 0,
           currentBalance: 0, 
           outstandingAmount: 0,
@@ -68,21 +76,32 @@ const MembersScreen: React.FC = () => {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 0
-        },
-        membershipStatus: member.membershipStatus || { 
-          isActive: true, 
-          standingCategory: 'good' 
-        },
-        interestSettings: member.interestSettings || {
-          calculationMethod: 'daily',
-          compounding: true,
-          taxDeduction: 0
-        },
-        contributionHistory: member.contributionHistory || [],
-        loanHistory: member.loanHistory || [],
-        interestHistory: member.interestHistory || [],
-        lastUpdated: member.lastUpdated || new Date()
-      }));
+        };
+        
+        return {
+          ...member,
+          memberNumber: member.memberNumber || '',
+          personalInfo: member.personalInfo || { 
+            firstName: '', 
+            lastName: '', 
+            fullName: 'Unknown Member' 
+          },
+          financialInfo: financialInfo,
+          membershipStatus: member.membershipStatus || { 
+            isActive: true, 
+            standingCategory: 'good' 
+          },
+          interestSettings: member.interestSettings || {
+            calculationMethod: 'daily',
+            compounding: true,
+            taxDeduction: 0
+          },
+          contributionHistory: member.contributionHistory || [],
+          loanHistory: member.loanHistory || [],
+          interestHistory: member.interestHistory || [],
+          lastUpdated: member.lastUpdated || new Date()
+        };
+      });
       
       console.log('DEBUG: Setting members state');
       setMembers(safeMembers);
@@ -158,8 +177,41 @@ const MembersScreen: React.FC = () => {
   }, [searchQuery, filter, members]);
 
   const formatCurrency = (amount: number | undefined | null) => {
-    const safeAmount = amount || 0;
+    // Handle null, undefined, or NaN by converting to 0
+    // Note: Negative values are preserved (e.g., -5934.26 remains -5934.26)
+    const safeAmount = amount === null || amount === undefined || isNaN(amount) ? 0 : amount;
     return `R ${safeAmount.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}`;
+  };
+
+  // NEW: Format balance display based on new business logic
+  const formatBalanceDisplay = (balance: number | undefined | null) => {
+    const safeBalance = balance === null || balance === undefined || isNaN(balance) ? 0 : balance;
+    
+    if (safeBalance > 0) {
+      // Positive balance = Balance Due (member owes money)
+      return {
+        label: 'Balance Due',
+        amount: safeBalance,
+        color: '#F44336', // Red for owing
+        isPositive: true
+      };
+    } else if (safeBalance < 0) {
+      // Negative balance = Balance (member has credit)
+      return {
+        label: 'Balance',
+        amount: Math.abs(safeBalance), // Show absolute value
+        color: '#4CAF50', // Green for credit
+        isPositive: false
+      };
+    } else {
+      // Zero balance
+      return {
+        label: 'Balance',
+        amount: 0,
+        color: '#666666', // Gray for zero
+        isPositive: false
+      };
+    }
   };
 
   const getStandingColor = (standing: string) => {
@@ -365,11 +417,14 @@ const MembersScreen: React.FC = () => {
                                   ? `${member.personalInfo.firstName} ${member.personalInfo.lastName}`
                                   : `Member ${member.memberNumber}`);
                 
+                // Get balance display info
+                const balanceDisplay = formatBalanceDisplay(member.financialInfo.currentBalance);
+                
                 return (
                   <View key={member.memberNumber}>
                     <List.Item
                       title={memberName}
-                      description={`${member.memberNumber} • Balance: ${formatCurrency(member.financialInfo.currentBalance)} • Outstanding: ${formatCurrency(member.financialInfo.outstandingAmount)}`}
+                      description={`${member.memberNumber} • ${balanceDisplay.label}: ${formatCurrency(balanceDisplay.amount)} • Outstanding: ${formatCurrency(member.financialInfo.outstandingAmount)}`}
                       left={props => (
                         <List.Icon 
                           {...props} 
@@ -549,7 +604,8 @@ const MembersScreen: React.FC = () => {
               value={selectedMemberNumber}
               onChangeText={setSelectedMemberNumber}
               style={styles.memberInput}
-              keyboardType="numeric"
+              placeholder="e.g., M031, M041, 031, 041"
+              autoCapitalize="characters"
             />
             <Paragraph style={styles.helpText}>
               Enter the member number this user should be linked to

@@ -180,11 +180,11 @@ const DashboardScreen: React.FC = () => {
                 <Text style={styles.statValue}>{fundStats.totalMembers}</Text>
               </View>
               <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Total Fund Value:</Text>
+                <Text style={styles.statLabel}>Total Fund Contributions:</Text>
                 <Text style={styles.statValue}>{formatCurrency(fundStats.totalFundValue)}</Text>
               </View>
               <View style={styles.statRow}>
-                <Text style={styles.statLabel}>Outstanding Loans:</Text>
+                <Text style={styles.statLabel}>Total Outstanding Contributions:</Text>
                 <Text style={styles.statValue}>{formatCurrency(fundStats.totalLoansOutstanding)}</Text>
               </View>
             </>
