@@ -3,6 +3,21 @@ import { Member, FundStatistics } from '../types/index';
 
 export class SupabaseMemberService {
   /**
+   * Helper function to parse JSON strings from database fields
+   */
+  private static parseJsonField(field: any): any {
+    if (!field) return {};
+    if (typeof field === 'string') {
+      try {
+        return JSON.parse(field);
+      } catch (error) {
+        console.warn('Error parsing JSON field:', error);
+        return {};
+      }
+    }
+    return field;
+  }
+  /**
    * Get member by member number
    */
   static async getMemberByNumber(memberNumber: string): Promise<Member | null> {
@@ -33,9 +48,11 @@ export class SupabaseMemberService {
 
       // Convert database snake_case to TypeScript camelCase
       if (memberData) {
+        // FIX: Parse financial_info if it's a JSON string
+        const financialInfoData = this.parseJsonField(memberData.financial_info);
+        
         // FIX: Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
         // Also check financial_info.outstanding_amount as fallback
-        const financialInfoData = memberData.financial_info || {};
         const outstandingAmount = (memberData.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
@@ -43,8 +60,8 @@ export class SupabaseMemberService {
         const currentBalance = balanceData ? 
           (balanceData.net_balance !== undefined && balanceData.net_balance !== null ? 
             balanceData.net_balance : balanceData.savings_balance || 0) : 
-          (memberData.financial_info && memberData.financial_info.current_balance !== undefined ? 
-            memberData.financial_info.current_balance : 0);
+          (financialInfoData.current_balance !== undefined ? 
+            financialInfoData.current_balance : 0);
         
         // Use actual balance data if available, otherwise use financial_info as fallback
         const financialInfo = balanceData ? {
@@ -61,20 +78,20 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 5.5 // Default interest rate
-        } : memberData.financial_info ? {
-          totalContributions: memberData.financial_info.total_contributions || 0,
-          currentBalance: memberData.financial_info.current_balance || 0,
-          outstandingAmount: memberData.financial_info.outstanding_amount || 0,
-          percentageOutstanding: memberData.financial_info.percentage_outstanding || 0,
-          balanceBroughtForward: memberData.financial_info.balance_brought_forward || 0,
-          plannedContributions: memberData.financial_info.planned_contributions || 0,
-          actualContributions: memberData.financial_info.actual_contributions || 0,
-          currentInterestEarned: memberData.financial_info.current_interest_earned || 0,
-          totalInterestEarned: memberData.financial_info.total_interest_earned || 0,
-          currentInterestCharged: memberData.financial_info.current_interest_charged || 0,
-          totalInterestCharged: memberData.financial_info.total_interest_charged || 0,
-          lastInterestCalculation: memberData.financial_info.last_interest_calculation ? new Date(memberData.financial_info.last_interest_calculation) : new Date(),
-          interestRate: memberData.financial_info.interest_rate || 0
+        } : financialInfoData ? {
+          totalContributions: financialInfoData.total_contributions || 0,
+          currentBalance: financialInfoData.current_balance || 0,
+          outstandingAmount: financialInfoData.outstanding_amount || 0,
+          percentageOutstanding: financialInfoData.percentage_outstanding || 0,
+          balanceBroughtForward: financialInfoData.balance_brought_forward || 0,
+          plannedContributions: financialInfoData.planned_contributions || 0,
+          actualContributions: financialInfoData.actual_contributions || 0,
+          currentInterestEarned: financialInfoData.current_interest_earned || 0,
+          totalInterestEarned: financialInfoData.total_interest_earned || 0,
+          currentInterestCharged: financialInfoData.current_interest_charged || 0,
+          totalInterestCharged: financialInfoData.total_interest_charged || 0,
+          lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
+          interestRate: financialInfoData.interest_rate || 0
         } : {
           totalContributions: 0,
           currentBalance: 0,
@@ -91,23 +108,33 @@ export class SupabaseMemberService {
           interestRate: 0
         };
 
+        // Parse personal_info if it's a JSON string
+        const personalInfoData = this.parseJsonField(memberData.personal_info);
+        
         // Use the name column if available, otherwise fall back to personal_info
         const personalInfo = memberData.name ? {
           firstName: memberData.name.split(' ')[0] || '',
           lastName: memberData.name.split(' ').slice(1).join(' ') || '',
           fullName: memberData.name
-        } : memberData.personal_info;
+        } : personalInfoData;
+
+        // Parse other JSON fields
+        const membershipStatus = this.parseJsonField(memberData.membership_status);
+        const interestSettings = this.parseJsonField(memberData.interest_settings);
+        const contributionHistory = this.parseJsonField(memberData.contribution_history) || [];
+        const loanHistory = this.parseJsonField(memberData.loan_history) || [];
+        const interestHistory = this.parseJsonField(memberData.interest_history) || [];
 
         return {
           memberNumber: memberData.member_number,
           userId: memberData.user_id,
           personalInfo: personalInfo,
           financialInfo: financialInfo,
-          contributionHistory: memberData.contribution_history || [],
-          loanHistory: memberData.loan_history || [],
-          interestHistory: memberData.interest_history || [],
-          membershipStatus: memberData.membership_status,
-          interestSettings: memberData.interest_settings,
+          contributionHistory: contributionHistory,
+          loanHistory: loanHistory,
+          interestHistory: interestHistory,
+          membershipStatus: membershipStatus,
+          interestSettings: interestSettings,
           lastUpdated: new Date(memberData.last_updated)
         } as Member;
       }
@@ -446,8 +473,10 @@ export class SupabaseMemberService {
 
       // Calculate statistics from database data with comprehensive null checks
       members.forEach((member: any) => {
-        // Safe access to nested properties with fallback defaults
-        const financialInfo = member?.financial_info || {};
+        // Parse JSON fields
+        const financialInfo = this.parseJsonField(member?.financial_info);
+        const membershipStatus = this.parseJsonField(member?.membership_status);
+        
         const actualContributions = typeof financialInfo?.actual_contributions === 'number'
           ? financialInfo.actual_contributions
           : (typeof financialInfo?.total_contributions === 'number'
@@ -461,8 +490,6 @@ export class SupabaseMemberService {
         totalFundValue += actualContributions;
         totalOutstanding += outstandingAmount;
 
-        // Safe access to membership status with comprehensive null checking
-        const membershipStatus = member?.membership_status || {};
         const standingCategory = typeof membershipStatus?.standingCategory === 'string'
           ? membershipStatus.standingCategory
           : 'good';
@@ -524,9 +551,11 @@ export class SupabaseMemberService {
 
       // Calculate statistics from members table
       members.forEach((member: any) => {
+        // Parse JSON fields
+        const financialInfo = this.parseJsonField(member?.financial_info);
+        
         // Calculate actual contributions made by member
         // Use actual_contributions if available, otherwise fall back to total_contributions
-        const financialInfo = member?.financial_info || {};
         const actualContributions = typeof financialInfo?.actual_contributions === 'number'
           ? financialInfo.actual_contributions
           : (typeof financialInfo?.total_contributions === 'number'
@@ -670,7 +699,7 @@ export class SupabaseMemberService {
         // Use actual balance data if available, otherwise use financial_info as fallback
         // FIX: Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
         // Also check financial_info.outstanding_amount as fallback
-        const financialInfoData = member.financial_info || {};
+        const financialInfoData = this.parseJsonField(member.financial_info);
         const outstandingAmount = (member.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
@@ -678,8 +707,8 @@ export class SupabaseMemberService {
         const currentBalance = balanceData ? 
           (balanceData.net_balance !== undefined && balanceData.net_balance !== null ? 
             balanceData.net_balance : balanceData.savings_balance || 0) : 
-          (member.financial_info && member.financial_info.current_balance !== undefined ? 
-            member.financial_info.current_balance : 0);
+          (financialInfoData.current_balance !== undefined ? 
+            financialInfoData.current_balance : 0);
         
         const financialInfo = balanceData ? {
           totalContributions: balanceData.total_contributions || 0,
@@ -695,20 +724,20 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 5.5 // Default interest rate
-        } : member.financial_info ? {
-          totalContributions: member.financial_info.total_contributions || 0,
-          currentBalance: member.financial_info.current_balance || 0,
-          outstandingAmount: member.financial_info.outstanding_amount || 0,
-          percentageOutstanding: member.financial_info.percentage_outstanding || 0,
-          balanceBroughtForward: member.financial_info.balance_brought_forward || 0,
-          plannedContributions: member.financial_info.planned_contributions || 0,
-          actualContributions: member.financial_info.actual_contributions || 0,
-          currentInterestEarned: member.financial_info.current_interest_earned || 0,
-          totalInterestEarned: member.financial_info.total_interest_earned || 0,
-          currentInterestCharged: member.financial_info.current_interest_charged || 0,
-          totalInterestCharged: member.financial_info.total_interest_charged || 0,
-          lastInterestCalculation: member.financial_info.last_interest_calculation ? new Date(member.financial_info.last_interest_calculation) : new Date(),
-          interestRate: member.financial_info.interest_rate || 0
+        } : financialInfoData ? {
+          totalContributions: financialInfoData.total_contributions || 0,
+          currentBalance: financialInfoData.current_balance || 0,
+          outstandingAmount: financialInfoData.outstanding_amount || 0,
+          percentageOutstanding: financialInfoData.percentage_outstanding || 0,
+          balanceBroughtForward: financialInfoData.balance_brought_forward || 0,
+          plannedContributions: financialInfoData.planned_contributions || 0,
+          actualContributions: financialInfoData.actual_contributions || 0,
+          currentInterestEarned: financialInfoData.current_interest_earned || 0,
+          totalInterestEarned: financialInfoData.total_interest_earned || 0,
+          currentInterestCharged: financialInfoData.current_interest_charged || 0,
+          totalInterestCharged: financialInfoData.total_interest_charged || 0,
+          lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
+          interestRate: financialInfoData.interest_rate || 0
         } : {
           totalContributions: 0,
           currentBalance: 0,
