@@ -77,7 +77,8 @@ export class SupabaseMemberService {
           currentInterestCharged: 0,
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
-          interestRate: 5.5 // Default interest rate
+          interestRate: 5.5, // Default interest rate
+          expectedContribution: financialInfoData.expected_contribution || 0
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
           currentBalance: financialInfoData.current_balance || 0,
@@ -91,7 +92,8 @@ export class SupabaseMemberService {
           currentInterestCharged: financialInfoData.current_interest_charged || 0,
           totalInterestCharged: financialInfoData.total_interest_charged || 0,
           lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
-          interestRate: financialInfoData.interest_rate || 0
+          interestRate: financialInfoData.interest_rate || 0,
+          expectedContribution: financialInfoData.expected_contribution || 0
         } : {
           totalContributions: 0,
           currentBalance: 0,
@@ -105,7 +107,8 @@ export class SupabaseMemberService {
           currentInterestCharged: 0,
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
-          interestRate: 0
+          interestRate: 0,
+          expectedContribution: 0
         };
 
         // Parse personal_info if it's a JSON string
@@ -723,7 +726,8 @@ export class SupabaseMemberService {
           currentInterestCharged: 0,
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
-          interestRate: 5.5 // Default interest rate
+          interestRate: 5.5, // Default interest rate
+          expectedContribution: financialInfoData.expected_contribution || 0
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
           currentBalance: financialInfoData.current_balance || 0,
@@ -737,7 +741,8 @@ export class SupabaseMemberService {
           currentInterestCharged: financialInfoData.current_interest_charged || 0,
           totalInterestCharged: financialInfoData.total_interest_charged || 0,
           lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
-          interestRate: financialInfoData.interest_rate || 0
+          interestRate: financialInfoData.interest_rate || 0,
+          expectedContribution: financialInfoData.expected_contribution || 0
         } : {
           totalContributions: 0,
           currentBalance: 0,
@@ -751,7 +756,8 @@ export class SupabaseMemberService {
           currentInterestCharged: 0,
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
-          interestRate: 0
+          interestRate: 0,
+          expectedContribution: 0
         };
 
         // Determine membership status based on net balance - NEW BUSINESS LOGIC

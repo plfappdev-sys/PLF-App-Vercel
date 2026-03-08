@@ -111,6 +111,8 @@ export interface Member {
     totalInterestCharged: number;
     lastInterestCalculation: Date;
     interestRate: number; // Member-specific interest rate
+    // Expected contribution based on join date
+    expectedContribution?: number;
   };
   contributionHistory: ContributionRecord[];
   loanHistory: LoanRecord[];

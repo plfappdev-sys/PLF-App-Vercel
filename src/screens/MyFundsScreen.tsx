@@ -291,6 +291,14 @@ const MyFundsScreen: React.FC = () => {
               </Text>
             </View>
             
+            {/* NEW: Expected Contribution */}
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>Expected Contribution:</Text>
+              <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
+                {formatCurrency(memberData.financialInfo.expectedContribution || 0)}
+              </Text>
+            </View>
+            
             {/* Interest Information */}
             <Divider style={styles.divider} />
             <View style={styles.statRow}>
