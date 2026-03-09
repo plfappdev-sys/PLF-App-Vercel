@@ -51,9 +51,11 @@ export class SupabaseMemberService {
         // FIX: Parse financial_info if it's a JSON string
         const financialInfoData = this.parseJsonField(memberData.financial_info);
         
-        // FIX: Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
-        // Also check financial_info.outstanding_amount as fallback
-        const outstandingAmount = (memberData.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
+        // FIX: Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
+        // These are the correct columns imported from Excel
+        const outstandingContributions = memberData.outstanding_contributions || 0;
+        const totalPenalties = memberData.total_penalties || 0;
+        const outstandingAmount = outstandingContributions + totalPenalties;
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
         // net_balance represents the actual current balance (savings - loans)
@@ -78,12 +80,15 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 5.5, // Default interest rate
-          expectedContribution: financialInfoData.expected_contribution || 0
+          expectedContribution: financialInfoData.expected_contribution || 0,
+          // New fields imported from Excel
+          outstandingContributions: outstandingContributions,
+          totalPenalties: totalPenalties
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
           currentBalance: financialInfoData.current_balance || 0,
-          outstandingAmount: financialInfoData.outstanding_amount || 0,
-          percentageOutstanding: financialInfoData.percentage_outstanding || 0,
+          outstandingAmount: outstandingAmount,
+          percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: financialInfoData.balance_brought_forward || 0,
           plannedContributions: financialInfoData.planned_contributions || 0,
           actualContributions: financialInfoData.actual_contributions || 0,
@@ -93,7 +98,10 @@ export class SupabaseMemberService {
           totalInterestCharged: financialInfoData.total_interest_charged || 0,
           lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
           interestRate: financialInfoData.interest_rate || 0,
-          expectedContribution: financialInfoData.expected_contribution || 0
+          expectedContribution: financialInfoData.expected_contribution || 0,
+          // New fields imported from Excel
+          outstandingContributions: outstandingContributions,
+          totalPenalties: totalPenalties
         } : {
           totalContributions: 0,
           currentBalance: 0,
@@ -108,7 +116,10 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 0,
-          expectedContribution: 0
+          expectedContribution: 0,
+          // New fields imported from Excel
+          outstandingContributions: 0,
+          totalPenalties: 0
         };
 
         // Parse personal_info if it's a JSON string
@@ -122,11 +133,38 @@ export class SupabaseMemberService {
         } : personalInfoData;
 
         // Parse other JSON fields
-        const membershipStatus = this.parseJsonField(memberData.membership_status);
         const interestSettings = this.parseJsonField(memberData.interest_settings);
         const contributionHistory = this.parseJsonField(memberData.contribution_history) || [];
         const loanHistory = this.parseJsonField(memberData.loan_history) || [];
         const interestHistory = this.parseJsonField(memberData.interest_history) || [];
+
+        // Determine membership status based on net balance - NEW BUSINESS LOGIC (same as getAllMembers)
+        let standingCategory = 'good';
+        if (balanceData && typeof balanceData.net_balance === 'number') {
+          if (balanceData.net_balance > 0) {
+            // Positive balance = member owes money, calculate outstanding percentage
+            const outstandingPercentage = balanceData.net_balance / 16600 * 100;
+            if (outstandingPercentage <= 10) {
+              standingCategory = 'owing_10';
+            } else if (outstandingPercentage <= 20) {
+              standingCategory = 'owing_20';
+            } else if (outstandingPercentage <= 30) {
+              standingCategory = 'owing_30';
+            } else if (outstandingPercentage <= 50) {
+              standingCategory = 'owing_50';
+            } else if (outstandingPercentage <= 65) {
+              standingCategory = 'owing_65';
+            } else {
+              standingCategory = 'owing_65_plus';
+            }
+          } else if (balanceData.net_balance < 0) {
+            // Negative balance = member has credit = good standing
+            standingCategory = 'good';
+          } else {
+            // Zero balance = good standing
+            standingCategory = 'good';
+          }
+        }
 
         return {
           memberNumber: memberData.member_number,
@@ -136,7 +174,10 @@ export class SupabaseMemberService {
           contributionHistory: contributionHistory,
           loanHistory: loanHistory,
           interestHistory: interestHistory,
-          membershipStatus: membershipStatus,
+          membershipStatus: {
+            isActive: true,
+            standingCategory: standingCategory
+          },
           interestSettings: interestSettings,
           lastUpdated: new Date(memberData.last_updated)
         } as Member;
@@ -565,10 +606,10 @@ export class SupabaseMemberService {
             ? financialInfo.total_contributions
             : 0);
 
-        // Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
-        // Also check financial_info.outstanding_amount as fallback
-        const outstandingAmount = (member.catch_up_fee || 0) + 
-                                 (financialInfo.outstanding_amount || 0);
+        // Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
+        const outstandingContributions = member.outstanding_contributions || 0;
+        const totalPenalties = member.total_penalties || 0;
+        const outstandingAmount = outstandingContributions + totalPenalties;
 
         totalFundValue += actualContributions;
         totalOutstanding += outstandingAmount;
@@ -700,10 +741,11 @@ export class SupabaseMemberService {
         const balanceData = balanceLookup[member.id];
         
         // Use actual balance data if available, otherwise use financial_info as fallback
-        // FIX: Calculate outstanding amount - only use catch_up_fee since unpaid_contributions and penalties columns don't exist
-        // Also check financial_info.outstanding_amount as fallback
+        // FIX: Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
         const financialInfoData = this.parseJsonField(member.financial_info);
-        const outstandingAmount = (member.catch_up_fee || 0) + (financialInfoData.outstanding_amount || 0);
+        const outstandingContributions = member.outstanding_contributions || 0;
+        const totalPenalties = member.total_penalties || 0;
+        const outstandingAmount = outstandingContributions + totalPenalties;
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
         // net_balance represents the actual current balance (savings - loans)
@@ -727,12 +769,15 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 5.5, // Default interest rate
-          expectedContribution: financialInfoData.expected_contribution || 0
+          expectedContribution: financialInfoData.expected_contribution || 0,
+          // New fields imported from Excel
+          outstandingContributions: outstandingContributions,
+          totalPenalties: totalPenalties
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
           currentBalance: financialInfoData.current_balance || 0,
-          outstandingAmount: financialInfoData.outstanding_amount || 0,
-          percentageOutstanding: financialInfoData.percentage_outstanding || 0,
+          outstandingAmount: outstandingAmount,
+          percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: financialInfoData.balance_brought_forward || 0,
           plannedContributions: financialInfoData.planned_contributions || 0,
           actualContributions: financialInfoData.actual_contributions || 0,
@@ -742,7 +787,10 @@ export class SupabaseMemberService {
           totalInterestCharged: financialInfoData.total_interest_charged || 0,
           lastInterestCalculation: financialInfoData.last_interest_calculation ? new Date(financialInfoData.last_interest_calculation) : new Date(),
           interestRate: financialInfoData.interest_rate || 0,
-          expectedContribution: financialInfoData.expected_contribution || 0
+          expectedContribution: financialInfoData.expected_contribution || 0,
+          // New fields imported from Excel
+          outstandingContributions: outstandingContributions,
+          totalPenalties: totalPenalties
         } : {
           totalContributions: 0,
           currentBalance: 0,
@@ -757,7 +805,10 @@ export class SupabaseMemberService {
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 0,
-          expectedContribution: 0
+          expectedContribution: 0,
+          // New fields imported from Excel
+          outstandingContributions: 0,
+          totalPenalties: 0
         };
 
         // Determine membership status based on net balance - NEW BUSINESS LOGIC
