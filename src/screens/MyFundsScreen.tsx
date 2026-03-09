@@ -267,14 +267,22 @@ const MyFundsScreen: React.FC = () => {
               );
             })()}
             
+            {/* NEW: Expected Contribution */}
             <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Total Contributions:</Text>
+              <Text style={styles.statLabel}>Expected Contribution:</Text>
+              <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
+                {formatCurrency(memberData.financialInfo.expectedContribution || 0)}
+              </Text>
+            </View>
+            
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>Total Contribution:</Text>
               <Text style={styles.statValue}>
                 {formatCurrency(memberData.financialInfo.totalContributions)}
               </Text>
             </View>
             
-            {/* NEW: Outstanding Amount only shown if positive balance (owes money) */}
+            {/* NEW: Outstanding Amount (Outstanding Contributions + Penalties) */}
             {memberData.financialInfo.currentBalance > 0 && (
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Outstanding Amount:</Text>
@@ -284,18 +292,27 @@ const MyFundsScreen: React.FC = () => {
               </View>
             )}
             
+            {/* NEW: Outstanding Contributions */}
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>Outstanding Contributions:</Text>
+              <Text style={[styles.statValue, { color: PLFTheme.colors.warning }]}>
+                {formatCurrency(memberData.financialInfo.outstandingContributions || 0)}
+              </Text>
+            </View>
+            
+            {/* NEW: Penalties */}
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>Penalties:</Text>
+              <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
+                {formatCurrency(memberData.financialInfo.totalPenalties || 0)}
+              </Text>
+            </View>
+            
+            {/* Planned Contributions (keep for reference but not in required order) */}
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Planned Contributions:</Text>
               <Text style={styles.statValue}>
                 {formatCurrency(memberData.financialInfo.plannedContributions)}
-              </Text>
-            </View>
-            
-            {/* NEW: Expected Contribution */}
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Expected Contribution:</Text>
-              <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
-                {formatCurrency(memberData.financialInfo.expectedContribution || 0)}
               </Text>
             </View>
             
