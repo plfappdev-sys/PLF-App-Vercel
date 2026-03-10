@@ -1435,6 +1435,450 @@ export class PDFReportGenerator {
 </html>`;
   }
 
+  // Generate HTML content for Comprehensive Financial Summary Report
+  static generateComprehensiveFinancialSummaryHTML(reportData: ReportData): string {
+    const data = reportData.data;
+    
+    // Helper function to get health color
+    const getHealthColor = (health: string) => {
+      switch (health) {
+        case 'Excellent': return '#4CAF50';
+        case 'Good': return '#8BC34A';
+        case 'Fair': return '#FFC107';
+        case 'Poor': return '#FF9800';
+        case 'Critical': return '#F44336';
+        default: return '#666';
+      }
+    };
+
+    // Helper function to format percentage
+    const formatPercentage = (value: number) => {
+      return `${value.toFixed(2)}%`;
+    };
+
+    // Helper function to format currency
+    const formatCurrency = (value: number) => {
+      return `R ${value.toLocaleString('en-ZA')}`;
+    };
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${reportData.title}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2196F3;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2196F3;
+            margin: 0;
+            font-size: 28px;
+        }
+        .header .subtitle {
+            color: #666;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .report-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .report-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .report-info td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .report-info td:first-child {
+            font-weight: bold;
+            width: 150px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #2196F3;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 5px;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .health-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 5px;
+            color: white;
+        }
+        .standing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .standing-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .standing-card.good { border-left: 4px solid #4CAF50; }
+        .standing-card.owing-10 { border-left: 4px solid #FF9800; }
+        .standing-card.owing-20 { border-left: 4px solid #FF5722; }
+        .standing-card.owing-30 { border-left: 4px solid #F44336; }
+        .standing-card.owing-50 { border-left: 4px solid #9C27B0; }
+        .standing-card.owing-65 { border-left: 4px solid #673AB7; }
+        .standing-card.owing-65-plus { border-left: 4px solid #000; }
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .detail-table th,
+        .detail-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .detail-table th {
+            background: #2196F3;
+            color: white;
+            font-weight: bold;
+        }
+        .detail-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .amount {
+            font-weight: bold;
+            text-align: right;
+        }
+        .amount.positive { color: #4CAF50; }
+        .amount.negative { color: #F44336; }
+        .recommendations {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .recommendations ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .recommendations li {
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 12px;
+        }
+        @media print {
+            body { margin: 0; }
+            .section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>${reportData.title}</h1>
+        <div class="subtitle">Comprehensive Financial Analysis and Health Assessment</div>
+    </div>
+
+    <div class="report-info">
+        <table>
+            <tr>
+                <td>Report Generated:</td>
+                <td>${reportData.generatedDate.toLocaleDateString('en-ZA', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}</td>
+            </tr>
+            <tr>
+                <td>Generated By:</td>
+                <td>${reportData.generatedBy}</td>
+            </tr>
+            <tr>
+                <td>Report Type:</td>
+                <td>Comprehensive Financial Summary</td>
+            </tr>
+            <tr>
+                <td>Period:</td>
+                <td>${new Date(data.period.startDate).toLocaleDateString('en-ZA')} to ${new Date(data.period.endDate).toLocaleDateString('en-ZA')}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Financial Health Assessment</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">${data.financialHealth.overallHealth}</div>
+                <div class="metric-label">Overall Health</div>
+                <div class="health-indicator" style="background: ${getHealthColor(data.financialHealth.overallHealth)}">
+                    ${data.financialHealth.overallHealth}
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.financialHealth.liquidityHealth}</div>
+                <div class="metric-label">Liquidity Health</div>
+                <div class="health-indicator" style="background: ${getHealthColor(data.financialHealth.liquidityHealth)}">
+                    ${data.financialHealth.liquidityHealth}
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.financialHealth.riskHealth}</div>
+                <div class="metric-label">Risk Health</div>
+                <div class="health-indicator" style="background: ${getHealthColor(data.financialHealth.riskHealth)}">
+                    ${data.financialHealth.riskHealth}
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.financialHealth.complianceHealth}</div>
+                <div class="metric-label">Compliance Health</div>
+                <div class="health-indicator" style="background: ${getHealthColor(data.financialHealth.complianceHealth)}">
+                    ${data.financialHealth.complianceHealth}
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.financialHealth.participationHealth}</div>
+                <div class="metric-label">Participation Health</div>
+                <div class="health-indicator" style="background: ${getHealthColor(data.financialHealth.participationHealth)}">
+                    ${data.financialHealth.participationHealth}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Fund Overview</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.fundOverview.totalFundValue)}</div>
+                <div class="metric-label">Total Fund Value</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.fundOverview.totalMembers}</div>
+                <div class="metric-label">Total Members</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.fundOverview.activeMembers}</div>
+                <div class="metric-label">Active Members</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.fundOverview.totalContributions)}</div>
+                <div class="metric-label">Total Contributions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.fundOverview.totalExpectedContributions)}</div>
+                <div class="metric-label">Expected Contributions</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.fundOverview.totalOutstanding)}</div>
+                <div class="metric-label">Total Outstanding</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.fundOverview.contributionComplianceRate)}</div>
+                <div class="metric-label">Compliance Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.fundOverview.memberParticipationRate)}</div>
+                <div class="metric-label">Participation Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Transaction Summary</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.transactionSummary.totalDeposits)}</div>
+                <div class="metric-label">Total Deposits</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.transactionSummary.totalWithdrawals)}</div>
+                <div class="metric-label">Total Withdrawals</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatCurrency(data.transactionSummary.totalLoanRepayments)}</div>
+                <div class="metric-label">Loan Repayments</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value ${data.transactionSummary.netCashFlow >= 0 ? 'positive' : 'negative'}">
+                    ${formatCurrency(data.transactionSummary.netCashFlow)}
+                </div>
+                <div class="metric-label">Net Cash Flow</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${data.transactionSummary.transactionCount}</div>
+                <div class="metric-label">Transaction Count</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Interest Summary</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value positive">${formatCurrency(data.interestSummary.totalInterestEarned)}</div>
+                <div class="metric-label">Interest Earned</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value negative">${formatCurrency(data.interestSummary.totalInterestCharged)}</div>
+                <div class="metric-label">Interest Charged</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value ${data.interestSummary.netInterest >= 0 ? 'positive' : 'negative'}">
+                    ${formatCurrency(data.interestSummary.netInterest)}
+                </div>
+                <div class="metric-label">Net Interest</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.interestSummary.averageInterestRate)}</div>
+                <div class="metric-label">Average Interest Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Member Standing Breakdown</h2>
+        <div class="standing-grid">
+            <div class="standing-card good">
+                <div class="metric-value">${data.memberStanding.good}</div>
+                <div class="metric-label">Good Standing</div>
+            </div>
+            <div class="standing-card owing-10">
+                <div class="metric-value">${data.memberStanding.owing_10}</div>
+                <div class="metric-label">Owing 10%</div>
+            </div>
+            <div class="standing-card owing-20">
+                <div class="metric-value">${data.memberStanding.owing_20}</div>
+                <div class="metric-label">Owing 20%</div>
+            </div>
+            <div class="standing-card owing-30">
+                <div class="metric-value">${data.memberStanding.owing_30}</div>
+                <div class="metric-label">Owing 30%</div>
+            </div>
+            <div class="standing-card owing-50">
+                <div class="metric-value">${data.memberStanding.owing_50}</div>
+                <div class="metric-label">Owing 50%</div>
+            </div>
+            <div class="standing-card owing-65">
+                <div class="metric-value">${data.memberStanding.owing_65}</div>
+                <div class="metric-label">Owing 65%</div>
+            </div>
+            <div class="standing-card owing-65-plus">
+                <div class="metric-value">${data.memberStanding.owing_65_plus}</div>
+                <div class="metric-label">Owing 65%+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Financial Ratios</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.financialRatios.liquidityRatio * 100)}</div>
+                <div class="metric-label">Liquidity Ratio</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.financialRatios.riskExposure)}</div>
+                <div class="metric-label">Risk Exposure</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.financialRatios.contributionComplianceRate)}</div>
+                <div class="metric-label">Compliance Rate</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${formatPercentage(data.financialRatios.memberParticipationRate)}</div>
+                <div class="metric-label">Participation Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Health Assessment Details</h2>
+        <div class="recommendations">
+            <h3>Assessment Details</h3>
+            <ul>
+                ${data.financialHealth.details.map((detail: string) => `
+                    <li>${detail}</li>
+                `).join('')}
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Recommendations</h2>
+        <div class="recommendations">
+            <h3>Strategic Recommendations</h3>
+            <ul>
+                ${data.recommendations.map((recommendation: string) => `
+                    <li>${recommendation}</li>
+                `).join('')}
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Important Notice:</strong> This comprehensive financial summary reflects the fund's status as of ${reportData.generatedDate.toLocaleDateString('en-ZA')}.</p>
+        <p>For any questions or concerns regarding this report, please contact the fund administrators.</p>
+        <p>This is an official document of the People's Liberator Fund.</p>
+        <p>Generated on ${reportData.generatedDate.toLocaleDateString('en-ZA')} at ${reportData.generatedDate.toLocaleTimeString('en-ZA')}</p>
+    </div>
+</body>
+</html>`;
+  }
+
   // Convert HTML to PDF (placeholder - would use a library like Puppeteer in real implementation)
   static async generatePDF(htmlContent: string, filename: string): Promise<string> {
     // In a real implementation, this would use a library like Puppeteer or jsPDF
