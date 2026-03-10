@@ -248,13 +248,13 @@ const MyFundsScreen: React.FC = () => {
         </Card>
       )}
 
-      {/* Financial Summary */}
+      {/* Financial Summary - UPDATED: Removed unwanted fields, fixed order */}
       {memberData && (
         <Card style={styles.card}>
           <Card.Content>
             <Title style={styles.cardTitle}>Financial Summary</Title>
             
-            {/* NEW: Balance display with new business logic */}
+            {/* 1. Balance Due / Balance */}
             {(() => {
               const balanceDisplay = formatBalanceDisplay(memberData.financialInfo.currentBalance);
               return (
@@ -267,7 +267,7 @@ const MyFundsScreen: React.FC = () => {
               );
             })()}
             
-            {/* NEW: Expected Contribution */}
+            {/* 2. Expected Contribution */}
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Expected Contribution:</Text>
               <Text style={[styles.statValue, { color: PLFTheme.colors.primaryGreen }]}>
@@ -275,6 +275,7 @@ const MyFundsScreen: React.FC = () => {
               </Text>
             </View>
             
+            {/* 3. Total Contribution */}
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Total Contribution:</Text>
               <Text style={styles.statValue}>
@@ -282,7 +283,7 @@ const MyFundsScreen: React.FC = () => {
               </Text>
             </View>
             
-            {/* NEW: Outstanding Amount (Outstanding Contributions + Penalties) */}
+            {/* 4. Outstanding Amount (Balance Due) */}
             {memberData.financialInfo.currentBalance > 0 && (
               <View style={styles.statRow}>
                 <Text style={styles.statLabel}>Outstanding Amount:</Text>
@@ -292,7 +293,7 @@ const MyFundsScreen: React.FC = () => {
               </View>
             )}
             
-            {/* NEW: Outstanding Contributions */}
+            {/* 5. Outstanding Contributions */}
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Outstanding Contributions:</Text>
               <Text style={[styles.statValue, { color: PLFTheme.colors.warning }]}>
@@ -300,7 +301,7 @@ const MyFundsScreen: React.FC = () => {
               </Text>
             </View>
             
-            {/* NEW: Penalties */}
+            {/* 6. Penalties */}
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Penalties:</Text>
               <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
@@ -308,30 +309,9 @@ const MyFundsScreen: React.FC = () => {
               </Text>
             </View>
             
-            {/* Planned Contributions (keep for reference but not in required order) */}
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Planned Contributions:</Text>
-              <Text style={styles.statValue}>
-                {formatCurrency(memberData.financialInfo.plannedContributions)}
-              </Text>
-            </View>
+            {/* REMOVED: Planned Contributions, Interest Earned, Interest Charged */}
             
-            {/* Interest Information */}
-            <Divider style={styles.divider} />
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Interest Earned:</Text>
-              <Text style={[styles.statValue, { color: PLFTheme.colors.success }]}>
-                {formatCurrency(memberData.financialInfo.totalInterestEarned || 0)}
-              </Text>
-            </View>
-            <View style={styles.statRow}>
-              <Text style={styles.statLabel}>Interest Charged:</Text>
-              <Text style={[styles.statValue, { color: PLFTheme.colors.error }]}>
-                {formatCurrency(memberData.financialInfo.totalInterestCharged || 0)}
-              </Text>
-            </View>
-            
-            {/* NEW: Status explanation */}
+            {/* Status explanation */}
             <Divider style={styles.divider} />
             <View style={styles.statusExplanation}>
               <Text style={styles.explanationText}>

@@ -1,0 +1,29 @@
+Use "C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\FineTuningApp" folder to create ImplementationNotes.txt to document the implementation of the steps below. Use the document to make a step by step plan on implementation of the below changes, and follow the plan while ticking off the steps already implemented and working.
+
+
+Use this below order for the Financial Summary on the "My Funds" Screen
+
+Balance / Balance Due
+Expected Contribution
+Total Contribution
+Outstanding Amount (Outstanding Contributions + Penalties)
+Outstanding Contributions
+Penalties
+
+
+The spreadsheet we did the import from is "C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx".
+Check if all the relevant and required Data is imported to the database. Most data has been imported, and some users are not active. On the 2024-2025 Sheet there are Active members. I only need the data of those active numbers in the database.
+Check the excel doc for all the sheets, especially on the "2024-2025" sheet, for the final totals that appear on the app screens.  See the columns mentioned below, for the data needed for the app. Note that some of the data in the app is working fine. This is just to fine tune and verify if the correct data is used.
+The data in being imported should be until and including June 2025.
+
+1.	Expected Contribution We have already worked this out.
+2.	Actual Contributions = What members actually paid 
+3.	Balance brought forward = closing balance from the previous year
+4.	Estimated 12 months contribution = column C + column D
+5.	Total contribution for 12 months = column BK (O+S+W+AA+AE+AI+AQ+AM+AU+AY+BC+BG)
+6.	Closing Balance = Total outstanding (H) + Penalty for the year (L) + Balance Brought Forward (E)
+7.	Penalty for the year (L) = R+V+Z+AD+AH+AL+AP+AT+AX+BB+BF+BJ
+8.	Capped penalties = Penalties capped from 2018 until 2024 Nov
+9.	Penalties**: 5.5% monthly interest for late payments (balance brought forward + current month contribution x 5.5%). Penalty for late payment in the next month is amount      due + current month contribution x 5.5%)
+10.	Total fund contributions = all contribution made by members.
+

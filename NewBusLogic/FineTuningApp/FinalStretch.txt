@@ -1,0 +1,15 @@
+I am experiencing issues when running and testing the app in vercel.
+
+1. The app keeps refreshing randomly and loading back to the login page while I am logged in. It just logs me out. Please assist in resolving this.
+
+2. The items I wanted removed from the My Funds screen under financial summary are still appearing. I want you to remove Planned Contributions, Interest Earned and Interest Charged. Please remove those Items.
+
+3. Superuser Oratile, when I log in with that account, The dashboard data under Fund Overview is different from when I log in as lesego@plf.com. The data appearing under lesego is the correct data. Please make sure all users see the correct data.
+
+4. On the My Funds screen, Under Financial Summary, Outstanding Contributions is supposed to be = (Expected Contribution - Total Contribution). Please fix That.
+
+Some of these issues I thought I had resolved, but the keep coming back.
+
+Please fix them, then commit and push to GitHub. I have the app hosted on vercel, so when I push to GitHub it automatically updates on vercel. 
+
+Check if there are files where changes have been made that were supposed to be pushed to GitHub but have not been pushed, hence the issues seem to be the same.

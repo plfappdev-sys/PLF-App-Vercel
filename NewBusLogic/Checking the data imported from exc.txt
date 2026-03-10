@@ -1,0 +1,18 @@
+
+Checking the data imported from excel into database
+
+We need to check if all the data has been correctly imported.
+
+1. Please verify if all the data has been imported from all sheets correctly into the supabase database. 
+	"C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx"
+		All data in the sheets "2018-2019,2019-2020,2020-2021 and all until 2024-2025. All the data up to June 2025 should be imported.
+		Verify names and import the members data for all financial years starting at their join date ending at June 2025.
+		The contributions should be collected from all the financial years to get to the total contributions and balances.
+		Also take note of all sheets and store them in the database accordingly.
+
+2. Check that contributions and balances shown on the app screens includes data from all financial years included in the sheets.
+		Verify formulas.
+
+3. 	Please remember that total contributions = Column G on the excel document. That is All members Total contributions for all financial years should be the Total Fund 	contributions
+	
+		

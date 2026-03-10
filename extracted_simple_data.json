@@ -1,0 +1,946 @@
+{
+  "members": [
+    {
+      "excel_row": 2,
+      "member_name": "Babotshedi Malibe",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 4032.750477436997,
+        "balance_brought_forward": 4000.0,
+        "total_bank_charges": 0.0,
+        "share_value": -4032.750477436997,
+        "capped_penalties": 1405.4502320443753,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 3,
+      "member_name": "Belinda Kelly",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5646.016568471512,
+        "balance_brought_forward": 6200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5646.016568471512,
+        "capped_penalties": 2080.762246145,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 4,
+      "member_name": "Boitshoko Dire",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9385.86068859698,
+        "balance_brought_forward": 11300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9385.86068859698,
+        "capped_penalties": 3646.2582788328127,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 5,
+      "member_name": "Christopher Naude",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6819.300998314796,
+        "balance_brought_forward": 7800.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6819.300998314796,
+        "capped_penalties": 2571.8982564000003,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 6,
+      "member_name": "Collin Oliphant",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8945.87902740575,
+        "balance_brought_forward": 10700.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8945.87902740575,
+        "capped_penalties": 3462.0822749871877,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 7,
+      "member_name": "Daniel Moepeng",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 400.0,
+        "total_penalties": 5185.585120289826,
+        "balance_brought_forward": 6900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -3075.5851202898257,
+        "capped_penalties": 2225.371750631563,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 8,
+      "member_name": "Dikagisho Mokoma",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8579.227643079725,
+        "balance_brought_forward": 10200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8579.227643079725,
+        "capped_penalties": 3308.6022717825,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 9,
+      "member_name": "Doni Mosimanekgosi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5902.672537499731,
+        "balance_brought_forward": 6550.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5902.672537499731,
+        "capped_penalties": 2188.198248388281,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 10,
+      "member_name": "Dumisane Mtotoba",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 4436.067000195625,
+        "balance_brought_forward": 4550.0,
+        "total_bank_charges": 0.0,
+        "share_value": -4436.067000195625,
+        "capped_penalties": 1574.2782355695313,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 11,
+      "member_name": "Ekofo Lofembe",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5572.686291606306,
+        "balance_brought_forward": 6100.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5572.686291606306,
+        "capped_penalties": 2050.0662455040624,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 12,
+      "member_name": "Ephraim Mbulelo Zukane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8945.87902740575,
+        "balance_brought_forward": 10700.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8945.87902740575,
+        "capped_penalties": 3462.0822749871877,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 13,
+      "member_name": "Freddy Sonakile",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 600.0,
+        "total_penalties": -2274.770960482466,
+        "balance_brought_forward": -2900.0,
+        "total_bank_charges": 0.0,
+        "share_value": 4173.770960482466,
+        "capped_penalties": -1136.3977621803124,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 14,
+      "member_name": "Gaithitjwe Letlhaku",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -5400.0,
+        "total_penalties": 2554.8042578046625,
+        "balance_brought_forward": 3700.0,
+        "total_bank_charges": 0.0,
+        "share_value": 5674.1957421953375,
+        "capped_penalties": 1242.7249051215624,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 15,
+      "member_name": "Gasebakwe Mankuroane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -1200.0,
+        "total_penalties": 6117.386053689186,
+        "balance_brought_forward": 9100.0,
+        "total_bank_charges": 0.0,
+        "share_value": null,
+        "capped_penalties": 2737.5309551218747,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 16,
+      "member_name": "Gideon Diole",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5521.355097800664,
+        "balance_brought_forward": 6030.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5521.355097800664,
+        "capped_penalties": 2028.5790450554061,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 17,
+      "member_name": "Gosego Molale",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -50.0,
+        "total_penalties": 4374.572037429749,
+        "balance_brought_forward": 6200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -1789.822037429749,
+        "capped_penalties": 1796.025102238125,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 18,
+      "member_name": "Jeff Matlou",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -5200.0,
+        "total_penalties": -4699.640937462736,
+        "balance_brought_forward": -1800.0,
+        "total_bank_charges": 0.0,
+        "share_value": 12717.640937462736,
+        "capped_penalties": -1685.0893791153126,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 19,
+      "member_name": "Jonas Letlhaku",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 0.0,
+        "total_penalties": 2625.8861837244986,
+        "balance_brought_forward": 3050.0,
+        "total_bank_charges": 0.0,
+        "share_value": -93.88618372449855,
+        "capped_penalties": 1014.0925749848437,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 20,
+      "member_name": "Jonas Moeng",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8212.576258753697,
+        "balance_brought_forward": 9700.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8212.576258753697,
+        "capped_penalties": 3155.122268577813,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 21,
+      "member_name": "Julia Mtyela",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6452.64961398877,
+        "balance_brought_forward": 7300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6452.64961398877,
+        "capped_penalties": 2418.4182531953124,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 22,
+      "member_name": "Justice Mxolisi Tyobeka",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 1400.0,
+        "total_penalties": 1862.6519653254802,
+        "balance_brought_forward": 1800.0,
+        "total_bank_charges": 0.0,
+        "share_value": -807.6519653254802,
+        "capped_penalties": 730.1382179437501,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 23,
+      "member_name": "Kabelo Morubane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 879.5485722331687,
+        "balance_brought_forward": -300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -879.5485722331687,
+        "capped_penalties": 85.5222044840625,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 24,
+      "member_name": "Katlego Khotsholo",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 800.0,
+        "total_penalties": 7769.301406754947,
+        "balance_brought_forward": 10200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6081.301406754947,
+        "capped_penalties": 3113.719177875625,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 25,
+      "member_name": "Keatlaretse Poo",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 900.0,
+        "total_penalties": 7786.838861036583,
+        "balance_brought_forward": 10200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6204.338861036583,
+        "capped_penalties": 3113.887065375625,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 26,
+      "member_name": "Kebonemotse Lebotse",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8065.915705023286,
+        "balance_brought_forward": 9500.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8065.915705023286,
+        "capped_penalties": 3093.730267295937,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 27,
+      "member_name": "Kedibone Morokhu",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8029.250566590686,
+        "balance_brought_forward": 9450.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8029.250566590686,
+        "capped_penalties": 3078.3822669754686,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 28,
+      "member_name": "Kgomodile Loate",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8865.215722854024,
+        "balance_brought_forward": 10590.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8865.215722854024,
+        "capped_penalties": 3428.3166742821563,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 29,
+      "member_name": "Lebogang Mafora",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5646.016568471512,
+        "balance_brought_forward": 6200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5646.016568471512,
+        "capped_penalties": 2080.762246145,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 30,
+      "member_name": "Lekgowa Mahole",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -600.0,
+        "total_penalties": 7022.929198753696,
+        "balance_brought_forward": 9700.0,
+        "total_bank_charges": 0.0,
+        "share_value": -3857.9291987536963,
+        "capped_penalties": 3155.122268577813,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 31,
+      "member_name": "Lenyatso Shadi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6020.814946557265,
+        "balance_brought_forward": 6711.110000000001,
+        "total_bank_charges": 0.0,
+        "share_value": -6020.814946557265,
+        "capped_penalties": 2237.6525750208957,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 32,
+      "member_name": "Lesego Bokaba",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 2250.8247496125077,
+        "balance_brought_forward": 1570.0,
+        "total_bank_charges": 0.0,
+        "share_value": -2250.8247496125077,
+        "capped_penalties": 659.5374164695938,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 33,
+      "member_name": "Macbeth Masupha Sello",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6379.3193371235675,
+        "balance_brought_forward": 7200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6379.3193371235675,
+        "capped_penalties": 2387.7222525543752,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 34,
+      "member_name": "Matshediso Ellen Tyobeka",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -900.0,
+        "total_penalties": -1409.3438512041662,
+        "balance_brought_forward": -1400.0,
+        "total_bank_charges": 0.0,
+        "share_value": 4890.843851204167,
+        "capped_penalties": -518.5491121765625,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 35,
+      "member_name": "Matshidiso Maleshane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8432.567089349315,
+        "balance_brought_forward": 10000.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8432.567089349315,
+        "capped_penalties": 3247.2102705006246,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 36,
+      "member_name": "Michael Boitumelo Kenosi Suping",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 650.0,
+        "total_penalties": -4.327223873525418,
+        "balance_brought_forward": -10.0,
+        "total_bank_charges": 0.0,
+        "share_value": 1850.5772238735253,
+        "capped_penalties": -89.30275021971875,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 37,
+      "member_name": "Mmantsho lamone",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 3952.0871728852703,
+        "balance_brought_forward": 3890.0,
+        "total_bank_charges": 0.0,
+        "share_value": -3952.0871728852703,
+        "capped_penalties": 1371.6846313393437,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 38,
+      "member_name": "Mncedisi Sibiya",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9825.842349788212,
+        "balance_brought_forward": 11900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9825.842349788212,
+        "capped_penalties": 3830.4342826784377,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 39,
+      "member_name": "Mpho Pilane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6232.658783393154,
+        "balance_brought_forward": 7000.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6232.658783393154,
+        "capped_penalties": 2326.3302512725,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 40,
+      "member_name": "Mthobeli Keyizana",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 4054.749560496556,
+        "balance_brought_forward": 4030.0,
+        "total_bank_charges": 0.0,
+        "share_value": -4054.749560496556,
+        "capped_penalties": 1414.659032236656,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 41,
+      "member_name": "Naomi Mokhine",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2000.0,
+        "total_penalties": 3846.6826474387985,
+        "balance_brought_forward": 4050.0,
+        "total_bank_charges": 0.0,
+        "share_value": -3424.6826474387985,
+        "capped_penalties": 1420.798232364844,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 42,
+      "member_name": "Nicholas Molale",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 1400.0,
+        "total_penalties": -2774.2638502149416,
+        "balance_brought_forward": -4560.0,
+        "total_bank_charges": 0.0,
+        "share_value": 3829.2638502149416,
+        "capped_penalties": -1416.6401808284688,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 43,
+      "member_name": "Nomalizo Florence Sebanyoni",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -900.0,
+        "total_penalties": 6288.171570184494,
+        "balance_brought_forward": 9200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -2806.671570184494,
+        "capped_penalties": 2735.2269557628124,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 44,
+      "member_name": "Obakeng Kgosiemang",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9752.512072923008,
+        "balance_brought_forward": 11800.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9752.512072923008,
+        "capped_penalties": 3799.7382820374996,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 45,
+      "member_name": "Ookame Molale",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 650.0,
+        "total_penalties": -38.37209661616454,
+        "balance_brought_forward": -350.0,
+        "total_bank_charges": 0.0,
+        "share_value": 1884.6220966161645,
+        "capped_penalties": -151.838553845,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 46,
+      "member_name": "Patrick Mateane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8285.906535618902,
+        "balance_brought_forward": 9800.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8285.906535618902,
+        "capped_penalties": 3185.8182692187497,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 47,
+      "member_name": "Pauline Mogomotsi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 7919.255151292875,
+        "balance_brought_forward": 9300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -7919.255151292875,
+        "capped_penalties": 3032.3382660140624,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 48,
+      "member_name": "Poloko khabae",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8725.888196810134,
+        "balance_brought_forward": 10400.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8725.888196810134,
+        "capped_penalties": 3369.994273064375,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 49,
+      "member_name": "Refilwe Lentswe",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 7845.924874427672,
+        "balance_brought_forward": 9200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -7845.924874427672,
+        "capped_penalties": 3001.6422653731247,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 50,
+      "member_name": "Rosinah Letlhaku",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5059.37435354987,
+        "balance_brought_forward": 5400.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5059.37435354987,
+        "capped_penalties": 1835.1942410175002,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 51,
+      "member_name": "Simon Mamatlhodi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6819.300998314796,
+        "balance_brought_forward": 7800.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6819.300998314796,
+        "capped_penalties": 2571.8982564000003,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 52,
+      "member_name": "Sina Molale",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 1100.0,
+        "total_penalties": 1524.7485409822843,
+        "balance_brought_forward": 1650.0,
+        "total_bank_charges": 0.0,
+        "share_value": -153.24854098228434,
+        "capped_penalties": 448.6364669823438,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 53,
+      "member_name": "Sophy buthelezi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 7625.934043832054,
+        "balance_brought_forward": 8900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -7625.934043832054,
+        "capped_penalties": 2909.5542634503126,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 54,
+      "member_name": "Stella Dintoe",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9825.842349788212,
+        "balance_brought_forward": 11900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9825.842349788212,
+        "capped_penalties": 3830.4342826784377,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 55,
+      "member_name": "Tebogo Itshegetseng",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5646.016568471512,
+        "balance_brought_forward": 6200.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5646.016568471512,
+        "capped_penalties": 2080.762246145,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 56,
+      "member_name": "Thabo Moeti",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8872.548750540544,
+        "balance_brought_forward": 10600.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8872.548750540544,
+        "capped_penalties": 3431.3862743462496,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 57,
+      "member_name": "Thembi Moepeng",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 7185.952382640822,
+        "balance_brought_forward": 8300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -7185.952382640822,
+        "capped_penalties": 2725.378259604687,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 58,
+      "member_name": "Thenjiwe Shazi",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9972.502903518623,
+        "balance_brought_forward": 12100.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9972.502903518623,
+        "capped_penalties": 3891.8262839603126,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 59,
+      "member_name": "Theona Molokela",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 9092.53958113616,
+        "balance_brought_forward": 10900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -9092.53958113616,
+        "capped_penalties": 3523.474276269062,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 60,
+      "member_name": "Tlotlego Evodia Mankuroane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -1200.0,
+        "total_penalties": 3037.514425350565,
+        "balance_brought_forward": 4900.0,
+        "total_bank_charges": 0.0,
+        "share_value": 760.485574649435,
+        "capped_penalties": 1448.2989282025,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 61,
+      "member_name": "Tryphina Kelly",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 2492.814663267685,
+        "balance_brought_forward": 1900.0,
+        "total_bank_charges": 0.0,
+        "share_value": -2492.814663267685,
+        "capped_penalties": 760.8342185846875,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 62,
+      "member_name": "Tshepang Setlhogo",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 5719.346845336717,
+        "balance_brought_forward": 6300.0,
+        "total_bank_charges": 0.0,
+        "share_value": -5719.346845336717,
+        "capped_penalties": 2111.4582467859373,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 63,
+      "member_name": "Tsholofelo Maleshane",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8725.888196810134,
+        "balance_brought_forward": 10400.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8725.888196810134,
+        "capped_penalties": 3369.994273064375,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 64,
+      "member_name": "Tumelo Letlhaku",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 6929.296413612603,
+        "balance_brought_forward": 7950.0,
+        "total_bank_charges": 0.0,
+        "share_value": -6929.296413612603,
+        "capped_penalties": 2617.9422573614056,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 65,
+      "member_name": "Vhuthihi Makhado",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": -1200.0,
+        "total_penalties": 1136.8266664853297,
+        "balance_brought_forward": 2300.0,
+        "total_bank_charges": 0.0,
+        "share_value": 2661.17333351467,
+        "capped_penalties": 617.202911538125,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 66,
+      "member_name": "wellington galogakwe",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 8065.915705023286,
+        "balance_brought_forward": 9500.0,
+        "total_bank_charges": 0.0,
+        "share_value": -8065.915705023286,
+        "capped_penalties": 3093.730267295937,
+        "estimated_annual_contribution": 2400.0
+      }
+    },
+    {
+      "excel_row": 67,
+      "member_name": "Zandie Mancotywa",
+      "data": {
+        "expected_contribution": 2400.0,
+        "outstanding_contributions": 2400.0,
+        "total_penalties": 2346.1541095372745,
+        "balance_brought_forward": 1700.0,
+        "total_bank_charges": 0.0,
+        "share_value": -2346.1541095372745,
+        "capped_penalties": 699.4422173028125,
+        "estimated_annual_contribution": 2400.0
+      }
+    }
+  ],
+  "summary": {
+    "extraction_date": "2026-03-09T18:24:25.895808",
+    "excel_file": "NewBusLogic/Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx",
+    "sheet_name": "2024-2025",
+    "total_members_extracted": 66,
+    "columns_found": {
+      "expected_contribution": "Expected Contribution (Current Year)",
+      "outstanding_contributions": "Total outstanding contribution for 12 Months ",
+      "total_penalties": "Penalty July 2024- June 2025",
+      "balance_brought_forward": "Balance Brought Forward ",
+      "total_bank_charges": "Total Bank Charges @ 1,1%",
+      "share_value": "Share Value",
+      "capped_penalties": "Capped Penalties Current Financial Year",
+      "estimated_annual_contribution": "Estimated 12 Months Contribution (Jul 2024-June 2025)",
+      "name": "Member"
+    },
+    "columns_missing": []
+  }
+}

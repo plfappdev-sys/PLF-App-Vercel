@@ -1,0 +1,50 @@
+Check if the data on the app is the same as the excel file.
+
+This is the account for lesego@plf.com
+
+Membership Status
+Member Number	: M031
+Standing	: Good Standing
+
+Account Status	: Active
+
+Financial Summary
+Balance Due 			: R 6 220,825
+Expected Contribution		: R 16 600,00
+Total Contribution		: R 5 300,00
+Outstanding Amount		: R 6 220,825
+Outstanding Contributions	: R 2 400,00
+Penalties			: R 2 250,82
+Planned Contributions		: R 0,00
+
+I see some errors logged in as lesego@plf.com. 
+
+Total Contribution is supposed to be = "Column BL" in the 2024-2025 worksheet in the  excel document. Please fix it.
+Outstanding Contributions is supposed to be = Expected Contribution - Total Contribution.
+Penalties is supposted to be = "Column M" in the 2024-2025 worksheet in the  excel document. Please fix it.
+  
+Please verify if this data is imported from "C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx" into the database and is properly showing on My Funds Screen in the Financial Summary.
+
+Remove Planned Contribution from the Financial Summary on the My Fund Screen.
+
+Please also check why the account status is Good Standing. 
+
+Another discrepency i have noticed is that when I am logged in as oratile the superuser, The data Displayed is different from when i am logged in as lesego@plf.com
+
+Oratile Dashboard
+Fund Overview
+Total Members				: 66
+Total Fund Contributions		: R 924 648,98
+Total Outstanding Contributions		: R 924 648,98
+
+Lesego Dashboard		
+Fund Overview
+Total Members				: 66
+Total Fund Contributions		: R 242 440,00
+Total Outstanding Contributions		: R 331 594,61
+Please check what is causing this discrepency and resolve it. Why is it showing two different sets of Data. 
+
+Total Fund Contributions is supposed to be = (The sum of Total Contributions for all Members)
+Total Outstanding Contributions is supposed to be = (The sum of the Outstanding Contributions for all members)
+
+Please assist in resolving these issues.

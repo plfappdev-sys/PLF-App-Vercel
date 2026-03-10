@@ -1,0 +1,24 @@
+I need to make the following changes the app and what data gets displayed.
+
+In the Dashboard screen under Fund Overview I need to display the following
+
+Total members (It Displays correctly)
+
+Total Fund Contributions (Should display the actual contributions received from members. "Total Contribution for 12 Months", which is column G on the "C:\Projects\Test\September\V5\PLF-App-Clean\NewBusLogic\Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx". This is the document that I imported the data from into the supabase database. Use the data as at June 2025.)
+
+Show the Total Outstanding, Then below that breakdown
+Total Outstanding 
+Show	Total Outstanding Contributions = Total (Outstanding Contributions + Penalties) in the excel file data mentioned above
+		Outstanding Contributions = Column H
+		Penalties = Column L 			
+
+
+
+On statements, member should only view own statement.
+
+
+On My funds screen under financial summary Display the following
+
+Balance
+Expected Contribution
+Actual Contribution

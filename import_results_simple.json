@@ -1,0 +1,772 @@
+{
+  "import_date": "2026-03-09T18:22:04.379228",
+  "extraction_summary": {
+    "extraction_date": "2026-03-09T18:20:58.163209",
+    "excel_file": "NewBusLogic/Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx",
+    "sheet_name": "2024-2025",
+    "total_members_extracted": 66,
+    "columns_found": {
+      "expected_contribution": "Expected Contribution (Current Year)",
+      "outstanding_contributions": "Total outstanding contribution for 12 Months ",
+      "total_penalties": "Penalty July 2024- June 2025",
+      "balance_brought_forward": "Balance Brought Forward ",
+      "total_bank_charges": "Total Bank Charges @ 1,1%",
+      "share_value": "Share Value",
+      "capped_penalties": "Capped Penalties Current Financial Year",
+      "estimated_annual_contribution": "Estimated 12 Months Contribution (Jul 2024-June 2025)",
+      "name": "Member"
+    },
+    "columns_missing": []
+  },
+  "import_results": {
+    "total": 66,
+    "updated": 46,
+    "skipped": 20,
+    "failed": 0,
+    "details": [
+      {
+        "member_name": "Babotshedi Malibe",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Belinda Kelly",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Boitshoko Dire",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Christopher Naude",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Collin Oliphant",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Daniel Moepeng",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Dikagisho Mokoma",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Doni Mosimanekgosi",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Dumisane Mtotoba",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Ekofo Lofembe",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Ephraim Mbulelo Zukane",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Freddy Sonakile",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Gaithitjwe Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Gasebakwe Mankuroane",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Gideon Diole",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Gosego Molale",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Jeff Matlou",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Jonas Letlhaku",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Jonas Moeng",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Julia Mtyela",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Justice Mxolisi Tyobeka",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Kabelo Morubane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Katlego Khotsholo",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Keatlaretse Poo",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Kebonemotse Lebotse",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Kedibone Morokhu",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Kgomodile Loate",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Lebogang Mafora",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Lekgowa Mahole",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Lenyatso Shadi",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Lesego Bokaba",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Macbeth Masupha Sello",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Matshediso Ellen Tyobeka",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Matshidiso Maleshane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Michael Boitumelo Kenosi Suping",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Mmantsho lamone",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Mncedisi Sibiya",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Mpho Pilane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Mthobeli Keyizana",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Naomi Mokhine",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Nicholas Molale",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Nomalizo Florence Sebanyoni",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Obakeng Kgosiemang",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Ookame Molale",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Patrick Mateane",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Pauline Mogomotsi",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Poloko khabae",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Refilwe Lentswe",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Rosinah Letlhaku",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Simon Mamatlhodi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Sina Molale",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Sophy buthelezi",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Stella Dintoe",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Tebogo Itshegetseng",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Thabo Moeti",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Thembi Moepeng",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Thenjiwe Shazi",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Theona Molokela",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Tlotlego Evodia Mankuroane",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Tryphina Kelly",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Tshepang Setlhogo",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Tsholofelo Maleshane",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "Tumelo Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Vhuthihi Makhado",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      },
+      {
+        "member_name": "wellington galogakwe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_name": "Zandie Mancotywa",
+        "status": "updated",
+        "fields": [
+          "expected_contribution",
+          "outstanding_contributions",
+          "total_penalties",
+          "balance_brought_forward",
+          "total_bank_charges",
+          "share_value",
+          "capped_penalties",
+          "estimated_annual_contribution"
+        ]
+      }
+    ]
+  }
+}

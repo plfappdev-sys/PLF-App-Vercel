@@ -113,6 +113,9 @@ export interface Member {
     interestRate: number; // Member-specific interest rate
     // Expected contribution based on join date
     expectedContribution?: number;
+    // New fields imported from Excel
+    outstandingContributions?: number;
+    totalPenalties?: number;
   };
   contributionHistory: ContributionRecord[];
   loanHistory: LoanRecord[];

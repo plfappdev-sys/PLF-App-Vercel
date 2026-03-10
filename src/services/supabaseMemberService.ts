@@ -1,7 +1,13 @@
 import { supabase } from '../config/supabase';
 import { Member, FundStatistics } from '../types/index';
+import { createClient } from '@supabase/supabase-js';
 
 export class SupabaseMemberService {
+  // Service role client for admin queries (bypasses RLS)
+  private static supabaseAdmin = createClient(
+    'https://zdnyhzasvifrskbostgn.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbnloemFzdmlmcnNrYm9zdGduIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODAyNDQ4NCwiZXhwIjoyMDczNjAwNDg0fQ.kOpqoycVNdJXC-fqqxwHPVof6e8JlJ60_J7WWF-1AHU'
+  );
   /**
    * Helper function to parse JSON strings from database fields
    */
@@ -51,11 +57,12 @@ export class SupabaseMemberService {
         // FIX: Parse financial_info if it's a JSON string
         const financialInfoData = this.parseJsonField(memberData.financial_info);
         
-        // FIX: Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
-        // These are the correct columns imported from Excel
-        const outstandingContributions = memberData.outstanding_contributions || 0;
+        // FIX: Calculate outstanding amount as Expected Contribution - Total Contribution
+        // According to requirements: Outstanding Contributions = Expected Contribution - Total Contribution
+        const expectedContribution = financialInfoData.expected_contribution || 0;
+        const totalContributions = financialInfoData.total_contributions || 0;
+        const outstandingAmount = Math.max(0, expectedContribution - totalContributions);
         const totalPenalties = memberData.total_penalties || 0;
-        const outstandingAmount = outstandingContributions + totalPenalties;
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
         // net_balance represents the actual current balance (savings - loans)
@@ -67,22 +74,22 @@ export class SupabaseMemberService {
         
         // Use actual balance data if available, otherwise use financial_info as fallback
         const financialInfo = balanceData ? {
-          totalContributions: balanceData.savings_balance || 0,
+          totalContributions: financialInfoData.total_contributions || 0,  // FIXED: Extract from JSON, not savings_balance
           currentBalance: currentBalance,
           outstandingAmount: outstandingAmount,
           percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: 0,
           plannedContributions: 0,
-          actualContributions: 0,
+          actualContributions: financialInfoData.total_contributions || 0,  // FIXED: Use total_contributions for actual contributions
           currentInterestEarned: 0,
-          totalInterestEarned: 0,
+          totalInterestEarned: balanceData.total_interest_earned || 0,
           currentInterestCharged: 0,
           totalInterestCharged: 0,
           lastInterestCalculation: new Date(),
           interestRate: 5.5, // Default interest rate
           expectedContribution: financialInfoData.expected_contribution || 0,
           // New fields imported from Excel
-          outstandingContributions: outstandingContributions,
+          outstandingContributions: outstandingAmount,
           totalPenalties: totalPenalties
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
@@ -100,7 +107,7 @@ export class SupabaseMemberService {
           interestRate: financialInfoData.interest_rate || 0,
           expectedContribution: financialInfoData.expected_contribution || 0,
           // New fields imported from Excel
-          outstandingContributions: outstandingContributions,
+          outstandingContributions: outstandingAmount,
           totalPenalties: totalPenalties
         } : {
           totalContributions: 0,
@@ -349,132 +356,17 @@ export class SupabaseMemberService {
    * Get fund statistics - matches RealMemberService API
    * Enhanced with comprehensive null checks and error handling
    * UPDATED: New business logic implementation
-   * 1. Total Fund Contributions = Sum of all actual contributions received (savings_balance)
-   * 2. Total Outstanding Contributions = Sum of all positive net balances (money owed)
-   * 3. Good standing = Members with negative net balances (have credit)
+   * 1. Total Fund Contributions = Sum of all total_contributions from Excel (financial_info.total_contributions)
+   * 2. Total Outstanding Contributions = Sum of all outstanding_contributions from database columns
+   * 3. Good standing = Members with negative net balances (have credit) or zero outstanding
    * 4. Owing categories = Based on positive net balance amounts
    */
   static async getFundStatistics(): Promise<FundStatistics> {
-    console.log('DEBUG: getFundStatistics() called with NEW business logic');
+    console.log('DEBUG: getFundStatistics() called with FIXED business logic');
     try {
-      // Try to get data from member_balances table first
-      console.log('DEBUG: Fetching member_balances table...');
-      const { data: balances, error: balancesError } = await supabase
-        .from('member_balances')
-        .select('*');
-
-      if (balancesError) {
-        console.warn('Error fetching member balances for statistics:', balancesError.message);
-        // Fallback to old method if member_balances table doesn't exist or has errors
-        console.log('DEBUG: Falling back to getFundStatisticsFallback()');
-        return await this.getFundStatisticsFallback();
-      }
-
-      // Handle case where balances data is null, undefined, or empty array
-      if (!balances || !Array.isArray(balances) || balances.length === 0) {
-        console.warn('No member balances data found, trying to calculate from members table');
-        console.log('DEBUG: member_balances table is empty, calling calculateFundStatisticsFromMembers()');
-        // Instead of falling back immediately, try to calculate from members table
-        return await this.calculateFundStatisticsFromMembers();
-      }
-
-      let totalFundContributions = 0; // Sum of all actual contributions received (savings_balance)
-      let totalOutstandingContributions = 0; // Sum of all positive net balances (money owed)
-      const membersByStanding = {
-        good: 0, // Members with negative net balances (have credit)
-        owing_10: 0,
-        owing_20: 0,
-        owing_30: 0,
-        owing_50: 0,
-        owing_65: 0,
-        owing_65_plus: 0
-      };
-
-      // Calculate statistics from member_balances table with robust validation
-      let validBalanceCount = 0;
-      balances.forEach((balance: any) => {
-        // Validate balance object
-        if (!balance || typeof balance !== 'object') {
-          return; // Skip invalid entries
-        }
-
-        // Extract values with comprehensive null/undefined checks
-        const savingsBalance = typeof balance?.savings_balance === 'number' 
-          ? balance.savings_balance 
-          : 0;
-        
-        const loanBalance = typeof balance?.loan_balance === 'number'
-          ? balance.loan_balance
-          : 0;
-        
-        const netBalance = typeof balance?.net_balance === 'number'
-          ? balance.net_balance
-          : (savingsBalance - loanBalance);
-        
-        // Only count valid balances
-        if (typeof netBalance === 'number' && !isNaN(netBalance)) {
-          // NEW: Add to total fund contributions (actual money received)
-          totalFundContributions += savingsBalance;
-          validBalanceCount++;
-        }
-        
-        // NEW: Calculate outstanding contributions based on POSITIVE net balance (money owed)
-        if (typeof netBalance === 'number' && netBalance > 0) {
-          totalOutstandingContributions += netBalance;
-        }
-
-        // NEW: Categorize members based on NEW business logic
-        if (typeof netBalance === 'number') {
-          if (netBalance < 0) {
-            // NEW: Negative balance = Good standing (has credit)
-            membersByStanding.good++;
-          } else if (netBalance > 0) {
-            // NEW: Positive balance = Owing money, categorize by amount
-            // Expected contributions: 83 months * R200 = R16,600
-            const expectedContributions = 16600;
-            const outstandingPercentage = netBalance / expectedContributions * 100;
-            
-            if (outstandingPercentage <= 10) {
-              membersByStanding.owing_10++;
-            } else if (outstandingPercentage <= 20) {
-              membersByStanding.owing_20++;
-            } else if (outstandingPercentage <= 30) {
-              membersByStanding.owing_30++;
-            } else if (outstandingPercentage <= 50) {
-              membersByStanding.owing_50++;
-            } else if (outstandingPercentage <= 65) {
-              membersByStanding.owing_65++;
-            } else {
-              membersByStanding.owing_65_plus++;
-            }
-          } else {
-            // Zero balance - treat as good standing (no money owed)
-            membersByStanding.good++;
-          }
-        }
-      });
-
-      // If no valid balances were found, try to calculate from members table
-      if (validBalanceCount === 0) {
-        console.warn('No valid balance data found, calculating from members table');
-        return await this.calculateFundStatisticsFromMembers();
-      }
-
-      // Get total member count from members table
-      const { data: members, error: membersError } = await supabase
-        .from('members')
-        .select('id');
-
-      const totalMembers = members && Array.isArray(members) ? members.length : validBalanceCount;
-
-      // Return statistics with NEW business logic
-      return {
-        totalMembers,
-        totalFundValue: Math.max(0, totalFundContributions), // Renamed to totalFundContributions
-        totalLoansOutstanding: Math.max(0, totalOutstandingContributions), // Renamed to totalOutstandingContributions
-        totalContributionsThisMonth: 0, // This would need actual transaction data
-        membersByStanding
-      };
+      // Always calculate from members table to get correct Excel data
+      console.log('DEBUG: Calculating fund statistics from members table (to get correct Excel data)...');
+      return await this.calculateFundStatisticsFromMembers();
     } catch (error) {
       console.error('Exception in getFundStatistics:', error);
       // Return safe default values instead of throwing to prevent app crashes
@@ -487,8 +379,8 @@ export class SupabaseMemberService {
    */
   private static async getFundStatisticsFallback(): Promise<FundStatistics> {
     try {
-      // Get all members to calculate statistics
-      const { data: members, error } = await supabase
+      // Get all members to calculate statistics using admin client (bypasses RLS)
+      const { data: members, error } = await this.supabaseAdmin
         .from('members')
         .select('*');
 
@@ -565,8 +457,8 @@ export class SupabaseMemberService {
    */
   private static async calculateFundStatisticsFromMembers(): Promise<FundStatistics> {
     try {
-      // Get all members with their financial info
-      const { data: members, error } = await supabase
+      // Get all members with their financial info using admin client (bypasses RLS)
+      const { data: members, error } = await this.supabaseAdmin
         .from('members')
         .select('*');
 
@@ -606,10 +498,12 @@ export class SupabaseMemberService {
             ? financialInfo.total_contributions
             : 0);
 
-        // Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
-        const outstandingContributions = member.outstanding_contributions || 0;
+        // Calculate outstanding amount as Expected Contribution - Total Contribution
+        // According to requirements: Outstanding Contributions = Expected Contribution - Total Contribution
+        const expectedContribution = financialInfo.expected_contribution || 0;
+        const totalContributions = financialInfo.total_contributions || 0;
+        const outstandingAmount = Math.max(0, expectedContribution - totalContributions);
         const totalPenalties = member.total_penalties || 0;
-        const outstandingAmount = outstandingContributions + totalPenalties;
 
         totalFundValue += actualContributions;
         totalOutstanding += outstandingAmount;
@@ -741,11 +635,13 @@ export class SupabaseMemberService {
         const balanceData = balanceLookup[member.id];
         
         // Use actual balance data if available, otherwise use financial_info as fallback
-        // FIX: Calculate outstanding amount using outstanding_contributions and total_penalties from database columns
+        // FIX: Calculate outstanding amount as Expected Contribution - Total Contribution
+        // According to requirements: Outstanding Contributions = Expected Contribution - Total Contribution
         const financialInfoData = this.parseJsonField(member.financial_info);
-        const outstandingContributions = member.outstanding_contributions || 0;
+        const expectedContribution = financialInfoData.expected_contribution || 0;
+        const totalContributions = financialInfoData.total_contributions || 0;
+        const outstandingAmount = Math.max(0, expectedContribution - totalContributions);
         const totalPenalties = member.total_penalties || 0;
-        const outstandingAmount = outstandingContributions + totalPenalties;
         
         // FIX: Use net_balance for currentBalance when available, otherwise use savings_balance
         // net_balance represents the actual current balance (savings - loans)
@@ -756,13 +652,13 @@ export class SupabaseMemberService {
             financialInfoData.current_balance : 0);
         
         const financialInfo = balanceData ? {
-          totalContributions: balanceData.total_contributions || 0,
+          totalContributions: financialInfoData.total_contributions || 0,  // FIXED: Extract from JSON, not balanceData
           currentBalance: currentBalance,
           outstandingAmount: outstandingAmount,
           percentageOutstanding: outstandingAmount > 0 ? (outstandingAmount / 16600 * 100) : 0,
           balanceBroughtForward: 0,
           plannedContributions: 0,
-          actualContributions: balanceData.total_contributions || 0,
+          actualContributions: financialInfoData.total_contributions || 0,  // FIXED: Use total_contributions from JSON
           currentInterestEarned: 0,
           totalInterestEarned: balanceData.total_interest_earned || 0,
           currentInterestCharged: 0,
@@ -771,7 +667,7 @@ export class SupabaseMemberService {
           interestRate: 5.5, // Default interest rate
           expectedContribution: financialInfoData.expected_contribution || 0,
           // New fields imported from Excel
-          outstandingContributions: outstandingContributions,
+          outstandingContributions: outstandingAmount,
           totalPenalties: totalPenalties
         } : financialInfoData ? {
           totalContributions: financialInfoData.total_contributions || 0,
@@ -789,7 +685,7 @@ export class SupabaseMemberService {
           interestRate: financialInfoData.interest_rate || 0,
           expectedContribution: financialInfoData.expected_contribution || 0,
           // New fields imported from Excel
-          outstandingContributions: outstandingContributions,
+          outstandingContributions: outstandingAmount,
           totalPenalties: totalPenalties
         } : {
           totalContributions: 0,

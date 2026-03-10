@@ -1,0 +1,185 @@
+# Data Verification Issues Resolution Plan
+## Created: March 9, 2026
+## Based on DataVerificationCheck.txt analysis
+
+## ISSUES IDENTIFIED
+
+### 1. DATA DISCREPANCY BETWEEN APP AND EXCEL
+**Issue**: Lesego Bokaba (M031) data shown in app doesn't match Excel data
+**App Data**:
+- Balance Due: R 6,220.825
+- Expected Contribution: R 16,600.00
+- Total Contribution: R 5,300.00
+- Outstanding Amount: R 6,220.825
+- Outstanding Contributions: R 0.00
+- Penalties: R 0.00
+
+**Excel Data**: Need to verify against "Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx"
+
+### 2. OUTSTANDING CONTRIBUTIONS AND PENALTIES SHOWING R 0.00
+**Issue**: These fields should have values but are showing zero
+**Root Cause Analysis Needed**:
+- Check if data is properly imported from Excel
+- Verify database columns exist and have correct data
+- Check calculation logic in supabaseMemberService
+
+### 3. REMOVE UNWANTED FIELDS FROM FINANCIAL SUMMARY
+**Issue**: Need to remove "Planned Contributions", "Interest Earned", and "Interest Charged" from My Funds Screen
+**Current State**: These fields are still displayed (positions 7-9 in test output)
+
+### 4. ACCOUNT STATUS SHOWING "GOOD STANDING" INCORRECTLY
+**Issue**: Account shows "Good Standing" when there's a balance due of R 6,220.825
+**Root Cause**: Standing calculation logic may be incorrect
+
+### 5. DASHBOARD DISCREPANCY BETWEEN USERS
+**Issue**: Different fund contribution values shown for Oratile (superuser) vs Lesego (member)
+**Oratile Dashboard**:
+- Total Fund Contributions: R 924,648.98
+- Total Outstanding Contributions: R 924,648.98
+
+**Lesego Dashboard**:
+- Total Fund Contributions: R 242,440.00
+- Total Outstanding Contributions: R 924,648.957
+
+**Discrepancy**: Total Fund Contributions differ (R 924,648.98 vs R 242,440.00)
+
+## STEP-BY-STEP RESOLUTION PLAN
+
+### PHASE 1: DATA VERIFICATION AND VALIDATION (DAY 1)
+
+#### Step 1.1: Verify Excel Data for Lesego Bokaba (M031)
+- [ ] Locate Excel file: "Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx"
+- [ ] Extract Lesego Bokaba (M031) data from Excel
+- [ ] Compare with app data to identify discrepancies
+- [ ] Document exact Excel values for validation
+
+#### Step 1.2: Check Database Schema and Data
+- [ ] Verify `members` table structure for M031
+- [ ] Check columns: `outstanding_contributions`, `total_penalties`, `catch_up_fee`
+- [ ] Verify data import from Excel was successful
+- [ ] Check `member_balances` table for M031
+
+#### Step 1.3: Analyze supabaseMemberService Logic
+- [ ] Review `getMemberByNumber()` method for M031
+- [ ] Check how `outstandingContributions` and `totalPenalties` are calculated
+- [ ] Verify data mapping from database to frontend
+
+### PHASE 2: FIX DATA DISCREPANCIES (DAY 1-2)
+
+#### Step 2.1: Fix Outstanding Contributions and Penalties
+- [ ] Identify why `outstanding_contributions` and `total_penalties` are zero
+- [ ] Update database with correct values from Excel
+- [ ] Test that values display correctly in app
+
+#### Step 2.2: Fix Standing Calculation Logic
+- [ ] Review standing calculation in `supabaseMemberService.getAllMembers()`
+- [ ] Fix logic: Positive balance should NOT show "Good Standing"
+- [ ] Update standing category based on outstanding percentage
+
+#### Step 2.3: Remove Unwanted Fields from My Funds Screen
+- [ ] Remove "Planned Contributions" from MyFundsScreen.tsx
+- [ ] Remove "Interest Earned" from MyFundsScreen.tsx  
+- [ ] Remove "Interest Charged" from MyFundsScreen.tsx
+- [ ] Update test to verify only 6 required fields remain
+
+### PHASE 3: FIX DASHBOARD DISCREPANCY (DAY 2)
+
+#### Step 3.1: Analyze Dashboard Discrepancy
+- [ ] Review `SupabaseMemberService.getFundStatistics()` method
+- [ ] Check why different values shown for superuser vs member
+- [ ] Investigate RLS (Row Level Security) policies
+- [ ] Check if different calculation methods are used
+
+#### Step 3.2: Fix Fund Statistics Calculation
+- [ ] Ensure consistent calculation for all user roles
+- [ ] Fix `calculateFundStatisticsFromMembers()` method if needed
+- [ ] Verify calculations match Excel totals
+
+#### Step 3.3: Test Dashboard Consistency
+- [ ] Test with Oratile (superuser) account
+- [ ] Test with Lesego (member) account
+- [ ] Verify both show same fund statistics
+
+### PHASE 4: COMPREHENSIVE TESTING AND VALIDATION (DAY 2)
+
+#### Step 4.1: Test All Fixes
+- [ ] Test My Funds Screen shows correct 6 fields
+- [ ] Test Outstanding Contributions and Penalties show correct values
+- [ ] Test Standing shows correct category (not "Good Standing" when owing)
+- [ ] Test Dashboard shows consistent values for all users
+
+#### Step 4.2: Data Validation Against Excel
+- [ ] Verify all member data matches Excel
+- [ ] Check calculations for accuracy
+- [ ] Document any remaining discrepancies
+
+#### Step 4.3: Update Documentation
+- [ ] Update TryingNewLogicForPLF.txt with progress
+- [ ] Update NewBusinessLogicImplementationNotes.txt with fixes
+- [ ] Create summary of issues resolved
+
+## TECHNICAL INVESTIGATION REQUIRED
+
+### 1. Database Schema Check
+Need to verify these columns exist in `members` table:
+- `outstanding_contributions` (decimal/numeric)
+- `total_penalties` (decimal/numeric) 
+- `catch_up_fee` (decimal/numeric)
+- `name` (text)
+- `member_number` (text)
+
+### 2. Data Import Verification
+Check if Excel data was properly imported:
+- Total contributions per member
+- Outstanding amounts
+- Penalty calculations
+- Catch-up fees
+
+### 3. Calculation Logic Review
+Review key methods in `supabaseMemberService.ts`:
+- `getMemberByNumber()` - member data retrieval
+- `getFundStatistics()` - dashboard calculations  
+- `calculateFundStatisticsFromMembers()` - fallback calculation
+- Standing category determination logic
+
+### 4. RLS Policy Impact
+Check if RLS policies affect data visibility:
+- Superuser may see all data
+- Member may only see their own data
+- This could explain dashboard discrepancy
+
+## RISK MITIGATION
+
+### Data Safety
+- Backup database before making changes
+- Test changes in development environment first
+- Have rollback plan for each change
+
+### Testing Strategy
+- Test each fix independently
+- Verify no regression in existing functionality
+- Test with multiple user roles
+
+### Communication
+- Document all changes made
+- Update implementation notes
+- Notify stakeholders of progress
+
+## SUCCESS CRITERIA
+
+1. ✅ My Funds Screen shows only 6 required fields (no Planned Contributions, Interest Earned, Interest Charged)
+2. ✅ Outstanding Contributions and Penalties show correct non-zero values for M031
+3. ✅ Standing shows correct category (not "Good Standing" when balance is due)
+4. ✅ Dashboard shows consistent fund statistics for all user roles
+5. ✅ All data matches Excel spreadsheet values
+
+## ESTIMATED TIMELINE
+- **Phase 1**: 4-6 hours (Day 1)
+- **Phase 2**: 4-6 hours (Day 1-2)
+- **Phase 3**: 3-4 hours (Day 2)
+- **Phase 4**: 2-3 hours (Day 2)
+
+**Total**: 13-19 hours over 2 days
+
+## NEXT IMMEDIATE ACTION
+Begin with Phase 1, Step 1.1: Verify Excel data for Lesego Bokaba (M031)

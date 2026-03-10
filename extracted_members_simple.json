@@ -1,0 +1,697 @@
+{
+  "BabotshediMalibe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 0
+  },
+  "BelindaKelly": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 1
+  },
+  "boitshokodire": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 2
+  },
+  "BoitshokoSelekanyane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 3
+  },
+  "BoitumeloMarumo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 4
+  },
+  "ChristopherNaude": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 5
+  },
+  "CollenZolileMbengo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 6
+  },
+  "CollinOliphant": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 7
+  },
+  "danielmoepeng": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 8
+  },
+  "DikagishoMokoma": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 9
+  },
+  "DoniMosimanekgosi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 10
+  },
+  "DumisaneMtotoba": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 11
+  },
+  "EkofoLofembe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 12
+  },
+  "ElizabethNakuphiThabeng": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 13
+  },
+  "EphraimMbuleloZukane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 14
+  },
+  "EuvodiaMothibi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 15
+  },
+  "FreddySonakile": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 16
+  },
+  "GaithitjweLetlhaku": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 17
+  },
+  "GasebakweMankuroane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 18
+  },
+  "GideonDiole": {
+    "name": "86.0",
+    "sheet": "Recon",
+    "row": 19
+  },
+  "GladnessMokgosi": {
+    "name": "5130.0",
+    "sheet": "Recon",
+    "row": 20
+  },
+  "GosegoMolale": {
+    "name": "4330.0",
+    "sheet": "Recon",
+    "row": 21
+  },
+  "JafthaNkashe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 22
+  },
+  "JeffMatlou": {
+    "name": "12100.0",
+    "sheet": "Recon",
+    "row": 23
+  },
+  "jonasletlhaku": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 24
+  },
+  "jonasMoeng": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 25
+  },
+  "JosephSekgalo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 26
+  },
+  "josiahgaotlhaolweMontwedi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 27
+  },
+  "JuliaMtyela": {
+    "name": "Bank Statement",
+    "sheet": "Recon",
+    "row": 28
+  },
+  "JusticeMxolisiTyobeka": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 29
+  },
+  "KabeloMorubane": {
+    "name": "60.0",
+    "sheet": "Recon",
+    "row": 30
+  },
+  "KagisoIsaacPhetoe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 31
+  },
+  "KagisoMokaila": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 32
+  },
+  "KatlegoKhotsholo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 33
+  },
+  "KeatlaretsePoo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 34
+  },
+  "KebonemotseLebotse": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 35
+  },
+  "KediboneMorokhu": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 36
+  },
+  "KegomoditsweKgosimore": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 37
+  },
+  "KgomodileLoate": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 38
+  },
+  "LebogangMafora": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 39
+  },
+  "LekgowaMahole": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 40
+  },
+  "LenyatsoShadi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 41
+  },
+  "LesegoBokaba": {
+    "name": "12000.0",
+    "sheet": "Recon",
+    "row": 42
+  },
+  "MacbethMasuphaSello": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 43
+  },
+  "MatshedisoEllenTyobeka": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 44
+  },
+  "MatshidisoMaleshane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 45
+  },
+  "MichaelBoitumeloKenosiSuping": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 46
+  },
+  "mmantsholamone": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 47
+  },
+  "mmapakokgagane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 48
+  },
+  "MncedisiSibiya": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 49
+  },
+  "Monacofransmakwaeba": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 50
+  },
+  "MphoPilane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 51
+  },
+  "MthobeliKeyizana": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 52
+  },
+  "NaomiMokhine": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 53
+  },
+  "NicholasMolale": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 54
+  },
+  "NomalizoFlorenceSebanyoni": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 55
+  },
+  "ObakengKgosiemang": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 56
+  },
+  "OntiretseMolefe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 57
+  },
+  "OokameMolale": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 58
+  },
+  "OratileBelicentLetlhogile": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 59
+  },
+  "PatrickMateane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 60
+  },
+  "PaulineMogomotsi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 61
+  },
+  "PHILLIOTHABISOMTYELA": {
+    "name": "Bank Statement",
+    "sheet": "Recon",
+    "row": 62
+  },
+  "PhineasMphoKgajane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 63
+  },
+  "Polokokhabae": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 64
+  },
+  "RefilweLentswe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 65
+  },
+  "RosinahLetlhaku": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 66
+  },
+  "SimonMamatlhodi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 67
+  },
+  "SinaMolale": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 68
+  },
+  "sophybuthelezi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 69
+  },
+  "StellaDintoe": {
+    "name": "Bank Statement",
+    "sheet": "Recon",
+    "row": 70
+  },
+  "SylviaMokhadi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 71
+  },
+  "TabaneMatshego": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 72
+  },
+  "TebogoItshegetseng": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 73
+  },
+  "ThaboMoeti": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 74
+  },
+  "ThapeloCorneliusMoseki": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 75
+  },
+  "ThembiMoepeng": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 76
+  },
+  "ThenjiweShazi": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 77
+  },
+  "TheonaMolokela": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 78
+  },
+  "TlotlegoEvodiaMankuroane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 79
+  },
+  "TryphinaKelly": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 80
+  },
+  "TshepangSetlhogo": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 81
+  },
+  "TsholofeloMaleshane": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 82
+  },
+  "TumeloLetlhaku": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 83
+  },
+  "VhuthihiMakhado": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 84
+  },
+  "VioletMolefe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 85
+  },
+  "wellingtongalogakwe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 86
+  },
+  "winnieGaaratwe": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 87
+  },
+  "ZandieMancotywa": {
+    "name": "",
+    "sheet": "Recon",
+    "row": 88
+  },
+  "BoitshokoDire": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 2
+  },
+  "DanielMoepeng": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 8
+  },
+  "JonasLetlhaku": {
+    "name": "5930.0",
+    "sheet": " 2018-2019",
+    "row": 24
+  },
+  "JonasMoeng": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 25
+  },
+  "JosiahGaotlhaolweMontwedi": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 27
+  },
+  "Mmantsholamone": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 47
+  },
+  "Mmapakokgagane": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 48
+  },
+  "Sophybuthelezi": {
+    "name": "",
+    "sheet": " 2018-2019",
+    "row": 69
+  },
+  "WinnieGaaratwe": {
+    "name": "81.0",
+    "sheet": "2022-2023",
+    "row": 87
+  },
+  "AVG": {
+    "name": "",
+    "sheet": "2022-2023",
+    "row": 91
+  },
+  "Numberofmemberscontributed202021": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 0
+  },
+  "Numberofmemberscontributed202122": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 1
+  },
+  "Numberofmemberscontributed202223": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 2
+  },
+  "Numberofmemberscontributed202324": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 3
+  },
+  "Totalcontributions": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 5
+  },
+  "Totalcontributions201920": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 6
+  },
+  "Totalcontributions202021": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 7
+  },
+  "Totalcontributions202122": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 8
+  },
+  "Totalcontributions202223": {
+    "name": "Greater than 50%",
+    "sheet": "Dashboard",
+    "row": 9
+  },
+  "TotalPenaltycharged": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 12
+  },
+  "Totalpenalty201920": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 13
+  },
+  "Totalpenalty202021": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 14
+  },
+  "Totalpenalty202122": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 15
+  },
+  "Totalpenalty202223": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 16
+  },
+  "TotalpenaltyCapped": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 28
+  },
+  "Totalpenaltydue202223": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 29
+  },
+  "Avemonthlycontribution201819": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 44
+  },
+  "Avemonthlycontribution201920": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 45
+  },
+  "Avemonthlycontribution202021": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 46
+  },
+  "Avemonthlycontribution202122": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 47
+  },
+  "Avemonthlycontribution202223": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 48
+  },
+  "Avemonthlycontribution202324": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 49
+  },
+  "MembershipStatus": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 51
+  },
+  "Membersingoodstanding": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 52
+  },
+  "Badpayers": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 53
+  },
+  "MonthlyContribution20232024": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 55
+  },
+  "Month": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 56
+  },
+  "July": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 57
+  },
+  "Aug": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 58
+  },
+  "Sep": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 59
+  },
+  "Oct": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 60
+  },
+  "Nov": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 61
+  },
+  "Dec": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 62
+  },
+  "Jan": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 63
+  },
+  "Feb": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 64
+  },
+  "Mar": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 65
+  },
+  "April": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 66
+  },
+  "May": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 67
+  },
+  "Jun": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 68
+  },
+  "Baddebts": {
+    "name": "",
+    "sheet": "Dashboard",
+    "row": 72
+  }
+}

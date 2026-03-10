@@ -1,0 +1,363 @@
+{
+  "import_date": "2026-03-09T17:10:09.709656",
+  "extraction_summary": {
+    "extraction_date": "2026-03-09T17:09:39.059902",
+    "excel_file": "NewBusLogic/Peoples Liberator Fund Contributions 30 June 2025 26-2-16 FINAL.xlsx",
+    "sheet_name": "2024-2025",
+    "total_members_extracted": 66,
+    "columns_found": {
+      "expected_contribution": "Expected Contribution (Current Year)",
+      "outstanding_contributions": "Total outstanding contribution for 12 Months ",
+      "total_penalties": "Penalty July 2024- June 2025",
+      "current_balance": "Closing Balance",
+      "total_bank_charges": "Total Bank Charges @ 1,1%",
+      "share_value": "Share Value",
+      "capped_penalties": "Capped Penalties Current Financial Year",
+      "estimated_annual_contribution": "Estimated 12 Months Contribution (Jul 2024-June 2025)",
+      "total_contributions": "Total Contribution for 12 Months",
+      "member_number": "Member"
+    },
+    "columns_missing": [
+      "balance_brought_forward",
+      "catch_up_fee"
+    ]
+  },
+  "import_results": {
+    "total": 66,
+    "updated": 0,
+    "skipped": 66,
+    "failed": 0,
+    "details": [
+      {
+        "member_number": "Babotshedi Malibe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Belinda  Kelly",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Boitshoko Dire",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Christopher Naude",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Collin Oliphant",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Daniel Moepeng",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Dikagisho  Mokoma",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Doni Mosimanekgosi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Dumisane  Mtotoba",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Ekofo Lofembe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Ephraim Mbulelo Zukane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Freddy  Sonakile",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Gaithitjwe   Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Gasebakwe Mankuroane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Gideon Diole",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Gosego Molale",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Jeff Matlou",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Jonas Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Jonas Moeng",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Julia  Mtyela",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Justice Mxolisi Tyobeka",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Kabelo  Morubane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Katlego  Khotsholo",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Keatlaretse Poo",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Kebonemotse Lebotse",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Kedibone  Morokhu",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Kgomodile Loate",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Lebogang Mafora",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Lekgowa  Mahole",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Lenyatso Shadi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Lesego Bokaba",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Macbeth Masupha Sello",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Matshediso Ellen Tyobeka",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Matshidiso  Maleshane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Michael Boitumelo Kenosi Suping",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Mmantsho lamone",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Mncedisi Sibiya",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Mpho  Pilane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Mthobeli Keyizana",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Naomi  Mokhine",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Nicholas  Molale",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Nomalizo Florence Sebanyoni",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Obakeng Kgosiemang",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Ookame Molale",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Patrick Mateane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Pauline Mogomotsi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Poloko  khabae",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Refilwe Lentswe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Rosinah Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Simon  Mamatlhodi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Sina Molale",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Sophy buthelezi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Stella Dintoe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tebogo Itshegetseng",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Thabo Moeti",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Thembi Moepeng",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Thenjiwe Shazi",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Theona Molokela",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tlotlego Evodia Mankuroane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tryphina  Kelly",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tshepang  Setlhogo",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tsholofelo Maleshane",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Tumelo  Letlhaku",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Vhuthihi Makhado",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "wellington  galogakwe",
+        "status": "skipped",
+        "reason": "not_found"
+      },
+      {
+        "member_number": "Zandie Mancotywa",
+        "status": "skipped",
+        "reason": "not_found"
+      }
+    ]
+  }
+}

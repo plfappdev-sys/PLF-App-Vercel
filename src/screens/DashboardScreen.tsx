@@ -274,10 +274,6 @@ const DashboardScreen: React.FC = () => {
                       {formatCurrency(memberData.financialInfo.outstandingAmount)}
                     </Text>
                   </View>
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Planned Contributions:</Text>
-                    <Text style={styles.statValue}>{formatCurrency(memberData.financialInfo.plannedContributions)}</Text>
-                  </View>
                 </>
               )}
             </Card.Content>
