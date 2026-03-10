@@ -145,32 +145,30 @@ export class SupabaseMemberService {
         const loanHistory = this.parseJsonField(memberData.loan_history) || [];
         const interestHistory = this.parseJsonField(memberData.interest_history) || [];
 
-        // Determine membership status based on net balance - NEW BUSINESS LOGIC (same as getAllMembers)
+        // Determine membership status based on OUTSTANDING CONTRIBUTIONS - FIXED BUSINESS LOGIC
+        // According to requirements: Membership status should be based on outstanding contributions percentage
+        // Outstanding Contributions = Expected Contribution - Total Contribution
+        // Outstanding Percentage = (Outstanding Amount / Expected Contribution) * 100
         let standingCategory = 'good';
-        if (balanceData && typeof balanceData.net_balance === 'number') {
-          if (balanceData.net_balance > 0) {
-            // Positive balance = member owes money, calculate outstanding percentage
-            const outstandingPercentage = balanceData.net_balance / 16600 * 100;
-            if (outstandingPercentage <= 10) {
-              standingCategory = 'owing_10';
-            } else if (outstandingPercentage <= 20) {
-              standingCategory = 'owing_20';
-            } else if (outstandingPercentage <= 30) {
-              standingCategory = 'owing_30';
-            } else if (outstandingPercentage <= 50) {
-              standingCategory = 'owing_50';
-            } else if (outstandingPercentage <= 65) {
-              standingCategory = 'owing_65';
-            } else {
-              standingCategory = 'owing_65_plus';
-            }
-          } else if (balanceData.net_balance < 0) {
-            // Negative balance = member has credit = good standing
-            standingCategory = 'good';
-          } else {
-            // Zero balance = good standing
-            standingCategory = 'good';
-          }
+        
+        // Calculate outstanding percentage based on outstanding contributions
+        const expectedContributionForStatus = financialInfoData.expected_contribution || 16600; // Default to 16600 if not set
+        const outstandingPercentage = outstandingAmount > 0 ? (outstandingAmount / expectedContributionForStatus * 100) : 0;
+        
+        if (outstandingPercentage === 0) {
+          standingCategory = 'good';
+        } else if (outstandingPercentage <= 10) {
+          standingCategory = 'owing_10';
+        } else if (outstandingPercentage <= 20) {
+          standingCategory = 'owing_20';
+        } else if (outstandingPercentage <= 30) {
+          standingCategory = 'owing_30';
+        } else if (outstandingPercentage <= 50) {
+          standingCategory = 'owing_50';
+        } else if (outstandingPercentage <= 65) {
+          standingCategory = 'owing_65';
+        } else {
+          standingCategory = 'owing_65_plus';
         }
 
         return {
@@ -707,32 +705,30 @@ export class SupabaseMemberService {
           totalPenalties: 0
         };
 
-        // Determine membership status based on net balance - NEW BUSINESS LOGIC
+        // Determine membership status based on OUTSTANDING CONTRIBUTIONS - FIXED BUSINESS LOGIC
+        // According to requirements: Membership status should be based on outstanding contributions percentage
+        // Outstanding Contributions = Expected Contribution - Total Contribution
+        // Outstanding Percentage = (Outstanding Amount / Expected Contribution) * 100
         let standingCategory = 'good';
-        if (balanceData && typeof balanceData.net_balance === 'number') {
-          if (balanceData.net_balance > 0) {
-            // Positive balance = member owes money, calculate outstanding percentage
-            const outstandingPercentage = balanceData.net_balance / 16600 * 100;
-            if (outstandingPercentage <= 10) {
-              standingCategory = 'owing_10';
-            } else if (outstandingPercentage <= 20) {
-              standingCategory = 'owing_20';
-            } else if (outstandingPercentage <= 30) {
-              standingCategory = 'owing_30';
-            } else if (outstandingPercentage <= 50) {
-              standingCategory = 'owing_50';
-            } else if (outstandingPercentage <= 65) {
-              standingCategory = 'owing_65';
-            } else {
-              standingCategory = 'owing_65_plus';
-            }
-          } else if (balanceData.net_balance < 0) {
-            // Negative balance = member has credit = good standing
-            standingCategory = 'good';
-          } else {
-            // Zero balance = good standing
-            standingCategory = 'good';
-          }
+        
+        // Calculate outstanding percentage based on outstanding contributions
+        const expectedContributionForStatus = financialInfoData.expected_contribution || 16600; // Default to 16600 if not set
+        const outstandingPercentage = outstandingAmount > 0 ? (outstandingAmount / expectedContributionForStatus * 100) : 0;
+        
+        if (outstandingPercentage === 0) {
+          standingCategory = 'good';
+        } else if (outstandingPercentage <= 10) {
+          standingCategory = 'owing_10';
+        } else if (outstandingPercentage <= 20) {
+          standingCategory = 'owing_20';
+        } else if (outstandingPercentage <= 30) {
+          standingCategory = 'owing_30';
+        } else if (outstandingPercentage <= 50) {
+          standingCategory = 'owing_50';
+        } else if (outstandingPercentage <= 65) {
+          standingCategory = 'owing_65';
+        } else {
+          standingCategory = 'owing_65_plus';
         }
 
         // Use the name column if available, otherwise fall back to personal_info
