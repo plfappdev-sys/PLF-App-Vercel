@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fixed Member Statement Example</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; border-bottom: 3px solid #6200EE; padding-bottom: 20px; }
+        .plf-logo { 
+            width: 80px; height: 80px; background: #6200EE; border-radius: 50%; 
+            display: inline-block; color: white; text-align: center; line-height: 80px;
+            font-weight: bold; font-size: 24px;
+        }
+        .financial-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+        .card { border: 1px solid #ddd; padding: 15px; text-align: center; border-radius: 8px; }
+        .value { font-size: 18px; font-weight: bold; color: #6200EE; }
+        .label { color: #666; font-size: 14px; }
+        .success { color: green; }
+        .warning { color: orange; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="plf-logo">PLF</div>
+        <h1>Member Statement - Lesego Bokaba (M031)</h1>
+        <p>People's Liberator Fund - Personal Financial Statement</p>
+    </div>
+    
+    <h2>Financial Summary (FIXED VERSION)</h2>
+    <div class="financial-grid">
+        <div class="card">
+            <div class="value">R 13,430</div>
+            <div class="label">Current Balance</div>
+        </div>
+        <div class="card">
+            <div class="value">R 13,430</div>
+            <div class="label">Total Contributions</div>
+        </div>
+        <div class="card">
+            <div class="value">R 3,970</div>
+            <div class="label">Outstanding Amount</div>
+        </div>
+        <div class="card">
+            <div class="value">22.82%</div>
+            <div class="label">Percentage Outstanding</div>
+            <div class="success">✓ Correct (was 29.6%)</div>
+        </div>
+        <div class="card">
+            <div class="value">R 17,400</div>
+            <div class="label">Expected Contribution</div>
+            <div class="success">✓ Added (was missing)</div>
+        </div>
+    </div>
+    
+    <h3>What was fixed:</h3>
+    <ul>
+        <li><span class="success">✓</span> Percentage Outstanding now correctly calculated as 3,970 ÷ 17,400 = 22.82% (was 29.6%)</li>
+        <li><span class="success">✓</span> Added Expected Contribution (R17,400) which was missing</li>
+        <li><span class="success">✓</span> Removed "Total Disbursements" which was incorrectly showing R3,970</li>
+        <li><span class="success">✓</span> Added PLF logo to report header</li>
+        <li><span class="success">✓</span> All values now match the My Funds screen data</li>
+    </ul>
+    
+    <h3>Before vs After:</h3>
+    <table border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>Metric</th>
+            <th>Before (Incorrect)</th>
+            <th>After (Correct)</th>
+        </tr>
+        <tr>
+            <td>Percentage Outstanding</td>
+            <td>29.6% (incorrect)</td>
+            <td><span class="success">22.82%</span> (correct)</td>
+        </tr>
+        <tr>
+            <td>Expected Contribution</td>
+            <td>Not shown</td>
+            <td><span class="success">R17,400</span> (shown)</td>
+        </tr>
+        <tr>
+            <td>Total Disbursements</td>
+            <td>R3,970 (incorrect - same as outstanding)</td>
+            <td><span class="success">Removed</span> (not applicable)</td>
+        </tr>
+    </table>
+</body>
+</html>

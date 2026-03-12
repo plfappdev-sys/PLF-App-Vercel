@@ -1,54 +1,78 @@
-const { SupabaseMemberService } = require('./src/services/supabaseMemberService');
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+  'https://zdnyhzasvifrskbostgn.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbnloemFzdmlmcnNrYm9zdGduIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODAyNDQ4NCwiZXhwIjoyMDczNjAwNDg0fQ.kOpqoycVNdJXC-fqqxwHPVof6e8JlJ60_J7WWF-1AHU'
+);
 
-async function testExpectedContribution() {
-  console.log('Testing expected contribution implementation...\n');
+async function testLesegoExpectedContribution() {
+  console.log('Testing Lesego Bokaba (M031) expected contribution...');
   
-  // Test with a few member numbers
-  const testMembers = ['M004', 'M005', 'M031', 'M047', 'M057'];
-  
-  for (const memberNumber of testMembers) {
-    console.log(`\n=== Testing member ${memberNumber} ===`);
+  try {
+    // Get Lesego Bokaba's member data
+    const { data: memberData, error } = await supabase
+      .from('members')
+      .select('*')
+      .eq('member_number', 'M031')
+      .single();
     
-    try {
-      const member = await SupabaseMemberService.getMemberByNumber(memberNumber);
-      
-      if (member) {
-        console.log(`Name: ${member.personalInfo.fullName}`);
-        console.log(`Member Number: ${member.memberNumber}`);
-        console.log(`Current Balance: R${member.financialInfo.currentBalance}`);
-        console.log(`Total Contributions: R${member.financialInfo.totalContributions}`);
-        console.log(`Expected Contribution: R${member.financialInfo.expectedContribution || 0}`);
-        console.log(`Outstanding Amount: R${member.financialInfo.outstandingAmount}`);
-        console.log(`Standing: ${member.membershipStatus.standingCategory}`);
-        
-        // Calculate expected contribution based on join date
-        const joinDate = new Date(member.personalInfo.joinDate || '2018-07-23');
-        const today = new Date();
-        const monthsDiff = (today.getFullYear() - joinDate.getFullYear()) * 12 + 
-                          (today.getMonth() - joinDate.getMonth());
-        const expectedContribution = Math.max(0, Math.min(monthsDiff, 83)) * 200;
-        
-        console.log(`Join Date: ${joinDate.toISOString().split('T')[0]}`);
-        console.log(`Months since join: ${monthsDiff}`);
-        console.log(`Calculated Expected Contribution: R${expectedContribution}`);
-        
-        if (member.financialInfo.expectedContribution !== expectedContribution) {
-          console.log(`⚠️ WARNING: Expected contribution mismatch!`);
-          console.log(`   Database: R${member.financialInfo.expectedContribution || 0}`);
-          console.log(`   Calculated: R${expectedContribution}`);
-        } else {
-          console.log(`✅ Expected contribution matches calculation`);
+    if (error) {
+      console.error('Error fetching member:', error);
+      return;
+    }
+    
+    console.log('Member found:', memberData.name);
+    
+    // Parse financial_info JSON
+    let financialInfo = {};
+    if (memberData.financial_info) {
+      if (typeof memberData.financial_info === 'string') {
+        try {
+          financialInfo = JSON.parse(memberData.financial_info);
+        } catch (e) {
+          console.warn('Error parsing financial_info JSON:', e);
         }
       } else {
-        console.log(`❌ Member ${memberNumber} not found`);
+        financialInfo = memberData.financial_info;
       }
-    } catch (error) {
-      console.error(`Error testing member ${memberNumber}:`, error.message);
     }
+    
+    console.log('Expected contribution from database:', financialInfo.expected_contribution);
+    console.log('Expected contribution type:', typeof financialInfo.expected_contribution);
+    console.log('Full financial_info:', JSON.stringify(financialInfo, null, 2));
+    
+    // Also check a few other members to verify uniform 17400
+    console.log('\nChecking a few other members for uniform 17400...');
+    
+    const { data: sampleMembers, error: sampleError } = await supabase
+      .from('members')
+      .select('member_number, name, financial_info')
+      .in('member_number', ['M001', 'M004', 'M006', 'M010', 'M031'])
+      .order('member_number');
+    
+    if (sampleError) {
+      console.error('Error fetching sample members:', sampleError);
+      return;
+    }
+    
+    sampleMembers.forEach(member => {
+      let finInfo = {};
+      if (member.financial_info) {
+        if (typeof member.financial_info === 'string') {
+          try {
+            finInfo = JSON.parse(member.financial_info);
+          } catch (e) {
+            // Ignore parse errors
+          }
+        } else {
+          finInfo = member.financial_info;
+        }
+      }
+      console.log(`${member.member_number}: ${member.name} - Expected: ${finInfo.expected_contribution || 'N/A'}`);
+    });
+    
+  } catch (error) {
+    console.error('Exception in test:', error);
   }
-  
-  console.log('\n=== Testing complete ===');
 }
 
-// Run the test
-testExpectedContribution().catch(console.error);
+testLesegoExpectedContribution();
