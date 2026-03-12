@@ -1,36 +1,38 @@
 import { createClient } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Supabase project configuration
 const supabaseUrl = 'https://zdnyhzasvifrskbostgn.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbnloemFzdmlmcnNrYm9zdGduIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgwMjQ0ODQsImV4cCI6MjA3MzYwMDQ4NH0.s_AXhoRM9tV4F166Bhd5fG7Z14kLA0iz0l08dlzZvnM';
 
-// Create Supabase client with session persistence
+// Create Supabase client with session persistence using AsyncStorage for React Native
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false, // Disable URL detection for React Native
     storage: {
-      getItem: (key) => {
+      getItem: async (key) => {
         try {
-          return localStorage.getItem(key);
+          const value = await AsyncStorage.getItem(key);
+          return value;
         } catch (error) {
-          console.warn('LocalStorage access error:', error);
+          console.warn('AsyncStorage get error:', error);
           return null;
         }
       },
-      setItem: (key, value) => {
+      setItem: async (key, value) => {
         try {
-          localStorage.setItem(key, value);
+          await AsyncStorage.setItem(key, value);
         } catch (error) {
-          console.warn('LocalStorage set error:', error);
+          console.warn('AsyncStorage set error:', error);
         }
       },
-      removeItem: (key) => {
+      removeItem: async (key) => {
         try {
-          localStorage.removeItem(key);
+          await AsyncStorage.removeItem(key);
         } catch (error) {
-          console.warn('LocalStorage remove error:', error);
+          console.warn('AsyncStorage remove error:', error);
         }
       },
     },
